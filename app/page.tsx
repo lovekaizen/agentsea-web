@@ -102,7 +102,7 @@ export default function Home() {
                 </span>
               </Link>
               <a
-                href="https://github.com/lov3kaizen/agentsea"
+                href="https://github.com/lovekaizen/agentsea"
                 className="btn btn-lg gap-2 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -449,7 +449,7 @@ export default function Home() {
                 </span>
               </Link>
               <a
-                href="https://github.com/lov3kaizen/agentsea"
+                href="https://github.com/lovekaizen/agentsea"
                 className="btn btn-lg gap-2 bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-sm"
                 target="_blank"
                 rel="noopener noreferrer"

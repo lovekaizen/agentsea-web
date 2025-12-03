@@ -201,13 +201,13 @@ socket.on('agentList', (data) => console.log(data.agents));`}
 
           <div className="mt-8 flex gap-4 flex-wrap">
             <a
-              href="https://github.com/lov3kaizen/agentsea/blob/main/docs/API.md"
+              href="https://github.com/lovekaizen/agentsea/blob/main/docs/API.md"
               className="btn btn-gradient"
             >
               <span>Full API Documentation →</span>
             </a>
             <a
-              href="https://github.com/lov3kaizen/agentsea/tree/main/examples"
+              href="https://github.com/lovekaizen/agentsea/tree/main/examples"
               className="btn bg-white/10 hover:bg-white/20 border-white/20 text-white"
             >
               View Examples →

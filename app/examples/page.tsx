@@ -611,12 +611,12 @@ const resources = [
     icon: '🐙',
     title: 'GitHub Repository',
     description: 'View source code and contribute',
-    href: 'https://github.com/lov3kaizen/agentsea',
+    href: 'https://github.com/lovekaizen/agentsea',
   },
   {
     icon: '💬',
     title: 'Community',
     description: 'Join discussions and get help',
-    href: 'https://github.com/lov3kaizen/agentsea/discussions',
+    href: 'https://github.com/lovekaizen/agentsea/discussions',
   },
 ];

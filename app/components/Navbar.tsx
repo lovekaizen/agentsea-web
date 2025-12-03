@@ -55,7 +55,7 @@ export default function Navbar() {
             </li>
             <li>
               <a
-                href="https://github.com/lov3kaizen/agentsea"
+                href="https://github.com/lovekaizen/agentsea"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -78,7 +78,7 @@ export default function Navbar() {
           </li>
           <li>
             <a
-              href="https://github.com/lov3kaizen/agentsea"
+              href="https://github.com/lovekaizen/agentsea"
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -592,7 +592,7 @@ pnpm add highlight.js`}
           </li>
           <li>
             <a
-              href="https://github.com/lov3kaizen/agentsea/tree/main/examples"
+              href="https://github.com/lovekaizen/agentsea/tree/main/examples"
               className="text-blue-600 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
