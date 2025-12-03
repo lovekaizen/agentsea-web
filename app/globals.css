@@ -1,0 +1,315 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fix menu active/hover states for cmyk theme */
+.menu li > a:active,
+.menu li > a.active,
+.menu li > .active {
+  color: white !important;
+}
+
+@layer base {
+  :root {
+    --gradient-start: #3b82f6;
+    --gradient-mid: #8b5cf6;
+    --gradient-end: #ec4899;
+  }
+}
+
+@layer components {
+  /* Text Gradients - Inspired by future.works */
+  /* Added padding and box-decoration-clone to prevent clipping */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .text-gradient-blue {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #3b82f6, #06b6d4);
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .text-gradient-purple {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #8b5cf6, #ec4899);
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .text-gradient-warm {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #f97316, #eab308);
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .text-gradient-cool {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #06b6d4, #22c55e);
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* Prevent emojis from getting gradient styling */
+  .text-gradient .emoji,
+  .text-gradient-blue .emoji,
+  .text-gradient-purple .emoji,
+  .text-gradient-warm .emoji,
+  .text-gradient-cool .emoji,
+  .text-gradient-animated .emoji,
+  [class*="text-gradient"] .emoji {
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: initial;
+    background-clip: unset;
+    background-image: none;
+  }
+
+  /* Animated gradient text */
+  .text-gradient-animated {
+    @apply bg-clip-text text-transparent;
+    background-size: 200% 200%;
+    background-image: linear-gradient(
+      135deg,
+      #3b82f6 0%,
+      #8b5cf6 25%,
+      #ec4899 50%,
+      #8b5cf6 75%,
+      #3b82f6 100%
+    );
+    animation: gradient-shift 8s ease infinite;
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Shimmer effect for premium feel */
+  .text-shimmer {
+    @apply bg-clip-text text-transparent relative;
+    background-image: linear-gradient(
+      110deg,
+      #e2e8f0 0%,
+      #e2e8f0 40%,
+      #ffffff 50%,
+      #e2e8f0 60%,
+      #e2e8f0 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+  }
+
+  /* Gradient borders */
+  .border-gradient {
+    position: relative;
+    border: none;
+  }
+
+  .border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-mesh {
+    background-color: #0f172a;
+    background-image:
+      radial-gradient(at 40% 20%, rgba(59, 130, 246, 0.3) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.3) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, rgba(236, 72, 153, 0.2) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, rgba(6, 182, 212, 0.2) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.2) 0px, transparent 50%);
+  }
+
+  /* Glow effects */
+  .glow {
+    box-shadow:
+      0 0 20px rgba(139, 92, 246, 0.3),
+      0 0 40px rgba(139, 92, 246, 0.2),
+      0 0 60px rgba(139, 92, 246, 0.1);
+  }
+
+  .glow-blue {
+    box-shadow:
+      0 0 20px rgba(59, 130, 246, 0.4),
+      0 0 40px rgba(59, 130, 246, 0.2);
+  }
+
+  .glow-purple {
+    box-shadow:
+      0 0 20px rgba(139, 92, 246, 0.4),
+      0 0 40px rgba(139, 92, 246, 0.2);
+  }
+
+  /* Gradient badge */
+  .badge-gradient {
+    @apply text-white font-medium;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid));
+  }
+
+  /* Section number styling */
+  .section-number {
+    @apply text-6xl font-bold opacity-10;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* Gradient divider */
+  .divider-gradient {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gradient-mid), transparent);
+  }
+
+  /* Card hover gradient effect */
+  .card-gradient-hover {
+    @apply relative overflow-hidden;
+  }
+
+  .card-gradient-hover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .card-gradient-hover:hover::before {
+    opacity: 1;
+  }
+
+  /* Stat number gradient */
+  .stat-gradient {
+    @apply text-5xl font-bold bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    padding-bottom: 0.1em;
+    padding-top: 0.05em;
+    margin-bottom: -0.1em;
+    margin-top: -0.05em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  /* Floating gradient orbs for background */
+  .orb {
+    @apply absolute rounded-full blur-3xl opacity-30;
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .orb-1 {
+    @apply bg-blue-500 w-96 h-96;
+    top: -10%;
+    left: -10%;
+  }
+
+  .orb-2 {
+    @apply bg-purple-500 w-80 h-80;
+    top: 50%;
+    right: -5%;
+    animation-delay: -5s;
+  }
+
+  .orb-3 {
+    @apply bg-pink-500 w-72 h-72;
+    bottom: -10%;
+    left: 30%;
+    animation-delay: -10s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+  }
+
+  /* Button gradient */
+  .btn-gradient {
+    @apply text-white border-0 relative overflow-hidden;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid));
+    transition: all 0.3s ease;
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+  }
+
+  .btn-gradient::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--gradient-mid), var(--gradient-end));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .btn-gradient:hover::after {
+    opacity: 1;
+  }
+
+  .btn-gradient span {
+    position: relative;
+    z-index: 1;
+  }
+}

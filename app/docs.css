@@ -1,0 +1,136 @@
+/* Enhanced Documentation Styles */
+
+/* Headings with visual hierarchy */
+.prose h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid hsl(var(--p) / 0.3);
+  color: hsl(var(--bc));
+}
+
+.prose h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid hsl(var(--p) / 0.2);
+  color: hsl(var(--bc));
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: hsl(var(--p));
+}
+
+.prose h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: hsl(var(--bc));
+}
+
+.prose h5 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: hsl(var(--bc));
+}
+
+/* Paragraph spacing */
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+  color: hsl(var(--bc) / 0.8);
+}
+
+/* List styling */
+.prose ul,
+.prose ol {
+  margin-bottom: 1.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+  color: hsl(var(--bc) / 0.8);
+}
+
+/* Code blocks */
+.prose code:not(pre code) {
+  background: hsl(var(--b3));
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, monospace;
+}
+
+/* Links */
+.prose a {
+  color: hsl(var(--p));
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.prose a:hover {
+  color: hsl(var(--pf));
+}
+
+/* Blockquotes */
+.prose blockquote {
+  border-left: 4px solid hsl(var(--p));
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: hsl(var(--bc) / 0.7);
+}
+
+/* Tables */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.prose th {
+  background: hsl(var(--b2));
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem;
+  border: 1px solid hsl(var(--b3));
+}
+
+.prose td {
+  padding: 0.75rem;
+  border: 1px solid hsl(var(--b3));
+}
+
+/* Section spacing */
+.doc-section {
+  margin-bottom: 4rem;
+  scroll-margin-top: 5rem;
+}
+
+/* Featured sections */
+.featured-section {
+  background: linear-gradient(to bottom right, hsl(var(--p) / 0.05), hsl(var(--s) / 0.05));
+  border: 1px solid hsl(var(--p) / 0.2);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+/* Code example sections */
+.code-section {
+  background: hsl(var(--b2));
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border: 1px solid hsl(var(--b3));
+}
