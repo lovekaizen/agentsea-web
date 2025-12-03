@@ -114,7 +114,7 @@ export default function MainLayout({
             </div>
             <div className="flex-none">
               <a
-                href="https://github.com/lov3kaizen/agentsea"
+                href="https://github.com/lovekaizen/agentsea"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-ghost btn-circle"
@@ -175,19 +175,19 @@ export default function MainLayout({
             </nav>
             <nav className="grid grid-flow-col gap-6 mb-6">
               <a
-                href="https://github.com/lov3kaizen/agentsea"
+                href="https://github.com/lovekaizen/agentsea"
                 className="link link-hover text-white/80 hover:text-white transition-colors"
               >
                 GitHub
               </a>
               <a
-                href="https://github.com/lov3kaizen/agentsea/discussions"
+                href="https://github.com/lovekaizen/agentsea/discussions"
                 className="link link-hover text-white/80 hover:text-white transition-colors"
               >
                 Discussions
               </a>
               <a
-                href="https://github.com/lov3kaizen/agentsea/issues"
+                href="https://github.com/lovekaizen/agentsea/issues"
                 className="link link-hover text-white/80 hover:text-white transition-colors"
               >
                 Issues
