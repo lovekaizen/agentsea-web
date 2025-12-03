@@ -13,13 +13,6 @@ export default function Home() {
 
         <div className="hero-content text-center max-w-5xl relative z-10">
           <div className="space-y-8 flex flex-col items-center text-white">
-            <Image
-              src={'/svg/agentsea-adk-logo-plain.svg'}
-              width={528}
-              height={145}
-              alt="AgentSea Logo"
-              className="mb-8"
-            />
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
               <span className="relative flex h-2 w-2">
@@ -30,6 +23,14 @@ export default function Home() {
                 Production-Ready ADK
               </span>
             </div>
+
+            <Image
+              src={'/svg/agentsea-adk-logo-plain.svg'}
+              width={528}
+              height={145}
+              alt="AgentSea Logo"
+              className="mb-8"
+            />
 
             <h1 className="text-6xl md:text-7xl font-bold leading-tight text-white">
               Unite and Orchestrate
