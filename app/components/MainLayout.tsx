@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { AGENTSEA_VERSION } from '../constants';
 
 interface NavLink {
   href: string;
@@ -105,7 +106,7 @@ export default function MainLayout({
                 className="hover:underline"
                 title="AgentSea on Github"
               >
-                v.0.1.0 release
+                {AGENTSEA_VERSION} release
               </a>{' '}
               - Contributors, Sponsors and Enquiries are most welcome 😌
             </div>
