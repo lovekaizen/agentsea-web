@@ -225,11 +225,11 @@ export default function MainLayout({
       {isDocsPage && (
         <aside className="fixed left-0 top-0 h-full bg-base-200 border-r border-base-300 z-40 w-80 transition-transform duration-300 -translate-x-full peer-checked:translate-x-0 lg:translate-x-0">
           <div className="flex flex-col h-full">
-            {/* Header with logo - only visible on mobile when open */}
-            <div className="flex items-center justify-between p-4 border-b border-base-300 lg:hidden">
+            {/* Header with logo */}
+            <div className="flex items-center justify-between p-4 border-b border-base-300">
               <Link href="/" className="btn btn-ghost px-0 py-2">
                 <Image
-                  src={'/svg/agentsea-adk-logo.svg'}
+                  src={'/svg/agentsea-logo.svg'}
                   width={160}
                   height={44}
                   alt="AgentSea Logo"
@@ -237,7 +237,7 @@ export default function MainLayout({
               </Link>
               <label
                 htmlFor="main-drawer"
-                className="btn btn-ghost btn-square btn-sm"
+                className="btn btn-ghost btn-square btn-sm lg:hidden"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
