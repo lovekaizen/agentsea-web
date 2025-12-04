@@ -277,7 +277,7 @@ await mcpRegistry.addServer({
           <li>
             <a
               href="https://github.com/modelcontextprotocol/servers"
-              className="text-blue-600 hover:underline"
+              className="text-sky-600 hover:underline"
             >
               Official MCP Servers
             </a>
@@ -285,13 +285,13 @@ await mcpRegistry.addServer({
           <li>
             <a
               href="https://github.com/topics/mcp-server"
-              className="text-blue-600 hover:underline"
+              className="text-sky-600 hover:underline"
             >
               Community MCP Servers
             </a>
           </li>
           <li>
-            <a href="https://mcp.so" className="text-blue-600 hover:underline">
+            <a href="https://mcp.so" className="text-sky-600 hover:underline">
               MCP Server Directory
             </a>
           </li>

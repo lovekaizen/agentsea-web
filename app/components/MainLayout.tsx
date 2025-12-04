@@ -96,21 +96,18 @@ export default function MainLayout({
       {/* Main content */}
       <div className={isDocsPage ? 'lg:pl-80' : ''}>
         {!isHomePage && (
-          <div className="navbar">
-            <div className="flex-1">
-              <Link
-                href="/"
-                className={`btn btn-ghost px-0 py-6 ${
-                  isDocsPage ? 'hidden lg:flex' : ''
-                }`}
+          <div className="flex items-center justify-between pr-4 pl-24 py-4 lg:px-8">
+            <div className="small">
+              <a
+                href="https://github.com/lovekaizen/agentsea"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+                title="AgentSea on Github"
               >
-                <Image
-                  src={'/svg/agentsea-adk-logo.svg'}
-                  width={282}
-                  height={78}
-                  alt="AgentSea Logo"
-                />
-              </Link>
+                v.0.1.0 release
+              </a>{' '}
+              - Contributors, Sponsors and Enquiries are most welcome 😌
             </div>
             <div className="flex-none">
               <a
@@ -139,36 +136,33 @@ export default function MainLayout({
         </main>
 
         <footer
-          className={`footer footer-center bg-gradient-mesh text-white p-10 relative overflow-hidden ${
+          className={`footer footer-center bg-base-100 border-t border-base-300 p-10 ${
             isDocsPage ? 'ml-16 lg:ml-0' : ''
           }`}
         >
-          <div className="orb orb-1 opacity-20"></div>
-          <div className="orb orb-2 opacity-20"></div>
-          <div className="relative z-10">
-            <div className="divider-gradient w-full max-w-md mx-auto mb-8"></div>
+          <div>
             <nav className="grid grid-flow-col gap-6 mb-4">
               <Link
                 href="/docs/voice"
-                className="link link-hover text-white/80 hover:text-white transition-colors"
+                className="link link-hover text-base-content/70 hover:text-base-content transition-colors"
               >
                 Voice Features
               </Link>
               <Link
                 href="/docs/local-models"
-                className="link link-hover text-white/80 hover:text-white transition-colors"
+                className="link link-hover text-base-content/70 hover:text-base-content transition-colors"
               >
                 Local Models
               </Link>
               <Link
                 href="/docs/cli"
-                className="link link-hover text-white/80 hover:text-white transition-colors"
+                className="link link-hover text-base-content/70 hover:text-base-content transition-colors"
               >
                 CLI Tool
               </Link>
               <Link
                 href="/api"
-                className="link link-hover text-white/80 hover:text-white transition-colors"
+                className="link link-hover text-base-content/70 hover:text-base-content transition-colors"
               >
                 REST API
               </Link>
@@ -176,25 +170,25 @@ export default function MainLayout({
             <nav className="grid grid-flow-col gap-6 mb-6">
               <a
                 href="https://github.com/lovekaizen/agentsea"
-                className="link link-hover text-white/80 hover:text-white transition-colors"
+                className="link link-hover text-base-content/70 hover:text-base-content transition-colors"
               >
                 GitHub
               </a>
               <a
                 href="https://github.com/lovekaizen/agentsea/discussions"
-                className="link link-hover text-white/80 hover:text-white transition-colors"
+                className="link link-hover text-base-content/70 hover:text-base-content transition-colors"
               >
                 Discussions
               </a>
               <a
                 href="https://github.com/lovekaizen/agentsea/issues"
-                className="link link-hover text-white/80 hover:text-white transition-colors"
+                className="link link-hover text-base-content/70 hover:text-base-content transition-colors"
               >
                 Issues
               </a>
             </nav>
             <aside>
-              <p className="text-white/60">
+              <p className="text-base-content/60">
                 © 2025{' '}
                 <span className="text-gradient-animated font-semibold">
                   AgentSea ADK
@@ -276,8 +270,8 @@ export default function MainLayout({
                             href={link.href}
                             className={
                               pathname === link.href
-                                ? 'active bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-l-2 border-purple-500 !text-white font-medium'
-                                : 'hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10 transition-all'
+                                ? 'active bg-gradient-to-r from-sky-600/20 to-cyan-500/20 border-l-2 border-cyan-500 !text-white font-medium'
+                                : 'hover:bg-gradient-to-r hover:from-sky-600/10 hover:to-cyan-500/10 transition-all'
                             }
                           >
                             {link.label}

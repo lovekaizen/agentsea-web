@@ -24,19 +24,19 @@ export default function Home() {
               </span>
             </div>
 
+            <h1 className="text-6xl md:text-7xl font-bold leading-tight text-white text-center">
+              Unite and Orchestrate
+              <br />
+              <span className="text-gradient-animated">AI Agents</span> with
+            </h1>
+
             <Image
               src={'/svg/agentsea-adk-logo-plain.svg'}
               width={528}
               height={145}
               alt="AgentSea Logo"
-              className="mb-8"
+              className="mb-8 center"
             />
-
-            <h1 className="text-6xl md:text-7xl font-bold leading-tight text-white">
-              Unite and Orchestrate
-              <br />
-              <span className="text-gradient-animated">AI Agents</span>
-            </h1>
 
             <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
               The complete framework for building agentic AI applications with
@@ -45,7 +45,7 @@ export default function Home() {
                 built-in voice
               </span>
               ,
-              <span className="text-gradient-warm font-semibold">
+              <span className="text-gradient-purple font-semibold">
                 {' '}
                 commerce capabilities
               </span>
