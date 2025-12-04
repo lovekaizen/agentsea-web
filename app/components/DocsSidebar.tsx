@@ -71,8 +71,8 @@ export default function DocsSidebar() {
       <Link href="/">
         <Image
           src={'/svg/agentsea-logo.svg'}
-          width={310}
-          height={86}
+          width={282}
+          height={78}
           alt="AgentSea Logo"
         />
       </Link>
