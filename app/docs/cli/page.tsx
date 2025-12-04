@@ -39,7 +39,7 @@ export default function CLIPage() {
             {`npm install -g @lov3kaizen/agentsea-cli
 pnpm add -g @lov3kaizen/agentsea-cli
 yarn global add @lov3kaizen/agentsea-cli
-agentsea --version`}
+sea --version`}
           </CodeBlock>
         </Section>
 
@@ -47,7 +47,7 @@ agentsea --version`}
           <p>Initialize AgentSea with the interactive setup wizard:</p>
 
           <CodeBlock language="bash">
-            {`agentsea init
+            {`sea init
 # The wizard will guide you through:
 # 1. Choose your provider (Anthropic, OpenAI, Ollama, etc.)
 # 2. Enter API key (if cloud provider)
@@ -77,13 +77,13 @@ agentsea --version`}
         </Section>
 
         <Section title="Commands" id="commands">
-          <h3>agentsea init</h3>
+          <h3>sea init</h3>
           <p>
             Interactive initialization wizard to set up AgentSea configuration.
           </p>
 
           <CodeBlock language="bash">
-            {`agentsea init
+            {`sea init
 Choose your provider: (Use arrow keys)
 Anthropic (Claude)
 OpenAI (GPT)
@@ -99,14 +99,14 @@ TTS provider: openai-tts
 Configuration saved!`}
           </CodeBlock>
 
-          <h3>agentsea chat</h3>
+          <h3>sea chat</h3>
           <p>Start an interactive chat session with your agent.</p>
 
           <CodeBlock language="bash">
-            {`agentsea chat
-agentsea chat --agent my-assistant
-agentsea chat --voice
-agentsea chat --model llama3.2
+            {`sea chat
+sea chat --agent my-assistant
+sea chat --voice
+sea chat --model llama3.2
 AgentSea Chat (Type 'exit' to quit)
 Hello! What can you help me with?
 I'm a helpful AI assistant. I can help with:
@@ -119,19 +119,19 @@ Calculate 42 * 58
 42 × 58 = 2,436`}
           </CodeBlock>
 
-          <h3>agentsea agent</h3>
+          <h3>sea agent</h3>
           <p>Manage your agents - create, list, get, delete, run.</p>
 
           <h4 className="text-lg font-semibold mt-6 mb-3">Create an Agent</h4>
           <CodeBlock language="bash">
-            {`agentsea agent create
-agentsea agent create my-assistant \
+            {`sea agent create
+sea agent create my-assistant \
   --provider anthropic \
   --model claude-sonnet-4-20250514 \
   --system-prompt "You are a helpful coding assistant" \
   --temperature 0.7 \
   --max-tokens 2048
-agentsea agent create voice-assistant \
+sea agent create voice-assistant \
   --provider ollama \
   --model llama3.2 \
   --voice-stt openai-whisper \
@@ -140,7 +140,7 @@ agentsea agent create voice-assistant \
 
           <h4 className="text-lg font-semibold mt-6 mb-3">List Agents</h4>
           <CodeBlock language="bash">
-            {`agentsea agent list
+            {`sea agent list
 Available Agents:
 ================
 my-assistant (default)
@@ -157,53 +157,53 @@ code-reviewer
 
           <h4 className="text-lg font-semibold mt-6 mb-3">Run an Agent</h4>
           <CodeBlock language="bash">
-            {`agentsea agent run my-assistant "What is 42 * 58?"
-agentsea agent run voice-assistant \
+            {`sea agent run my-assistant "What is 42 * 58?"
+sea agent run voice-assistant \
   --voice-input ./question.mp3 \
   --voice-output ./response.mp3
-agentsea agent run my-assistant "Explain async/await" {'>'} explanation.txt`}
+sea agent run my-assistant "Explain async/await" {'>'} explanation.txt`}
           </CodeBlock>
 
           <h4 className="text-lg font-semibold mt-6 mb-3">
             Other Agent Commands
           </h4>
           <CodeBlock language="bash">
-            {`agentsea agent get my-assistant
-agentsea agent delete my-assistant
-agentsea agent default my-assistant`}
+            {`sea agent get my-assistant
+sea agent delete my-assistant
+sea agent default my-assistant`}
           </CodeBlock>
 
-          <h3>agentsea model</h3>
+          <h3>sea model</h3>
           <p>Manage local models (works with Ollama).</p>
 
           <CodeBlock language="bash">
-            {`agentsea model pull llama3.2
+            {`sea model pull llama3.2
 Pulling llama3.2...
 ████████████████████████████████ 100% (4.7 GB)
 Model llama3.2 pulled successfully!
-agentsea model list
+sea model list
 Available Models:
 ================
 llama3.2 (4.7 GB)
 mistral (4.1 GB)
 codellama (3.8 GB)
 qwen2.5 (4.7 GB)
-agentsea model info llama3.2
+sea model info llama3.2
 Model: llama3.2
 Size: 4.7 GB
 Parameters: 8B
 Quantization: Q4_0
 Family: LLaMA
 License: Llama 3 Community License
-agentsea model remove codellama`}
+sea model remove codellama`}
           </CodeBlock>
 
-          <h3>agentsea provider</h3>
+          <h3>sea provider</h3>
           <p>Manage provider configurations.</p>
 
           <CodeBlock language="bash">
-            {`agentsea provider add anthropic --api-key sk-ant-...
-agentsea provider list
+            {`sea provider add anthropic --api-key sk-ant-...
+sea provider list
 Configured Providers:
 ====================
 anthropic (Claude)
@@ -212,8 +212,8 @@ anthropic (Claude)
 ollama (Local)
   Base URL: http://localhost:11434
   Models: 4 installed
-agentsea provider test anthropic
-agentsea provider remove openai`}
+sea provider test anthropic
+sea provider remove openai`}
           </CodeBlock>
         </Section>
 
@@ -221,10 +221,10 @@ agentsea provider remove openai`}
           <h3>1. Quick Local Setup</h3>
           <CodeBlock language="bash">
             {`curl -fsSL https://ollama.com/install.sh | sh
-agentsea init
+sea init
 # Select: Ollama (Local)
-agentsea model pull llama3.2
-agentsea chat
+sea model pull llama3.2
+sea chat
 No API keys needed!
 Complete privacy!
 Zero costs!`}
@@ -232,33 +232,33 @@ Zero costs!`}
 
           <h3>2. Create Voice-Enabled Assistant</h3>
           <CodeBlock language="bash">
-            {`agentsea agent create voice-bot \
+            {`sea agent create voice-bot \
   --provider anthropic \
   --model claude-sonnet-4-20250514 \
   --voice-stt openai-whisper \
   --voice-tts openai-tts \
   --system-prompt "You are a voice assistant. Keep responses concise."
-agentsea chat --agent voice-bot --voice
-agentsea agent run voice-bot \
+sea chat --agent voice-bot --voice
+sea agent run voice-bot \
   --voice-input question.mp3 \
   --voice-output answer.mp3`}
           </CodeBlock>
 
           <h3>3. Multi-Agent Setup</h3>
           <CodeBlock language="bash">
-            {`agentsea agent create researcher \
+            {`sea agent create researcher \
   --model claude-sonnet-4-20250514 \
   --system-prompt "Research and gather information"
-agentsea agent create writer \
+sea agent create writer \
   --model gpt-4-turbo-preview \
   --system-prompt "Write clear, engaging content"
-agentsea agent create coder \
+sea agent create coder \
   --provider ollama \
   --model codellama \
   --system-prompt "Write clean, efficient code"
-agentsea agent run researcher "Latest AI trends"
-agentsea agent run writer "Blog post about AI agents"
-agentsea agent run coder "Python function for data validation"`}
+sea agent run researcher "Latest AI trends"
+sea agent run writer "Blog post about AI agents"
+sea agent run coder "Python function for data validation"`}
           </CodeBlock>
         </Section>
 
@@ -353,8 +353,8 @@ agentsea agent run coder "Python function for data validation"`}
             {`curl -fsSL https://ollama.com/install.sh | sh
 npm install -g @lov3kaizen/agentsea-cli
 ollama pull llama3.2
-agentsea init  # Choose Ollama
-agentsea chat
+sea init  # Choose Ollama
+sea chat
 # Start coding assistance with local AI
 # No API costs, complete privacy!`}
           </CodeBlock>
@@ -362,16 +362,16 @@ agentsea chat
           <h3>Example 2: Production Setup</h3>
           <CodeBlock>
             <pre data-prefix="$">
-              <code>agentsea provider add anthropic --api-key sk-ant-***</code>
+              <code>sea provider add anthropic --api-key sk-ant-***</code>
             </pre>
             <pre data-prefix="$">
-              <code>agentsea provider add openai --api-key sk-***</code>
+              <code>sea provider add openai --api-key sk-***</code>
             </pre>
             <pre data-prefix=" ">
               <code></code>
             </pre>
             <pre data-prefix="$">
-              <code>agentsea agent create prod-assistant \</code>
+              <code>sea agent create prod-assistant \</code>
             </pre>
             <pre data-prefix=" ">
               <code> --provider anthropic \</code>
@@ -389,14 +389,14 @@ agentsea chat
               <code></code>
             </pre>
             <pre data-prefix="$">
-              <code>agentsea agent default prod-assistant</code>
+              <code>sea agent default prod-assistant</code>
             </pre>
             <pre data-prefix=" ">
               <code></code>
             </pre>
             <pre data-prefix="$">
               <code>
-                agentsea agent run prod-assistant "Analyze this error log..."{' '}
+                sea agent run prod-assistant "Analyze this error log..."{' '}
                 {'<'} error.log
               </code>
             </pre>
@@ -404,14 +404,14 @@ agentsea chat
 
           <h3>Example 3: Voice Assistant</h3>
           <CodeBlock language="bash">
-            {`agentsea init
+            {`sea init
 # Configure voice providers when prompted
-agentsea agent create jarvis \
+sea agent create jarvis \
   --provider anthropic \
   --voice-stt openai-whisper \
   --voice-tts openai-tts
-agentsea chat --agent jarvis --voice
-agentsea agent run jarvis \
+sea chat --agent jarvis --voice
+sea agent run jarvis \
   --voice-input ~/Desktop/question.mp3 \
   --voice-output ~/Desktop/answer.mp3`}
           </CodeBlock>
@@ -440,7 +440,7 @@ agentsea agent run jarvis \
           <AlertBox type="success">
             <h3 className="text-lg font-semibold mb-2">Pro Tip</h3>
             <p className="m-0">
-              Use <code>agentsea chat --voice</code> for a hands-free coding
+              Use <code>sea chat --voice</code> for a hands-free coding
               experience. Ask questions while looking at your code, get answers
               spoken back to you. Perfect for pair programming with AI!
             </p>
