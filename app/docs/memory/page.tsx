@@ -277,7 +277,7 @@ const conversationIds = await memory.getConversationIds('tenant-123');`}
             another. Use this with the{' '}
             <Link
               href="/docs/multi-tenancy"
-              className="text-blue-600 hover:underline"
+              className="text-sky-600 hover:underline"
             >
               Multi-Tenancy system
             </Link>{' '}

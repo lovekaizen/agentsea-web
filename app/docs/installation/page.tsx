@@ -72,7 +72,7 @@ pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs`}
               Sign up at{' '}
               <a
                 href="https://console.anthropic.com"
-                className="text-blue-600 hover:underline"
+                className="text-sky-600 hover:underline"
               >
                 console.anthropic.com
               </a>
@@ -92,7 +92,7 @@ pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs`}
               Sign up at{' '}
               <a
                 href="https://platform.openai.com"
-                className="text-blue-600 hover:underline"
+                className="text-sky-600 hover:underline"
               >
                 platform.openai.com
               </a>

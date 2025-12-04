@@ -238,7 +238,7 @@ socket.on('agentList', (data) => console.log(data.agents));`}
                 className="bg-base-200 rounded-xl border border-base-300 overflow-hidden card-gradient-hover"
               >
                 {/* Class Header */}
-                <div className="p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-b border-base-300">
+                <div className="p-6 bg-gradient-to-r from-sky-600/10 to-cyan-500/10 border-b border-base-300">
                   <h3 className="text-2xl font-bold mb-2 text-gradient">
                     {apiClass.name}
                   </h3>
@@ -269,7 +269,7 @@ socket.on('agentList', (data) => console.log(data.agents));`}
                       {apiClass.methods.map((method, methodIndex) => (
                         <div
                           key={methodIndex}
-                          className="border-l-4 border-purple-500 pl-4"
+                          className="border-l-4 border-cyan-500 pl-4"
                         >
                           <h5 className="font-mono text-sm font-semibold mb-1">
                             {method.signature}

@@ -18,11 +18,11 @@ export default function FormattingPage() {
       />
 
       <div className="prose max-w-none">
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-8">
-          <p className="text-sm text-blue-900 font-semibold mb-2">
+        <div className="bg-sky-50 border-l-4 border-sky-500 p-6 rounded-lg mb-8">
+          <p className="text-sm text-sky-900 font-semibold mb-2">
             ✨ New Feature
           </p>
-          <p className="text-sm text-blue-800">
+          <p className="text-sm text-sky-800">
             Content formatting is now available in @lov3kaizen/agentsea-core
             0.1.0+. It provides automatic conversion of agent responses into
             various formats suitable for web apps, APIs, and user interfaces.
@@ -576,24 +576,24 @@ pnpm add highlight.js`}
         </h2>
         <ul className="space-y-2">
           <li>
-            <Link href="/docs/agents" className="text-blue-600 hover:underline">
+            <Link href="/docs/agents" className="text-sky-600 hover:underline">
               → Learn about Agents
             </Link>
           </li>
           <li>
-            <Link href="/docs/nestjs" className="text-blue-600 hover:underline">
+            <Link href="/docs/nestjs" className="text-sky-600 hover:underline">
               → NestJS Integration
             </Link>
           </li>
           <li>
-            <Link href="/examples" className="text-blue-600 hover:underline">
+            <Link href="/examples" className="text-sky-600 hover:underline">
               → View Examples
             </Link>
           </li>
           <li>
             <a
               href="https://github.com/lovekaizen/agentsea/tree/main/examples"
-              className="text-blue-600 hover:underline"
+              className="text-sky-600 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -21,7 +21,7 @@ export function PageHeader({
     default: 'text-gradient',
     blue: 'text-gradient-blue',
     purple: 'text-gradient-purple',
-    warm: 'text-gradient-warm',
+    warm: 'text-gradient-purple',
     cool: 'text-gradient-cool',
     animated: 'text-gradient-animated',
   };
@@ -31,7 +31,9 @@ export function PageHeader({
       {badge && (
         <span className="badge badge-gradient px-4 py-3 mb-4">{badge}</span>
       )}
-      <h1 className={`text-5xl font-bold mb-4 ${gradientClasses[titleGradient]}`}>
+      <h1
+        className={`text-5xl font-bold mb-4 ${gradientClasses[titleGradient]}`}
+      >
         {title}
       </h1>
       {description && (
@@ -84,7 +86,9 @@ export function Section({
       {(title || badge) && (
         <div className="flex items-center gap-3 mb-6">
           {badge && (
-            <span className="badge badge-gradient px-3 py-2 text-sm">{badge}</span>
+            <span className="badge badge-gradient px-3 py-2 text-sm">
+              {badge}
+            </span>
           )}
           {title && (
             <h2
@@ -127,7 +131,9 @@ export function SubSection({
   return (
     <div id={id} className={`mb-8 ${className}`}>
       {title && (
-        <h3 className={`text-2xl font-semibold mb-4 ${gradientClasses[titleGradient]}`}>
+        <h3
+          className={`text-2xl font-semibold mb-4 ${gradientClasses[titleGradient]}`}
+        >
           {title}
         </h3>
       )}
@@ -181,7 +187,7 @@ export function CodeBlock({ children, language }: CodeBlockProps) {
 
     // Find minimum indentation (ignoring empty lines)
     const minIndent = lines
-      .filter(line => line.trim().length > 0)
+      .filter((line) => line.trim().length > 0)
       .reduce((min, line) => {
         const match = line.match(/^(\s*)/);
         const indent = match ? match[1].length : 0;
@@ -190,7 +196,7 @@ export function CodeBlock({ children, language }: CodeBlockProps) {
 
     // Remove the common indentation from all lines
     if (minIndent > 0 && minIndent !== Infinity) {
-      return lines.map(line => line.slice(minIndent)).join('\n');
+      return lines.map((line) => line.slice(minIndent)).join('\n');
     }
 
     return lines.join('\n');
@@ -274,7 +280,8 @@ export function CodeBlock({ children, language }: CodeBlockProps) {
           }}
           codeTagProps={{
             style: {
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+              fontFamily:
+                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
             },
           }}
         >
@@ -291,19 +298,31 @@ interface AlertBoxProps {
   gradient?: boolean;
 }
 
-export function AlertBox({ children, type = 'info', gradient = false }: AlertBoxProps) {
+export function AlertBox({
+  children,
+  type = 'info',
+  gradient = false,
+}: AlertBoxProps) {
   const typeClasses = {
-    info: gradient ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30' : 'alert-info',
-    success: gradient ? 'bg-gradient-to-r from-green-500/10 to-cyan-500/10 border-green-500/30' : 'alert-success',
-    warning: gradient ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/30' : 'alert-warning',
-    error: gradient ? 'bg-gradient-to-r from-red-500/10 to-pink-500/10 border-red-500/30' : 'alert-error',
+    info: gradient
+      ? 'bg-gradient-to-r from-sky-600/10 to-cyan-500/10 border-sky-500/30'
+      : 'alert-info',
+    success: gradient
+      ? 'bg-gradient-to-r from-teal-500/10 to-cyan-400/10 border-teal-500/30'
+      : 'alert-success',
+    warning: gradient
+      ? 'bg-gradient-to-r from-amber-500/10 to-orange-400/10 border-amber-500/30'
+      : 'alert-warning',
+    error: gradient
+      ? 'bg-gradient-to-r from-orange-500/10 to-red-400/10 border-orange-500/30'
+      : 'alert-error',
   };
 
   const iconColors = {
-    info: 'text-blue-500',
-    success: 'text-green-500',
-    warning: 'text-yellow-500',
-    error: 'text-red-500',
+    info: 'text-sky-500',
+    success: 'text-teal-500',
+    warning: 'text-amber-500',
+    error: 'text-orange-500',
   };
 
   const icons = {
@@ -312,7 +331,9 @@ export function AlertBox({ children, type = 'info', gradient = false }: AlertBox
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        className={`stroke-current shrink-0 w-6 h-6 ${gradient ? iconColors[type] : ''}`}
+        className={`stroke-current shrink-0 w-6 h-6 ${
+          gradient ? iconColors[type] : ''
+        }`}
       >
         <path
           strokeLinecap="round"
@@ -325,7 +346,9 @@ export function AlertBox({ children, type = 'info', gradient = false }: AlertBox
     success: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`stroke-current shrink-0 h-6 w-6 ${gradient ? iconColors[type] : ''}`}
+        className={`stroke-current shrink-0 h-6 w-6 ${
+          gradient ? iconColors[type] : ''
+        }`}
         fill="none"
         viewBox="0 0 24 24"
       >
@@ -340,7 +363,9 @@ export function AlertBox({ children, type = 'info', gradient = false }: AlertBox
     warning: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`stroke-current shrink-0 h-6 w-6 ${gradient ? iconColors[type] : ''}`}
+        className={`stroke-current shrink-0 h-6 w-6 ${
+          gradient ? iconColors[type] : ''
+        }`}
         fill="none"
         viewBox="0 0 24 24"
       >
@@ -355,7 +380,9 @@ export function AlertBox({ children, type = 'info', gradient = false }: AlertBox
     error: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`stroke-current shrink-0 h-6 w-6 ${gradient ? iconColors[type] : ''}`}
+        className={`stroke-current shrink-0 h-6 w-6 ${
+          gradient ? iconColors[type] : ''
+        }`}
         fill="none"
         viewBox="0 0 24 24"
       >
@@ -370,7 +397,11 @@ export function AlertBox({ children, type = 'info', gradient = false }: AlertBox
   };
 
   return (
-    <div className={`alert ${typeClasses[type]} my-6 ${gradient ? 'border rounded-xl' : ''}`}>
+    <div
+      className={`alert ${typeClasses[type]} my-6 ${
+        gradient ? 'border rounded-xl' : ''
+      }`}
+    >
       {icons[type]}
       <div className="flex-1">{children}</div>
     </div>
@@ -384,7 +415,12 @@ interface FeatureCardProps {
   href?: string;
 }
 
-export function FeatureCard({ icon, title, description, href }: FeatureCardProps) {
+export function FeatureCard({
+  icon,
+  title,
+  description,
+  href,
+}: FeatureCardProps) {
   const content = (
     <div className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all border border-base-300 card-gradient-hover group hover:scale-[1.02]">
       <div className="card-body relative z-10">

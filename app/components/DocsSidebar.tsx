@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 interface NavLink {
@@ -67,6 +68,14 @@ export default function DocsSidebar() {
 
   return (
     <aside className="w-full lg:w-64">
+      <Link href="/">
+        <Image
+          src={'/svg/agentsea-logo.svg'}
+          width={310}
+          height={86}
+          alt="AgentSea Logo"
+        />
+      </Link>
       <div className="sticky top-4">
         <ul className="menu bg-base-200 rounded-box w-full">
           {sections.map((section, idx) => (

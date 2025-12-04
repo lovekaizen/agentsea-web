@@ -354,7 +354,7 @@ const llamaCppAgent = new Agent(
 const response = await ollamaAgent.execute('Hello!');`}
         </CodeBlock>
 
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-6 my-6">
+        <div className="bg-sky-50 border-l-4 border-sky-500 p-6 my-6">
           <p className="font-semibold mb-2">Benefits of Local Providers:</p>
           <ul className="space-y-1">
             <li>🔒 Data privacy - nothing leaves your machine</li>
@@ -365,7 +365,7 @@ const response = await ollamaAgent.execute('Hello!');`}
           <p className="mt-4">
             <Link
               href="/docs/local-providers"
-              className="text-blue-600 hover:underline font-semibold"
+              className="text-sky-600 hover:underline font-semibold"
             >
               → Complete Guide to Local & Open Source Providers
             </Link>

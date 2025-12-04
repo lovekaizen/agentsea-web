@@ -18,7 +18,7 @@ export default function LocalProvidersPage() {
       />
 
       <div className="prose prose-lg max-w-none">
-        <div className="bg-slate-50 border-l-4 border-blue-500 p-6 mb-8">
+        <div className="bg-sky-50 border-l-4 border-sky-500 p-6 mb-8">
           <h3 className="text-lg font-semibold mb-2">
             Why Use Local Providers?
           </h3>
@@ -200,7 +200,7 @@ for await (const chunk of stream) {
             <li>
               <a
                 href="https://huggingface.co/bartowski"
-                className="text-blue-600 hover:underline"
+                className="text-sky-600 hover:underline"
               >
                 bartowski's collection
               </a>{' '}
@@ -209,7 +209,7 @@ for await (const chunk of stream) {
             <li>
               <a
                 href="https://huggingface.co/TheBloke"
-                className="text-blue-600 hover:underline"
+                className="text-sky-600 hover:underline"
               >
                 TheBloke's collection
               </a>{' '}
@@ -218,7 +218,7 @@ for await (const chunk of stream) {
             <li>
               <a
                 href="https://huggingface.co/QuantFactory"
-                className="text-blue-600 hover:underline"
+                className="text-sky-600 hover:underline"
               >
                 QuantFactory
               </a>{' '}
@@ -367,7 +367,7 @@ const provider = new HuggingFaceProvider({
               Download LM Studio from{' '}
               <a
                 href="https://lmstudio.ai"
-                className="text-blue-600 hover:underline"
+                className="text-sky-600 hover:underline"
               >
                 lmstudio.ai
               </a>
@@ -755,19 +755,19 @@ services:
           <div className="space-x-4">
             <a
               href="/docs/quick-start"
-              className="text-blue-600 hover:underline font-semibold"
+              className="text-sky-600 hover:underline font-semibold"
             >
               Quick Start Guide →
             </a>
             <a
               href="/docs/agents"
-              className="text-blue-600 hover:underline font-semibold"
+              className="text-sky-600 hover:underline font-semibold"
             >
               Agent Documentation →
             </a>
             <a
               href="/examples"
-              className="text-blue-600 hover:underline font-semibold"
+              className="text-sky-600 hover:underline font-semibold"
             >
               See Examples →
             </a>
@@ -777,24 +777,24 @@ services:
         <h2 className="text-3xl font-bold mt-12 mb-4">Next Steps</h2>
         <ul className="list-disc pl-6 space-y-2 mb-8">
           <li>
-            <a href="/docs/tools" className="text-blue-600 hover:underline">
+            <a href="/docs/tools" className="text-sky-600 hover:underline">
               Learn about Tool Integration
             </a>
           </li>
           <li>
-            <a href="/docs/workflows" className="text-blue-600 hover:underline">
+            <a href="/docs/workflows" className="text-sky-600 hover:underline">
               Build Multi-Agent Workflows
             </a>
           </li>
           <li>
-            <a href="/docs/memory" className="text-blue-600 hover:underline">
+            <a href="/docs/memory" className="text-sky-600 hover:underline">
               Configure Memory Stores
             </a>
           </li>
           <li>
             <a
               href="/docs/observability"
-              className="text-blue-600 hover:underline"
+              className="text-sky-600 hover:underline"
             >
               Monitor Performance
             </a>

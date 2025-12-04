@@ -18,7 +18,7 @@ export default function MultiTenancyPage() {
       />
 
       <div className="prose max-w-none">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <div className="bg-sky-50 border border-sky-200 rounded-lg p-6 mb-8">
           <h3 className="text-lg font-semibold mb-2">🆕 Latest Feature</h3>
           <p className="mb-0">
             Multi-tenancy support was added in v0.1.0, providing
