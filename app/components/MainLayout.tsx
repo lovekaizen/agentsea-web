@@ -86,7 +86,7 @@ export default function MainLayout({
   return (
     <div className="relative">
       {/* Overlay when drawer is open */}
-      {isDrawerOpen && (
+      {!isHomePage && isDrawerOpen && (
         <div
           onClick={closeDrawer}
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
@@ -94,7 +94,7 @@ export default function MainLayout({
       )}
 
       {/* Main content */}
-      <div className="lg:pl-80">
+      <div className={isHomePage ? '' : 'lg:pl-80'}>
         {!isHomePage && (
           <div className="flex items-center justify-between pr-4 pl-24 py-4 lg:px-8">
             <div className="small">
@@ -131,11 +131,11 @@ export default function MainLayout({
           </div>
         )}
 
-        <main className="flex-1 pl-16 lg:pl-0">
+        <main className={`flex-1 ${isHomePage ? '' : 'pl-16 lg:pl-0'}`}>
           {children}
         </main>
 
-        <footer className="footer footer-center bg-base-100 border-t border-base-300 p-10 ml-16 lg:ml-0">
+        <footer className={`footer footer-center bg-base-100 border-t border-base-300 p-10 ${isHomePage ? '' : 'ml-16 lg:ml-0'}`}>
           <div>
             <nav className="grid grid-flow-col gap-6 mb-4">
               <Link
@@ -197,6 +197,7 @@ export default function MainLayout({
       </div>
 
       {/* Narrow sidebar when closed */}
+      {!isHomePage && (
       <aside className="fixed left-0 top-0 h-full bg-base-200 border-r border-base-300 z-20 w-16 flex items-start justify-center pt-4 lg:hidden">
         <button onClick={toggleDrawer} className="btn btn-ghost btn-square">
           <svg
@@ -214,8 +215,10 @@ export default function MainLayout({
           </svg>
         </button>
       </aside>
+      )}
 
       {/* Expanded sidebar when open */}
+      {!isHomePage && (
       <aside
         className={`fixed left-0 top-0 h-full bg-base-200 border-r border-base-300 z-40 w-80 transition-transform duration-300 lg:translate-x-0 ${
           isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
@@ -283,6 +286,7 @@ export default function MainLayout({
           </div>
         </div>
       </aside>
+      )}
     </div>
   );
 }
