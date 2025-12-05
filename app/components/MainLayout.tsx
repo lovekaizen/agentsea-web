@@ -84,7 +84,7 @@ export default function MainLayout({
   const toggleDrawer = () => setIsDrawerOpen((prev) => !prev);
 
   return (
-    <div className="relative">
+    <div className="relative overflow-x-hidden">
       {/* Overlay when drawer is open */}
       {!isHomePage && isDrawerOpen && (
         <div
@@ -94,9 +94,9 @@ export default function MainLayout({
       )}
 
       {/* Main content */}
-      <div className={isHomePage ? '' : 'lg:pl-80'}>
+      <div className={`min-h-screen overflow-x-hidden ${isHomePage ? '' : 'lg:pl-80'}`}>
         {!isHomePage && (
-          <div className="flex items-center justify-between pr-4 pl-24 py-4 lg:px-8">
+          <div className="flex items-center justify-between px-6 py-4 pl-20 lg:pl-6">
             <div className="small">
               <a
                 href="https://github.com/lovekaizen/agentsea"
@@ -131,11 +131,13 @@ export default function MainLayout({
           </div>
         )}
 
-        <main className={`flex-1 ${isHomePage ? '' : 'pl-16 lg:pl-0'}`}>
-          {children}
+        <main className={`flex-1 min-w-0 w-full ${isHomePage ? '' : 'pl-20 pr-6 lg:px-8'}`}>
+          <div className={isHomePage ? '' : 'max-w-4xl w-full break-words'}>
+            {children}
+          </div>
         </main>
 
-        <footer className={`footer footer-center bg-base-100 border-t border-base-300 p-10 ${isHomePage ? '' : 'ml-16 lg:ml-0'}`}>
+        <footer className={`footer footer-center bg-base-100 border-t border-base-300 p-10 ${isHomePage ? '' : 'ml-16 mr-6 lg:mx-0'}`}>
           <div>
             <nav className="grid grid-flow-col gap-6 mb-4">
               <Link
