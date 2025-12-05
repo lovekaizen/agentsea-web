@@ -45,19 +45,20 @@ export default function Navbar() {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <Link href="/docs">Documentation</Link>
+              <Link href="/docs" onClick={() => (document.activeElement as HTMLElement)?.blur()}>Documentation</Link>
             </li>
             <li>
-              <Link href="/examples">Examples</Link>
+              <Link href="/examples" onClick={() => (document.activeElement as HTMLElement)?.blur()}>Examples</Link>
             </li>
             <li>
-              <Link href="/api">API Reference</Link>
+              <Link href="/api" onClick={() => (document.activeElement as HTMLElement)?.blur()}>API Reference</Link>
             </li>
             <li>
               <a
                 href="https://github.com/lovekaizen/agentsea"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => (document.activeElement as HTMLElement)?.blur()}
               >
                 GitHub
               </a>

@@ -214,6 +214,7 @@ const result = await ttsProvider.synthesize('Hello, world!', {
   ToolRegistry,
   BufferMemory,
 } from '@lov3kaizen/agentsea-core';
+import type { VoiceAgentConfig, TTSConfig } from '@lov3kaizen/agentsea-types';
 
 // Create base agent
 const agent = new Agent(

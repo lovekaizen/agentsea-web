@@ -340,20 +340,134 @@ socket.on('agentList', (data) => console.log(data.agents));`}
           </h2>
           <p className="text-white/80 mb-4">
             AgentSea is fully typed with comprehensive TypeScript definitions.
-            Import types directly from the package:
+            Types are available from the dedicated types package or re-exported from core:
           </p>
-          <CodeBlock language="typescript">
-            {`import type {
+
+          {/* Types Package */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-gradient-purple">
+              Dedicated Types Package
+            </h3>
+            <CodeBlock language="bash">
+              {`npm install @lov3kaizen/agentsea-types`}
+            </CodeBlock>
+          </div>
+
+          {/* Core Types */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-gradient-blue">
+              Core Agent Types
+            </h3>
+            <CodeBlock language="typescript">
+              {`import type {
+  // Agent & Execution
   AgentConfig,
+  AgentContext,
+  AgentResponse,
   Message,
+  FormattedContent,
+  OutputFormat,
+  FormatOptions,
+
+  // Tools
   Tool,
   ToolCall,
+  ToolContext,
+  RetryConfig,
+
+  // Providers
+  LLMProvider,
+  ProviderConfig,
   LLMResponse,
-  ExecutionContext,
-  WorkflowConfig,
+  LLMStreamChunk,
+  ProviderInstanceConfig,
+
+  // Memory
+  MemoryConfig,
   MemoryStore,
+
+  // Workflows
+  WorkflowType,
+  WorkflowConfig,
+  RoutingLogic,
+  RoutingRule,
+  ErrorHandlingStrategy,
+
+  // Streaming
+  StreamEvent,
+
+  // Observability
+  AgentMetrics,
+  SpanContext,
+} from '@lov3kaizen/agentsea-types';
+// Or from core: '@lov3kaizen/agentsea-core'`}
+            </CodeBlock>
+          </div>
+
+          {/* Multi-Tenancy Types */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-gradient-animated">
+              Multi-Tenancy Types
+            </h3>
+            <CodeBlock language="typescript">
+              {`import type {
+  Tenant,
+  TenantStatus,
+  TenantSettings,
+  TenantContext,
+  TenantApiKey,
+  TenantQuota,
+  TenantStorage,
+  TenantResolver,
+} from '@lov3kaizen/agentsea-types';`}
+            </CodeBlock>
+          </div>
+
+          {/* Voice Types */}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-gradient-cool">
+              Voice & Speech Types
+            </h3>
+            <CodeBlock language="typescript">
+              {`import type {
+  AudioFormat,
+  VoiceType,
+  STTConfig,
+  TTSConfig,
+  STTResult,
+  TTSResult,
+  STTProvider,
+  TTSProvider,
+  VoiceMessage,
+  VoiceAgentConfig,
+} from '@lov3kaizen/agentsea-types';`}
+            </CodeBlock>
+          </div>
+
+          {/* MCP & ACP Types */}
+          <div>
+            <h3 className="text-xl font-semibold mb-3 text-gradient-warm">
+              Protocol Types (MCP & ACP)
+            </h3>
+            <CodeBlock language="typescript">
+              {`// Model Context Protocol
+import type {
+  MCPServerConfig,
+  MCPTool,
+  MCPResource,
+  MCPPrompt,
+} from '@lov3kaizen/agentsea-core';
+
+// Agentic Commerce Protocol
+import type {
+  ACPProduct,
+  ACPCart,
+  ACPCheckoutSession,
+  ACPOrder,
+  ACPCustomer,
 } from '@lov3kaizen/agentsea-core';`}
-          </CodeBlock>
+            </CodeBlock>
+          </div>
         </div>
       </div>
 
@@ -407,13 +521,18 @@ const apiSections = [
         methods: [
           {
             signature:
-              'execute(prompt: string, context: ExecutionContext): Promise<LLMResponse>',
+              'execute(prompt: string, context: AgentContext): Promise<AgentResponse>',
             description: 'Execute the agent with the given prompt and context',
           },
           {
             signature:
-              'stream(prompt: string, context: ExecutionContext): AsyncIterable<LLMStreamChunk>',
-            description: 'Stream agent responses in real-time',
+              'executeStream(prompt: string, context: AgentContext): AsyncIterable<StreamEvent>',
+            description: 'Stream agent responses in real-time with events',
+          },
+          {
+            signature:
+              'formatResponse(response: AgentResponse): FormattedContent',
+            description: 'Format agent response to specified output format',
           },
         ],
         properties: [
@@ -431,6 +550,18 @@ const apiSections = [
             name: 'provider',
             type: 'LLMProvider',
             description: 'LLM provider instance',
+          },
+        ],
+      },
+      {
+        name: 'ContentFormatter',
+        description: 'Format agent output to text, markdown, HTML, or React',
+        constructor: 'Static utility class',
+        methods: [
+          {
+            signature:
+              'static format(content: string, format: OutputFormat, options?: FormatOptions): FormattedContent',
+            description: 'Format content to specified output format',
           },
         ],
       },
@@ -586,6 +717,42 @@ const apiSections = [
           },
         ],
       },
+      {
+        name: 'SummaryMemory',
+        description: 'Memory with automatic summarization of older messages',
+        constructor: 'new SummaryMemory(options: SummaryMemoryOptions)',
+        methods: [
+          {
+            signature:
+              'save(conversationId: string, messages: Message[]): Promise<void>',
+            description: 'Save messages with automatic summarization',
+          },
+          {
+            signature: 'load(conversationId: string): Promise<Message[]>',
+            description: 'Load messages including summaries',
+          },
+          {
+            signature: 'search(conversationId: string, query: string): Promise<Message[]>',
+            description: 'Search messages by semantic similarity',
+          },
+        ],
+      },
+      {
+        name: 'TenantBufferMemory',
+        description: 'Tenant-scoped in-memory storage',
+        constructor: 'new TenantBufferMemory(maxMessages: number)',
+        methods: [
+          {
+            signature:
+              'save(conversationId: string, messages: Message[], tenantId: string): Promise<void>',
+            description: 'Save messages scoped to tenant',
+          },
+          {
+            signature: 'load(conversationId: string, tenantId: string): Promise<Message[]>',
+            description: 'Load tenant-scoped messages',
+          },
+        ],
+      },
     ],
   },
   {
@@ -649,24 +816,308 @@ const apiSections = [
         ],
       },
       {
-        name: 'Metrics',
-        description: 'Performance metrics collection',
-        constructor: 'new Metrics()',
+        name: 'MetricsCollector',
+        description: 'Performance metrics collection and aggregation',
+        constructor: 'new MetricsCollector()',
         methods: [
           {
-            signature:
-              'recordCounter(name: string, value: number, tags?: Record<string, string>): void',
-            description: 'Record counter metric',
+            signature: 'record(metrics: AgentMetrics): void',
+            description: 'Record agent execution metrics',
           },
           {
-            signature:
-              'recordHistogram(name: string, value: number, tags?: Record<string, string>): void',
-            description: 'Record histogram metric',
+            signature: 'getAll(): AgentMetrics[]',
+            description: 'Get all recorded metrics',
           },
           {
-            signature:
-              'recordGauge(name: string, value: number, tags?: Record<string, string>): void',
-            description: 'Record gauge metric',
+            signature: 'getByAgent(agentName: string): AgentMetrics[]',
+            description: 'Get metrics for specific agent',
+          },
+          {
+            signature: 'getByTimeRange(start: Date, end: Date): AgentMetrics[]',
+            description: 'Get metrics within time range',
+          },
+          {
+            signature: 'getStats(agentName?: string): MetricsStats',
+            description: 'Get aggregated statistics',
+          },
+          {
+            signature: 'subscribe(callback: (metrics: AgentMetrics) => void): () => void',
+            description: 'Subscribe to new metrics events',
+          },
+        ],
+      },
+      {
+        name: 'Tracer',
+        description: 'Distributed tracing for agent executions',
+        constructor: 'new Tracer()',
+        methods: [
+          {
+            signature: 'startSpan(name: string, context?: SpanContext): Span',
+            description: 'Start a new trace span',
+          },
+          {
+            signature: 'endSpan(span: Span): void',
+            description: 'End a trace span',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '🎙️',
+    title: 'Voice',
+    classes: [
+      {
+        name: 'VoiceAgent',
+        description: 'Voice-enabled agent with speech-to-text and text-to-speech',
+        constructor: `new VoiceAgent(
+  agent: Agent,
+  config: VoiceAgentConfig
+)`,
+        methods: [
+          {
+            signature: 'processVoice(audio: Buffer): Promise<VoiceMessage>',
+            description: 'Process audio input and return voice response',
+          },
+          {
+            signature: 'speak(text: string): Promise<VoiceMessage>',
+            description: 'Convert text to voice response',
+          },
+          {
+            signature: 'transcribe(audio: Buffer): Promise<STTResult>',
+            description: 'Transcribe audio to text',
+          },
+          {
+            signature: 'synthesize(text: string): Promise<TTSResult>',
+            description: 'Synthesize text to audio',
+          },
+          {
+            signature: 'synthesizeStream(text: string): AsyncIterable<Buffer>',
+            description: 'Stream synthesized audio chunks',
+          },
+          {
+            signature: 'getHistory(): VoiceMessage[]',
+            description: 'Get voice conversation history',
+          },
+          {
+            signature: 'saveAudio(audio: Buffer, path: string): Promise<void>',
+            description: 'Save audio buffer to file',
+          },
+        ],
+      },
+      {
+        name: 'OpenAIWhisperProvider',
+        description: 'OpenAI Whisper speech-to-text provider',
+        constructor: 'new OpenAIWhisperProvider(apiKey: string)',
+        methods: [
+          {
+            signature: 'transcribe(audio: Buffer, config?: STTConfig): Promise<STTResult>',
+            description: 'Transcribe audio using Whisper',
+          },
+        ],
+      },
+      {
+        name: 'OpenAITTSProvider',
+        description: 'OpenAI text-to-speech provider',
+        constructor: 'new OpenAITTSProvider(apiKey: string)',
+        methods: [
+          {
+            signature: 'synthesize(text: string, config?: TTSConfig): Promise<TTSResult>',
+            description: 'Synthesize speech using OpenAI TTS',
+          },
+          {
+            signature: 'getVoices(): Promise<VoiceType[]>',
+            description: 'Get available voice options',
+          },
+        ],
+      },
+      {
+        name: 'ElevenLabsTTSProvider',
+        description: 'ElevenLabs high-quality text-to-speech',
+        constructor: 'new ElevenLabsTTSProvider(apiKey: string)',
+        methods: [
+          {
+            signature: 'synthesize(text: string, config?: TTSConfig): Promise<TTSResult>',
+            description: 'Synthesize speech using ElevenLabs',
+          },
+          {
+            signature: 'synthesizeStream(text: string, config?: TTSConfig): AsyncIterable<Buffer>',
+            description: 'Stream synthesized audio',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '💬',
+    title: 'Conversation',
+    classes: [
+      {
+        name: 'ConversationSchema',
+        description: 'Define structured multi-step conversation flows',
+        constructor: 'new ConversationSchema(config: ConversationSchemaConfig)',
+        methods: [
+          {
+            signature: 'getState(): ConversationState',
+            description: 'Get current conversation state',
+          },
+          {
+            signature: 'getCurrentStep(): ConversationStep',
+            description: 'Get current step configuration',
+          },
+          {
+            signature: 'processResponse(response: string): ProcessResult',
+            description: 'Process response and advance conversation',
+          },
+          {
+            signature: 'reset(): void',
+            description: 'Reset conversation to initial state',
+          },
+        ],
+      },
+      {
+        name: 'ConversationManager',
+        description: 'Manage AI-assisted structured conversations',
+        constructor: `new ConversationManager(
+  schema: ConversationSchema,
+  agent: Agent
+)`,
+        methods: [
+          {
+            signature: 'start(): Promise<Message>',
+            description: 'Start the conversation',
+          },
+          {
+            signature: 'processMessage(input: string): Promise<Message>',
+            description: 'Process user input with AI assistance',
+          },
+          {
+            signature: 'getState(): ConversationState',
+            description: 'Get current conversation state',
+          },
+          {
+            signature: 'getHistory(): Message[]',
+            description: 'Get conversation history',
+          },
+          {
+            signature: 'export(): ConversationExport',
+            description: 'Export conversation for persistence',
+          },
+          {
+            signature: 'import(data: ConversationExport): void',
+            description: 'Import saved conversation',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '🏢',
+    title: 'Multi-Tenancy',
+    classes: [
+      {
+        name: 'TenantManager',
+        description: 'Manage tenant lifecycle and isolation',
+        constructor: 'new TenantManager(storage: TenantStorage)',
+        methods: [
+          {
+            signature: 'createTenant(data: CreateTenantData): Promise<Tenant>',
+            description: 'Create a new tenant',
+          },
+          {
+            signature: 'getTenant(id: string): Promise<Tenant | null>',
+            description: 'Get tenant by ID',
+          },
+          {
+            signature: 'getTenantBySlug(slug: string): Promise<Tenant | null>',
+            description: 'Get tenant by slug',
+          },
+          {
+            signature: 'updateTenant(id: string, data: UpdateTenantData): Promise<Tenant>',
+            description: 'Update tenant settings',
+          },
+          {
+            signature: 'deleteTenant(id: string): Promise<void>',
+            description: 'Delete a tenant',
+          },
+          {
+            signature: 'listTenants(options?: ListOptions): Promise<Tenant[]>',
+            description: 'List all tenants with pagination',
+          },
+          {
+            signature: 'createApiKey(tenantId: string, data: CreateApiKeyData): Promise<TenantApiKey>',
+            description: 'Create API key for tenant',
+          },
+          {
+            signature: 'revokeApiKey(keyId: string): Promise<void>',
+            description: 'Revoke an API key',
+          },
+        ],
+      },
+      {
+        name: 'MemoryTenantStorage',
+        description: 'In-memory tenant storage implementation',
+        constructor: 'new MemoryTenantStorage()',
+        methods: [
+          {
+            signature: 'createTenant(tenant: Tenant): Promise<Tenant>',
+            description: 'Store a new tenant',
+          },
+          {
+            signature: 'getTenant(id: string): Promise<Tenant | null>',
+            description: 'Retrieve tenant by ID',
+          },
+          {
+            signature: 'updateQuota(tenantId: string, quota: TenantQuota): Promise<void>',
+            description: 'Update tenant quota usage',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '🛒',
+    title: 'ACP (Commerce)',
+    classes: [
+      {
+        name: 'ACPClient',
+        description: 'Agentic Commerce Protocol client for e-commerce integration',
+        constructor: 'new ACPClient(config: ACPConfig)',
+        methods: [
+          {
+            signature: 'searchProducts(query: ACPProductSearchQuery): Promise<ACPProductSearchResult>',
+            description: 'Search products in catalog',
+          },
+          {
+            signature: 'getProduct(productId: string): Promise<ACPProduct>',
+            description: 'Get product details',
+          },
+          {
+            signature: 'createCart(customerId?: string): Promise<ACPCart>',
+            description: 'Create a new shopping cart',
+          },
+          {
+            signature: 'addToCart(cartId: string, productId: string, quantity: number): Promise<ACPCart>',
+            description: 'Add item to cart',
+          },
+          {
+            signature: 'createCheckoutSession(cartId: string): Promise<ACPCheckoutSession>',
+            description: 'Create checkout session',
+          },
+          {
+            signature: 'processPayment(sessionId: string, paymentMethod: ACPPaymentMethod): Promise<ACPPaymentIntent>',
+            description: 'Process payment for checkout',
+          },
+          {
+            signature: 'getOrder(orderId: string): Promise<ACPOrder>',
+            description: 'Get order details',
+          },
+        ],
+        properties: [
+          {
+            name: 'config',
+            type: 'ACPConfig',
+            description: 'Client configuration',
           },
         ],
       },
