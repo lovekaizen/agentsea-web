@@ -64,6 +64,7 @@ export default function ToolsPage() {
   fileReadTool,
   textSummaryTool,
 } from '@lov3kaizen/agentsea-core';
+import type { Tool, ToolCall, ToolContext } from '@lov3kaizen/agentsea-types';
 
 // Create tool registry
 const toolRegistry = new ToolRegistry();

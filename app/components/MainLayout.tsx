@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { AGENTSEA_VERSION } from '../constants';
 
 interface NavLink {
@@ -76,28 +77,26 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isDocsPage =
-    pathname.startsWith('/docs') ||
-    pathname === '/api' ||
-    pathname === '/examples';
   const isHomePage = pathname === '/';
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const closeDrawer = () => setIsDrawerOpen(false);
+  const toggleDrawer = () => setIsDrawerOpen((prev) => !prev);
 
   return (
-    <div className="relative">
-      <input id="main-drawer" type="checkbox" className="peer hidden" />
-
-      {/* Overlay when drawer is open - only show on docs pages */}
-      {isDocsPage && (
-        <label
-          htmlFor="main-drawer"
-          className="fixed inset-0 bg-black/50 z-30 hidden peer-checked:block lg:peer-checked:hidden"
+    <div className="relative overflow-x-hidden">
+      {/* Overlay when drawer is open */}
+      {!isHomePage && isDrawerOpen && (
+        <div
+          onClick={closeDrawer}
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
         />
       )}
 
       {/* Main content */}
-      <div className={isDocsPage ? 'lg:pl-80' : ''}>
+      <div className={`min-h-screen overflow-x-hidden ${isHomePage ? '' : 'lg:pl-80'}`}>
         {!isHomePage && (
-          <div className="flex items-center justify-between pr-4 pl-24 py-4 lg:px-8">
+          <div className="flex items-center justify-between px-6 py-4 pl-20 lg:pl-6">
             <div className="small">
               <a
                 href="https://github.com/lovekaizen/agentsea"
@@ -132,15 +131,13 @@ export default function MainLayout({
           </div>
         )}
 
-        <main className={`flex-1 ${isDocsPage ? 'pl-16 lg:pl-0' : ''}`}>
-          {children}
+        <main className={`flex-1 min-w-0 w-full ${isHomePage ? '' : 'pl-20 pr-6 lg:px-8'}`}>
+          <div className={isHomePage ? '' : 'max-w-4xl w-full break-words'}>
+            {children}
+          </div>
         </main>
 
-        <footer
-          className={`footer footer-center bg-base-100 border-t border-base-300 p-10 ${
-            isDocsPage ? 'ml-16 lg:ml-0' : ''
-          }`}
-        >
+        <footer className={`footer footer-center bg-base-100 border-t border-base-300 p-10 ${isHomePage ? '' : 'ml-16 mr-6 lg:mx-0'}`}>
           <div>
             <nav className="grid grid-flow-col gap-6 mb-4">
               <Link
@@ -201,91 +198,96 @@ export default function MainLayout({
         </footer>
       </div>
 
-      {/* Narrow sidebar when closed - only show on docs pages */}
-      {isDocsPage && (
-        <aside className="fixed left-0 top-0 h-full bg-base-200 border-r border-base-300 z-20 w-16 flex items-start justify-center pt-4 lg:hidden">
-          <label htmlFor="main-drawer" className="btn btn-ghost btn-square">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="inline-block w-6 h-6 stroke-current"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </label>
-        </aside>
+      {/* Narrow sidebar when closed */}
+      {!isHomePage && (
+      <aside className="fixed left-0 top-0 h-full bg-base-200 border-r border-base-300 z-20 w-16 flex items-start justify-center pt-4 lg:hidden">
+        <button onClick={toggleDrawer} className="btn btn-ghost btn-square">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="inline-block w-6 h-6 stroke-current"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      </aside>
       )}
 
-      {/* Expanded sidebar when open - only show on docs pages */}
-      {isDocsPage && (
-        <aside className="fixed left-0 top-0 h-full bg-base-200 border-r border-base-300 z-40 w-80 transition-transform duration-300 -translate-x-full peer-checked:translate-x-0 lg:translate-x-0">
-          <div className="flex flex-col h-full">
-            {/* Header with logo */}
-            <div className="flex items-center justify-between p-4 border-b border-base-300">
-              <Link href="/" className="btn btn-ghost px-0 py-2">
-                <Image
-                  src={'/svg/agentsea-logo.svg'}
-                  width={160}
-                  height={44}
-                  alt="AgentSea Logo"
-                />
-              </Link>
-              <label
-                htmlFor="main-drawer"
-                className="btn btn-ghost btn-square btn-sm lg:hidden"
+      {/* Expanded sidebar when open */}
+      {!isHomePage && (
+      <aside
+        className={`fixed left-0 top-0 h-full bg-base-200 border-r border-base-300 z-40 w-80 transition-transform duration-300 lg:translate-x-0 ${
+          isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Header with logo */}
+          <div className="flex items-center justify-between p-4 border-b border-base-300">
+            <Link href="/" className="btn btn-ghost px-0 py-2" onClick={closeDrawer}>
+              <Image
+                src={'/svg/agentsea-logo.svg'}
+                width={160}
+                height={44}
+                alt="AgentSea Logo"
+              />
+            </Link>
+            <button
+              onClick={closeDrawer}
+              className="btn btn-ghost btn-square btn-sm lg:hidden"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="inline-block w-5 h-5 stroke-current"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  className="inline-block w-5 h-5 stroke-current"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </label>
-            </div>
-
-            {/* Navigation links */}
-            <div className="flex-1 overflow-y-auto">
-              <ul className="menu p-4">
-                {sections.map((section, idx) => (
-                  <li key={idx}>
-                    <h2 className="menu-title text-gradient-purple font-semibold">
-                      {section.title}
-                    </h2>
-                    <ul>
-                      {section.links.map((link) => (
-                        <li key={link.href} className="pl-2">
-                          <Link
-                            href={link.href}
-                            className={
-                              pathname === link.href
-                                ? 'active bg-gradient-to-r from-sky-600/20 to-cyan-500/20 border-l-2 border-cyan-500 !text-white font-medium'
-                                : 'hover:bg-gradient-to-r hover:from-sky-600/10 hover:to-cyan-500/10 transition-all'
-                            }
-                          >
-                            {link.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
-        </aside>
+
+          {/* Navigation links */}
+          <div className="flex-1 overflow-y-auto">
+            <ul className="menu p-4">
+              {sections.map((section, idx) => (
+                <li key={idx}>
+                  <h2 className="menu-title text-gradient-purple font-semibold">
+                    {section.title}
+                  </h2>
+                  <ul>
+                    {section.links.map((link) => (
+                      <li key={link.href} className="pl-2">
+                        <Link
+                          href={link.href}
+                          onClick={closeDrawer}
+                          className={
+                            pathname === link.href
+                              ? 'active bg-gradient-to-r from-sky-600/20 to-cyan-500/20 border-l-2 border-cyan-500 !text-white font-medium'
+                              : 'hover:bg-gradient-to-r hover:from-sky-600/10 hover:to-cyan-500/10 transition-all'
+                          }
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </aside>
       )}
     </div>
   );

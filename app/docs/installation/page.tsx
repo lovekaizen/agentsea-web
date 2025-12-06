@@ -49,6 +49,15 @@ npm install @lov3kaizen/agentsea-core
 # Using yarn
 yarn add @lov3kaizen/agentsea-core`}
           </CodeBlock>
+
+          <AlertBox type="info">
+            <h3 className="text-lg font-semibold mb-2">Types Package</h3>
+            <p className="m-0">
+              Types are re-exported from <code>@lov3kaizen/agentsea-core</code>, but you can also
+              install the dedicated types package for direct imports:{' '}
+              <code>pnpm add @lov3kaizen/agentsea-types</code>
+            </p>
+          </AlertBox>
         </Section>
 
         <Section title="NestJS Integration" id="nestjs-integration">
@@ -131,6 +140,7 @@ ENABLE_TRACING=true`}
 
           <CodeBlock language="typescript">
             {`import { Agent, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
+import type { AgentConfig, AgentContext } from '@lov3kaizen/agentsea-types';
 
 const agent = new Agent(
   {

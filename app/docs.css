@@ -69,6 +69,17 @@
   border-radius: 0.25rem;
   font-size: 0.875rem;
   font-family: ui-monospace, monospace;
+  word-break: break-word;
+}
+
+/* Pre blocks - ensure horizontal scroll instead of overflow */
+.prose pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.prose pre code {
+  white-space: pre;
 }
 
 /* Links */
@@ -91,11 +102,17 @@
   color: hsl(var(--bc) / 0.7);
 }
 
-/* Tables */
+/* Tables - wrap in scrollable container */
+.prose .table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 1.5rem 0;
+}
+
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1.5rem 0;
+  min-width: max-content;
 }
 
 .prose th {

@@ -35,7 +35,7 @@ export default function Home() {
               width={528}
               height={145}
               alt="AgentSea Logo"
-              className="mb-8 center"
+              className="center"
             />
 
             <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
@@ -58,7 +58,7 @@ export default function Home() {
             </p>
 
             {/* Stats Row */}
-            <div className="flex flex-wrap justify-center gap-8 py-8">
+            <div className="flex flex-wrap justify-center gap-8 py-2">
               <div className="text-center">
                 <div className="stat-gradient">12+</div>
                 <div className="text-sm text-white/60 mt-1">LLM Providers</div>

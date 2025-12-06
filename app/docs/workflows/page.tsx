@@ -49,6 +49,7 @@ export default function WorkflowsPage() {
   AnthropicProvider,
   ToolRegistry,
 } from '@lov3kaizen/agentsea-core';
+import type { WorkflowConfig, WorkflowType } from '@lov3kaizen/agentsea-types';
 
 const workflow = WorkflowFactory.create(
   {

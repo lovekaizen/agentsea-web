@@ -44,6 +44,7 @@ export default function AgentsPage() {
   ToolRegistry,
   BufferMemory,
 } from '@lov3kaizen/agentsea-core';
+import type { AgentConfig, AgentContext, AgentResponse } from '@lov3kaizen/agentsea-types';
 
 // Set up provider
 const provider = new AnthropicProvider(process.env.ANTHROPIC_API_KEY);
