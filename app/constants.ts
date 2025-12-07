@@ -1,2 +1,2 @@
 // AgentSea version - update this when releasing new versions
-export const AGENTSEA_VERSION = 'v0.2.0';
+export const AGENTSEA_VERSION = 'v0.3.1';

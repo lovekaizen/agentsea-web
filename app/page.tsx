@@ -64,7 +64,7 @@ export default function Home() {
                 <div className="text-sm text-white/60 mt-1">LLM Providers</div>
               </div>
               <div className="text-center">
-                <div className="stat-gradient">5</div>
+                <div className="stat-gradient">7</div>
                 <div className="text-sm text-white/60 mt-1">
                   Voice Providers
                 </div>
@@ -365,7 +365,7 @@ export default function Home() {
                 <ul className="space-y-4">
                   <li className="flex items-center gap-3">
                     <span className="badge badge-gradient gap-2 px-3">+</span>
-                    <span>Voice built-in (5 providers)</span>
+                    <span>Voice built-in (7 providers)</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <span className="badge badge-gradient gap-2 px-3">+</span>
@@ -517,7 +517,7 @@ const features = [
     icon: '🎙️',
     title: 'Voice Support (TTS/STT)',
     description:
-      '5 voice providers built-in: OpenAI Whisper, Local Whisper, OpenAI TTS, ElevenLabs, Piper TTS',
+      '7 voice providers built-in: OpenAI Whisper, LemonFox, Local Whisper, OpenAI TTS, LemonFox TTS, ElevenLabs, Piper TTS',
     link: '/docs/voice',
   },
   {
