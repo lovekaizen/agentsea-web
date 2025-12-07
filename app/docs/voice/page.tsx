@@ -50,15 +50,15 @@ export default function VoicePage() {
         <AlertBox type="info">
           <div>
             <h3 className="font-bold text-lg mb-2">
-              5 Voice Providers Included
+              7 Voice Providers Included
             </h3>
             <p className="mb-2">
-              <strong>STT Providers:</strong> OpenAI Whisper (cloud), Local
-              Whisper (privacy)
+              <strong>STT Providers:</strong> OpenAI Whisper (cloud), LemonFox
+              (cost-effective), Local Whisper (privacy)
             </p>
             <p>
-              <strong>TTS Providers:</strong> OpenAI TTS, ElevenLabs, Piper TTS
-              (local)
+              <strong>TTS Providers:</strong> OpenAI TTS, LemonFox
+              (cost-effective), ElevenLabs (premium), Piper TTS (local)
             </p>
           </div>
         </AlertBox>
@@ -88,6 +88,43 @@ console.log('Text:', result.text);
 console.log('Language:', result.language);
 console.log('Duration:', result.duration);`}
         </CodeBlock>
+
+        <h3 className="text-2xl font-semibold mb-4 mt-8">
+          LemonFox STT (Cost-Effective)
+        </h3>
+        <p className="text-base-content/70 mb-4">
+          OpenAI-compatible Whisper v3 transcription at a fraction of the cost
+          - $0.50 per 3 hours of audio. Perfect for production workloads.
+        </p>
+
+        <CodeBlock language="typescript">
+          {`import { LemonFoxSTTProvider } from '@lov3kaizen/agentsea-core';
+
+const sttProvider = new LemonFoxSTTProvider(process.env.LEMONFOX_API_KEY);
+
+// Transcribe audio file - same API as OpenAI Whisper
+const result = await sttProvider.transcribe('./audio.mp3', {
+  model: 'whisper-1',
+  language: 'en',
+  responseFormat: 'verbose_json',
+});
+
+console.log('Text:', result.text);
+console.log('Duration:', result.duration);`}
+        </CodeBlock>
+
+        <AlertBox type="success">
+          <div>
+            <h4 className="font-semibold mb-2">Alternative: Custom baseURL</h4>
+            <p className="mb-2">
+              You can also use the OpenAI Whisper provider with a custom
+              baseURL:
+            </p>
+            <code className="text-sm">
+              {`new OpenAIWhisperProvider({ apiKey: LEMONFOX_API_KEY, baseURL: 'https://api.lemonfox.ai/v1' })`}
+            </code>
+          </div>
+        </AlertBox>
 
         <h3 className="text-2xl font-semibold mb-4 mt-8">
           Local Whisper (Privacy)
@@ -142,6 +179,49 @@ const result = await ttsProvider.synthesize('Hello, world!', {
 // Save audio
 writeFileSync('./output.mp3', result.audio);`}
         </CodeBlock>
+
+        <h3 className="text-2xl font-semibold mb-4 mt-8">
+          LemonFox TTS (Cost-Effective)
+        </h3>
+        <p className="text-base-content/70 mb-4">
+          OpenAI-compatible TTS with 50+ voices at up to 90% savings - $2.50
+          per 1M characters. Includes all OpenAI voices plus extras like
+          "sarah".
+        </p>
+
+        <CodeBlock language="typescript">
+          {`import { LemonFoxTTSProvider } from '@lov3kaizen/agentsea-core';
+import { writeFileSync } from 'fs';
+
+const ttsProvider = new LemonFoxTTSProvider(process.env.LEMONFOX_API_KEY);
+
+// Synthesize speech - same API as OpenAI TTS
+const result = await ttsProvider.synthesize('Hello, world!', {
+  model: 'tts-1',
+  voice: 'sarah', // or any OpenAI voice like 'nova'
+  format: 'mp3',
+});
+
+// Save audio
+writeFileSync('./output.mp3', result.audio);
+
+// Streaming also supported
+for await (const chunk of ttsProvider.synthesizeStream('Long text...')) {
+  // Process audio chunks in real-time
+}`}
+        </CodeBlock>
+
+        <AlertBox type="success">
+          <div>
+            <h4 className="font-semibold mb-2">Alternative: Custom baseURL</h4>
+            <p className="mb-2">
+              You can also use the OpenAI TTS provider with a custom baseURL:
+            </p>
+            <code className="text-sm">
+              {`new OpenAITTSProvider({ apiKey: LEMONFOX_API_KEY, baseURL: 'https://api.lemonfox.ai/v1' })`}
+            </code>
+          </div>
+        </AlertBox>
 
         <h3 className="text-2xl font-semibold mb-4 mt-8">
           ElevenLabs (Premium)
@@ -242,6 +322,17 @@ const voiceAgent = new VoiceAgent(agent, {
       {/* Best Practices */}
       <Section title="Best Practices" id="best-practices">
         <div className="space-y-4">
+          <AlertBox type="success">
+            <div>
+              <h4 className="font-semibold mb-2">Cost-Effective Production</h4>
+              <p>
+                Use LemonFox for production: STT at $0.50/3hrs (lowest on
+                market) and TTS at $2.50/1M chars (up to 90% savings). Same API
+                as OpenAI - just swap the provider!
+              </p>
+            </div>
+          </AlertBox>
+
           <AlertBox type="info">
             <div>
               <h4 className="font-semibold mb-2">Voice-Optimized Prompts</h4>
@@ -262,7 +353,7 @@ const voiceAgent = new VoiceAgent(agent, {
             </div>
           </AlertBox>
 
-          <AlertBox type="success">
+          <AlertBox type="info">
             <div>
               <h4 className="font-semibold mb-2">Privacy First</h4>
               <p>

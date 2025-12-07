@@ -32,8 +32,9 @@ export default function ProvidersPage() {
               Text Generation WebUI, vLLM, Jan
             </p>
             <p className="m-0">
-              <strong>Voice Providers (5):</strong> OpenAI Whisper, Local
-              Whisper, OpenAI TTS, ElevenLabs, Piper TTS
+              <strong>Voice Providers (7):</strong> OpenAI Whisper, LemonFox
+              STT, Local Whisper, OpenAI TTS, LemonFox TTS, ElevenLabs, Piper
+              TTS
             </p>
           </div>
         </div>
