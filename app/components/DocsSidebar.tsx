@@ -40,6 +40,7 @@ const sections: NavSection[] = [
   {
     title: 'Features',
     links: [
+      { href: '/docs/react-hooks', label: 'React Hooks' },
       { href: '/docs/voice', label: 'Voice (TTS/STT)' },
       { href: '/docs/local-models', label: 'Local Models' },
       { href: '/docs/acp-integration', label: 'ACP Commerce' },
@@ -89,8 +90,8 @@ export default function DocsSidebar() {
                       href={link.href}
                       className={
                         pathname === link.href
-                          ? 'active !text-primary-content'
-                          : 'hover:!text-primary-content active:!text-primary-content'
+                          ? 'bg-gradient-to-r from-primary/20 via-secondary/15 to-accent/10 text-primary font-medium border-l-2 border-primary'
+                          : 'hover:bg-gradient-to-r hover:from-primary/10 hover:via-secondary/5 hover:to-transparent hover:text-primary transition-all duration-200'
                       }
                     >
                       {link.label}
