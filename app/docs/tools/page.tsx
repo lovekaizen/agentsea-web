@@ -8,6 +8,7 @@ import {
   Divider,
 } from '../../components/Section';
 
+
 export default function ToolsPage() {
   return (
     <PageContainer maxWidth="5xl">
@@ -345,6 +346,207 @@ const allTools = toolRegistry.list();
 toolRegistry.unregister('calculator');`}
         </CodeBlock>
 
+        <h2>Isomorphic Tool Management</h2>
+        <AlertBox type="info">
+          Isomorphic tools let you define tools once and implement them for
+          different environments (server or client). This enables type-safe tool
+          definitions with Zod schemas for both input and output validation.
+        </AlertBox>
+
+        <p>
+          The isomorphic tool system provides a clean separation between tool
+          definitions and their implementations, allowing you to:
+        </p>
+        <ul>
+          <li>Define tools with full input/output type safety</li>
+          <li>Create server-side implementations for backend operations</li>
+          <li>Create client-side implementations for browser operations</li>
+          <li>Share tool definitions between environments</li>
+        </ul>
+
+        <h3>Tool Definition</h3>
+        <p>
+          Create a tool definition that can be implemented for different
+          environments:
+        </p>
+
+        <CodeBlock language="typescript">
+          {`import { toolDefinition } from '@lov3kaizen/agentsea-core';
+import { z } from 'zod';
+
+// Define the tool with input/output schemas
+const getUserDef = toolDefinition({
+  name: 'get_user',
+  description: 'Get user information from the database',
+  inputSchema: z.object({
+    userId: z.string().describe('The user ID to look up'),
+  }),
+  outputSchema: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    createdAt: z.string(),
+  }),
+});
+
+// Server implementation - direct database access
+const getUserServer = getUserDef.server(async ({ userId }, context) => {
+  const user = await db.users.findUnique({ where: { id: userId } });
+  return {
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt.toISOString(),
+  };
+});
+
+// Client implementation - fetch from API
+const getUserClient = getUserDef.client(async ({ userId }) => {
+  const response = await fetch(\`/api/users/\${userId}\`);
+  return response.json();
+});
+
+// Use with agent
+const agent = new Agent({
+  tools: [getUserServer.toTool()],
+  // ...
+});`}
+        </CodeBlock>
+
+        <h3>Quick Helpers</h3>
+        <p>
+          For simpler cases, use the quick helper functions to create tools in
+          one step:
+        </p>
+
+        <CodeBlock language="typescript">
+          {`import { serverTool, clientTool, hybridTool } from '@lov3kaizen/agentsea-core';
+import { z } from 'zod';
+
+// Server-only tool
+const calculateTool = serverTool({
+  name: 'calculate',
+  description: 'Perform arithmetic operations',
+  inputSchema: z.object({
+    operation: z.enum(['add', 'subtract', 'multiply', 'divide']),
+    a: z.number(),
+    b: z.number(),
+  }),
+  outputSchema: z.object({ result: z.number() }),
+  execute: async ({ operation, a, b }) => {
+    switch (operation) {
+      case 'add': return { result: a + b };
+      case 'subtract': return { result: a - b };
+      case 'multiply': return { result: a * b };
+      case 'divide': return { result: a / b };
+    }
+  },
+});
+
+// Client-only tool (runs in browser)
+const showNotification = clientTool({
+  name: 'show_notification',
+  description: 'Show a browser notification',
+  inputSchema: z.object({
+    title: z.string(),
+    body: z.string(),
+  }),
+  outputSchema: z.object({ shown: z.boolean() }),
+  execute: ({ title, body }) => {
+    new Notification(title, { body });
+    return { shown: true };
+  },
+});
+
+// Hybrid tool with both implementations
+const userTool = hybridTool({
+  name: 'get_user',
+  description: 'Get user information',
+  inputSchema: z.object({ userId: z.string() }),
+  outputSchema: z.object({ name: z.string(), email: z.string() }),
+  server: async ({ userId }) => {
+    return await db.users.findUnique({ where: { id: userId } });
+  },
+  client: async ({ userId }) => {
+    const res = await fetch(\`/api/users/\${userId}\`);
+    return res.json();
+  },
+});`}
+        </CodeBlock>
+
+        <h3>Built-in Isomorphic Tools</h3>
+        <p>
+          AgentSea includes isomorphic versions of built-in tools with both
+          server and client implementations:
+        </p>
+
+        <CodeBlock language="typescript">
+          {`import {
+  calculatorDef,
+  calculatorServer,
+  calculatorClient,
+} from '@lov3kaizen/agentsea-core';
+
+// Use the definition to create custom implementations
+const customCalc = calculatorDef.server(async ({ operation, a, b }) => {
+  // Custom server logic with logging
+  console.log(\`Calculating: \${a} \${operation} \${b}\`);
+  // ... implementation
+});
+
+// Or use pre-built implementations
+const tools = [calculatorServer.toTool()];
+
+// Execute directly
+const result = await calculatorServer.execute(
+  { operation: 'add', a: 5, b: 3 },
+  context
+);
+// { result: 8 }`}
+        </CodeBlock>
+
+        <h3>Type Safety</h3>
+        <p>
+          Extract input and output types from tool definitions for full type
+          safety:
+        </p>
+
+        <CodeBlock language="typescript">
+          {`import type { ToolInput, ToolOutput } from '@lov3kaizen/agentsea-core';
+
+// Extract types from tool
+type CalcInput = ToolInput<typeof calculatorDef>;
+// { operation: 'add' | 'subtract' | 'multiply' | 'divide'; a: number; b: number }
+
+type CalcOutput = ToolOutput<typeof calculatorDef>;
+// { result: number }
+
+// Use in your code
+function runCalculation(input: CalcInput): Promise<CalcOutput> {
+  return calculatorServer.execute(input, context);
+}`}
+        </CodeBlock>
+
+        <h3>Converting to Legacy Tools</h3>
+        <p>Convert isomorphic tools to the legacy Tool interface for compatibility:</p>
+
+        <CodeBlock language="typescript">
+          {`import { toLegacyTool, toLegacyTools } from '@lov3kaizen/agentsea-core';
+
+// Convert single tool
+const legacyCalc = toLegacyTool(calculatorServer);
+
+// Convert multiple tools
+const legacyTools = toLegacyTools([
+  calculatorServer,
+  getUserServer,
+  customTool,
+]);
+
+// Use with existing code
+toolRegistry.registerMany(legacyTools);`}
+        </CodeBlock>
+
+        <Divider />
+
         <h2>Best Practices</h2>
         <ul>
           <li>
@@ -377,10 +579,21 @@ toolRegistry.unregister('calculator');`}
             <strong>Rate Limiting</strong>: Implement rate limiting for
             expensive operations
           </li>
+          <li>
+            <strong>Use Output Schemas</strong>: Define output schemas for
+            better type safety and validation
+          </li>
+          <li>
+            <strong>Environment Separation</strong>: Use isomorphic tools to
+            keep server and client logic separate
+          </li>
         </ul>
 
         <h2>Next Steps</h2>
         <ul>
+          <li>
+            <Link href="/docs/react-hooks">Use Tools with React Hooks</Link>
+          </li>
           <li>
             <Link href="/docs/mcp-overview">Learn about MCP Integration</Link>
           </li>
