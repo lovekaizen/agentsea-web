@@ -9,6 +9,19 @@
   color: white !important;
 }
 
+/* Mobile code block improvements */
+@media (max-width: 640px) {
+  .alert .my-4 {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  pre code {
+    word-break: break-all !important;
+    white-space: pre-wrap !important;
+  }
+}
+
 @layer base {
   :root {
     /* AgentSea Ocean Theme */
