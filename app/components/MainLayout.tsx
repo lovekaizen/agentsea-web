@@ -32,6 +32,7 @@ const sections: NavSection[] = [
     links: [
       { href: '/docs/agents', label: 'Agents' },
       { href: '/docs/providers', label: 'Providers' },
+      { href: '/docs/per-model-type-safety', label: 'Per-Model Type Safety' },
       { href: '/docs/local-providers', label: 'Local Providers' },
       { href: '/docs/tools', label: 'Tools' },
       { href: '/docs/workflows', label: 'Workflows' },

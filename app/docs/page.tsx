@@ -131,6 +131,12 @@ const sections = [
     href: '/docs/agents',
   },
   {
+    icon: '🎯',
+    title: 'Per-Model Type Safety',
+    description: 'Compile-time validation for model-specific options',
+    href: '/docs/per-model-type-safety',
+  },
+  {
     icon: '🦙',
     title: 'Local & Open Source',
     description: 'Run agents locally for privacy and zero API costs',
@@ -178,6 +184,7 @@ const sections = [
 const features = [
   'Multi-agent orchestration with workflows',
   'Multi-provider support (12+ providers)',
+  'Per-model type safety with compile-time validation',
   'Local & open source models (Ollama, llama.cpp, etc.)',
   'First-class MCP (Model Context Protocol) integration',
   'Built-in voice support (TTS/STT) with 5 providers',
