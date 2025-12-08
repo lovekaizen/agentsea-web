@@ -216,8 +216,8 @@ export function CodeBlock({ children, language }: CodeBlockProps) {
   };
 
   return (
-    <div className="my-6 rounded-xl overflow-hidden shadow-lg bg-gray-900 border border-base-300 relative group glow-purple">
-      <div className="flex items-center justify-between bg-base-300 px-4 py-2 border-b border-base-content/10">
+    <div className="my-4 sm:my-6 rounded-lg sm:rounded-xl overflow-hidden shadow-lg bg-gray-900 border border-base-300 relative group glow-purple max-w-full">
+      <div className="flex items-center justify-between bg-base-300 px-3 sm:px-4 py-2 border-b border-base-content/10">
         <span className="text-xs font-semibold text-base-content/60 uppercase tracking-wider">
           {language || 'CODE'}
         </span>
@@ -242,7 +242,7 @@ export function CodeBlock({ children, language }: CodeBlockProps) {
                   d="M5 13l4 4L19 7"
                 />
               </svg>
-              <span>Copied!</span>
+              <span className="hidden xs:inline">Copied!</span>
             </>
           ) : (
             <>
@@ -260,7 +260,7 @@ export function CodeBlock({ children, language }: CodeBlockProps) {
                   d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                 />
               </svg>
-              <span>Copy</span>
+              <span className="hidden xs:inline">Copy</span>
             </>
           )}
         </button>
@@ -273,16 +273,18 @@ export function CodeBlock({ children, language }: CodeBlockProps) {
           style={atomDark}
           customStyle={{
             margin: 0,
-            padding: '1rem',
+            padding: '0.75rem',
             background: 'transparent',
-            fontSize: '0.875rem',
+            fontSize: '0.75rem',
             lineHeight: '1.5',
           }}
           codeTagProps={{
             style: {
               fontFamily:
                 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+              wordBreak: 'break-word',
             },
+            className: 'sm:text-sm',
           }}
         >
           {textContent}
@@ -402,8 +404,8 @@ export function AlertBox({
         gradient ? 'border rounded-xl' : ''
       }`}
     >
-      {icons[type]}
-      <div className="flex-1">{children}</div>
+      <div className="hidden sm:block">{icons[type]}</div>
+      <div className="flex-1 min-w-0 overflow-hidden">{children}</div>
     </div>
   );
 }
