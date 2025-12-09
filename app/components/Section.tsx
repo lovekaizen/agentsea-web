@@ -1,6 +1,7 @@
 'use client';
 
 import React, { ReactNode, useState } from 'react';
+import Link from 'next/link';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -438,7 +439,6 @@ export function FeatureCard({
   );
 
   if (href) {
-    const Link = require('next/link').default;
     return <Link href={href}>{content}</Link>;
   }
 
