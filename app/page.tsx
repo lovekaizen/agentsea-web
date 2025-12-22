@@ -64,14 +64,14 @@ export default function Home() {
                 <div className="text-sm text-white/60 mt-1">LLM Providers</div>
               </div>
               <div className="text-center">
+                <div className="stat-gradient">15+</div>
+                <div className="text-sm text-white/60 mt-1">Packages</div>
+              </div>
+              <div className="text-center">
                 <div className="stat-gradient">7</div>
                 <div className="text-sm text-white/60 mt-1">
                   Voice Providers
                 </div>
-              </div>
-              <div className="text-center">
-                <div className="stat-gradient">14</div>
-                <div className="text-sm text-white/60 mt-1">Commerce Tools</div>
               </div>
               <div className="text-center">
                 <div className="stat-gradient">100%</div>
@@ -233,11 +233,89 @@ export default function Home() {
       {/* Gradient Divider */}
       <div className="divider-gradient"></div>
 
-      {/* All Features Grid */}
+      {/* Packages Section */}
       <section className="py-24 px-4 bg-base-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <span className="badge badge-gradient px-4 py-3 mb-4">03</span>
+            <h2 className="text-5xl font-bold mb-4">
+              Modular <span className="text-gradient-purple">Packages</span>
+            </h2>
+            <p className="text-lg text-base-content/70">
+              Extend your agents with powerful, production-ready modules
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {packages.map((pkg, index) => (
+              <Link
+                key={index}
+                href={pkg.link}
+                className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-300 cursor-pointer hover:scale-105 card-gradient-hover group overflow-hidden"
+              >
+                <div className="card-body relative z-10">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="text-4xl group-hover:scale-110 transition-transform">
+                      {pkg.icon}
+                    </div>
+                    <div>
+                      <h3 className="card-title text-xl group-hover:text-gradient transition-all">
+                        {pkg.title}
+                      </h3>
+                      <div className="badge badge-outline badge-sm opacity-60">
+                        {pkg.version}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-base-content/70 mb-4">{pkg.description}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {pkg.features.map((feature, i) => (
+                      <span
+                        key={i}
+                        className="badge badge-sm bg-base-200 border-base-300"
+                      >
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link
+              href="/docs"
+              className="btn btn-gradient btn-lg gap-2"
+            >
+              <span className="flex items-center gap-2">
+                Explore All Packages
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Gradient Divider */}
+      <div className="divider-gradient"></div>
+
+      {/* All Features Grid */}
+      <section className="py-24 px-4 bg-base-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="badge badge-gradient px-4 py-3 mb-4">04</span>
             <h2 className="text-5xl font-bold mb-4">
               <span className="text-gradient-blue">Everything</span> You Need
             </h2>
@@ -282,7 +360,7 @@ export default function Home() {
         <div className="orb orb-3"></div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-12">
-            <span className="badge badge-gradient px-4 py-3 mb-4">04</span>
+            <span className="badge badge-gradient px-4 py-3 mb-4">05</span>
             <h2 className="text-5xl font-bold mb-6 text-white">
               Run <span className="text-gradient-cool">Everything</span> Locally
             </h2>
@@ -347,7 +425,7 @@ export default function Home() {
       <section className="py-24 px-4 bg-base-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <span className="badge badge-gradient px-4 py-3 mb-4">05</span>
+            <span className="badge badge-gradient px-4 py-3 mb-4">06</span>
             <h2 className="text-5xl font-bold mb-4">
               Why Choose{' '}
               <span className="text-gradient-animated">AgentSea</span>?
@@ -512,6 +590,63 @@ const keyFeatures = [
   },
 ];
 
+const packages = [
+  {
+    icon: '👥',
+    title: 'Crews',
+    version: 'v0.1.0',
+    description:
+      'Multi-agent orchestration with role-based coordination, delegation strategies, and workflow management.',
+    features: ['Role-based', 'Delegation', 'Workflows', 'Templates'],
+    link: '/docs/crews',
+  },
+  {
+    icon: '🚀',
+    title: 'Gateway',
+    version: 'v0.1.0',
+    description:
+      'Intelligent LLM routing with load balancing, failover, and cost optimization across providers.',
+    features: ['Load Balancing', 'Failover', 'Cost Optimization', 'Metrics'],
+    link: '/docs/gateway',
+  },
+  {
+    icon: '🛡️',
+    title: 'Guardrails',
+    version: 'v0.1.0',
+    description:
+      'Safety and validation layer with content filtering, PII detection, and prompt injection protection.',
+    features: ['Content Safety', 'PII Detection', 'Injection Protection'],
+    link: '/docs/guardrails',
+  },
+  {
+    icon: '📊',
+    title: 'Evaluate',
+    version: 'v0.1.0',
+    description:
+      'LLM evaluation platform with automated metrics, LLM-as-Judge, and human feedback collection.',
+    features: ['Auto Metrics', 'LLM-as-Judge', 'Human Feedback', 'RLHF'],
+    link: '/docs/evaluate',
+  },
+  {
+    icon: '🧬',
+    title: 'Embeddings',
+    version: 'v0.1.0',
+    description:
+      'Vector embeddings toolkit with multi-provider support, intelligent chunking, and vector store integrations.',
+    features: ['Multi-Provider', 'Chunking', 'Vector Stores', 'Caching'],
+    link: '/docs/embeddings',
+  },
+  {
+    icon: '🌊',
+    title: 'Surf',
+    version: 'v0.1.0',
+    description:
+      'Browser automation and computer use with vision-based control and Claude vision integration.',
+    features: ['Vision Control', 'Browser Automation', 'Screen Capture'],
+    link: '/docs/surf',
+  },
+];
+
 const features = [
   {
     icon: '🎙️',
@@ -535,11 +670,11 @@ const features = [
     link: '/docs/cli',
   },
   {
-    icon: '🤖',
-    title: 'Multi-Agent System',
+    icon: '👥',
+    title: 'Multi-Agent Crews',
     description:
-      'Orchestrate multiple agents with sequential, parallel, and supervisor workflows',
-    link: '/docs/workflows',
+      'Role-based coordination with delegation strategies and workflow management',
+    link: '/docs/crews',
   },
   {
     icon: '⚡',
@@ -584,10 +719,11 @@ const features = [
     link: '/docs/memory',
   },
   {
-    icon: '📊',
-    title: 'Full Observability',
-    description: 'Built-in logging, metrics, and distributed tracing',
-    link: '/docs/observability',
+    icon: '🚀',
+    title: 'LLM Gateway',
+    description:
+      'Intelligent routing with load balancing, failover, and cost optimization',
+    link: '/docs/gateway',
   },
   {
     icon: '🌐',
@@ -603,9 +739,32 @@ const features = [
     link: '/docs/nestjs',
   },
   {
-    icon: '🚀',
-    title: 'Production Ready',
-    description: 'Rate limiting, caching, error handling, and retry logic',
+    icon: '🛡️',
+    title: 'Safety Guardrails',
+    description:
+      'Content filtering, PII detection, and prompt injection protection',
+    link: '/docs/guardrails',
+  },
+  {
+    icon: '📊',
+    title: 'LLM Evaluation',
+    description:
+      'Automated metrics, LLM-as-Judge, and human feedback collection',
+    link: '/docs/evaluate',
+  },
+  {
+    icon: '🧬',
+    title: 'Vector Embeddings',
+    description:
+      'Multi-provider embeddings with chunking and vector store integrations',
+    link: '/docs/embeddings',
+  },
+  {
+    icon: '🌊',
+    title: 'Browser Automation',
+    description:
+      'Vision-based browser control and computer use with Claude vision',
+    link: '/docs/surf',
   },
   {
     icon: '🔒',

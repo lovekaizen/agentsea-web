@@ -42,8 +42,20 @@ const sections: NavSection[] = [
     ],
   },
   {
+    title: 'Packages',
+    links: [
+      { href: '/docs/crews', label: 'Crews (Multi-Agent)' },
+      { href: '/docs/gateway', label: 'Gateway (LLM Routing)' },
+      { href: '/docs/guardrails', label: 'Guardrails (Safety)' },
+      { href: '/docs/evaluate', label: 'Evaluate (LLM Quality)' },
+      { href: '/docs/embeddings', label: 'Embeddings (Vectors)' },
+      { href: '/docs/surf', label: 'Surf (Browser Automation)' },
+    ],
+  },
+  {
     title: 'Features',
     links: [
+      { href: '/docs/react-hooks', label: 'React Hooks' },
       { href: '/docs/voice', label: 'Voice (TTS/STT)' },
       { href: '/docs/local-models', label: 'Local Models' },
       { href: '/docs/acp-integration', label: 'ACP Commerce' },
