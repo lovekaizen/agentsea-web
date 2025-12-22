@@ -506,6 +506,405 @@ import type {
 
 const apiSections = [
   {
+    icon: '👥',
+    title: 'Crews',
+    classes: [
+      {
+        name: 'Crew',
+        description: 'Multi-agent crew for coordinated task execution',
+        constructor: `createCrew(config: CrewConfig)`,
+        methods: [
+          {
+            signature: 'addTask(task: TaskConfig): void',
+            description: 'Add a task to the crew queue',
+          },
+          {
+            signature: 'kickoff(): Promise<CrewResult>',
+            description: 'Start crew execution and return final result',
+          },
+          {
+            signature: 'getProgress(): CrewProgress',
+            description: 'Get current execution progress',
+          },
+        ],
+        properties: [
+          { name: 'name', type: 'string', description: 'Crew name identifier' },
+          { name: 'delegationStrategy', type: 'DelegationStrategy', description: 'Task assignment strategy' },
+          { name: 'agents', type: 'CrewAgent[]', description: 'Array of crew agents' },
+        ],
+      },
+      {
+        name: 'Pre-built Templates',
+        description: 'Ready-to-use crew configurations',
+        constructor: 'Factory functions',
+        methods: [
+          {
+            signature: 'createResearchCrew(options: ResearchCrewOptions): Crew',
+            description: 'Create a research-focused crew with researcher and writer agents',
+          },
+          {
+            signature: 'createCodeReviewCrew(options: CodeReviewOptions): Crew',
+            description: 'Create a code review crew with reviewer and security agents',
+          },
+          {
+            signature: 'createWritingCrew(options: WritingOptions): Crew',
+            description: 'Create a content writing crew',
+          },
+          {
+            signature: 'createCustomerSupportCrew(options: SupportOptions): Crew',
+            description: 'Create a customer support crew',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '🌐',
+    title: 'Gateway',
+    classes: [
+      {
+        name: 'Gateway',
+        description: 'OpenAI-compatible LLM gateway with intelligent routing',
+        constructor: `new Gateway(config: GatewayConfig)`,
+        methods: [
+          {
+            signature: 'chat.completions.create(request): Promise<ChatCompletion>',
+            description: 'Create chat completion with auto-routing',
+          },
+          {
+            signature: 'getMetrics(): GatewayMetrics',
+            description: 'Get usage metrics (requests, costs, latency)',
+          },
+          {
+            signature: 'checkHealth(): Promise<HealthStatus>',
+            description: 'Check health of all providers',
+          },
+          {
+            signature: 'shutdown(): Promise<void>',
+            description: 'Gracefully shutdown gateway',
+          },
+        ],
+        properties: [
+          { name: 'providers', type: 'ProviderConfig[]', description: 'Configured LLM providers' },
+          { name: 'routing', type: 'RoutingConfig', description: 'Routing strategy configuration' },
+          { name: 'cache', type: 'CacheConfig', description: 'Response cache settings' },
+        ],
+      },
+      {
+        name: 'Virtual Models',
+        description: 'Auto-routing model aliases',
+        constructor: 'Use as model name',
+        methods: [
+          {
+            signature: 'model: "best"',
+            description: 'Route to highest quality model',
+          },
+          {
+            signature: 'model: "cheapest"',
+            description: 'Route to lowest cost model',
+          },
+          {
+            signature: 'model: "fastest"',
+            description: 'Route to lowest latency provider',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '🛡️',
+    title: 'Guardrails',
+    classes: [
+      {
+        name: 'GuardrailsEngine',
+        description: 'Safety and validation engine for AI inputs/outputs',
+        constructor: `createGuardrailsEngine(config: GuardrailsConfig)`,
+        methods: [
+          {
+            signature: 'registerGuard(guard: Guard): void',
+            description: 'Register a guard instance',
+          },
+          {
+            signature: 'checkInput(input: string, context?: GuardContext): Promise<GuardResult>',
+            description: 'Check input against all input guards',
+          },
+          {
+            signature: 'checkOutput(output: string, context?: GuardContext): Promise<GuardResult>',
+            description: 'Check output against all output guards',
+          },
+        ],
+        properties: [
+          { name: 'failureMode', type: "'fail-fast' | 'fail-safe' | 'collect-all'", description: 'How to handle guard failures' },
+          { name: 'defaultAction', type: "'allow' | 'block' | 'warn'", description: 'Default action when no guard blocks' },
+        ],
+      },
+      {
+        name: 'Built-in Guards',
+        description: 'Pre-built safety guards',
+        constructor: 'new Guard(options)',
+        methods: [
+          {
+            signature: 'ToxicityGuard({ sensitivity: "low" | "medium" | "high" })',
+            description: 'Detect toxic or harmful content',
+          },
+          {
+            signature: 'PIIGuard({ types: string[], maskingStrategy: "redact" | "mask" | "hash" })',
+            description: 'Detect and mask personally identifiable information',
+          },
+          {
+            signature: 'PromptInjectionGuard({ sensitivity: "low" | "medium" | "high" })',
+            description: 'Detect prompt injection attempts',
+          },
+          {
+            signature: 'SchemaGuard({ schema: ZodSchema })',
+            description: 'Validate output against Zod schema',
+          },
+          {
+            signature: 'TokenBudgetGuard({ maxTokensPerRequest: number })',
+            description: 'Enforce token limits',
+          },
+          {
+            signature: 'CostGuard({ maxCostPerRequest: number })',
+            description: 'Enforce cost limits',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '📊',
+    title: 'Evaluate',
+    classes: [
+      {
+        name: 'EvaluationPipeline',
+        description: 'Pipeline for running LLM evaluations',
+        constructor: `new EvaluationPipeline(config: PipelineConfig)`,
+        methods: [
+          {
+            signature: 'evaluate(options: EvaluateOptions): Promise<PipelineResult>',
+            description: 'Run evaluation on a dataset',
+          },
+        ],
+        properties: [
+          { name: 'metrics', type: 'Metric[]', description: 'Evaluation metrics to use' },
+          { name: 'parallelism', type: 'number', description: 'Number of parallel evaluations' },
+        ],
+      },
+      {
+        name: 'Built-in Metrics',
+        description: 'Pre-built evaluation metrics',
+        constructor: 'new Metric(options)',
+        methods: [
+          {
+            signature: 'AccuracyMetric({ type: "exact" | "fuzzy" | "semantic" })',
+            description: 'Measure accuracy against expected output',
+          },
+          {
+            signature: 'RelevanceMetric()',
+            description: 'Measure relevance to input',
+          },
+          {
+            signature: 'CoherenceMetric()',
+            description: 'Measure logical consistency',
+          },
+          {
+            signature: 'ToxicityMetric()',
+            description: 'Detect harmful content',
+          },
+          {
+            signature: 'FaithfulnessMetric()',
+            description: 'Measure factual accuracy (RAG)',
+          },
+        ],
+      },
+      {
+        name: 'LLM-as-Judge',
+        description: 'Use LLMs to evaluate responses',
+        constructor: 'new Judge(config)',
+        methods: [
+          {
+            signature: 'RubricJudge({ provider, rubric })',
+            description: 'Evaluate with custom rubric levels',
+          },
+          {
+            signature: 'ComparativeJudge({ provider, criteria })',
+            description: 'Compare two responses head-to-head',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '🔍',
+    title: 'Embeddings',
+    classes: [
+      {
+        name: 'EmbeddingManager',
+        description: 'Manage embedding lifecycle with caching and stores',
+        constructor: `createEmbeddingManager(config: EmbeddingConfig)`,
+        methods: [
+          {
+            signature: 'registerModel(provider: EmbeddingProvider, isDefault?: boolean): void',
+            description: 'Register an embedding provider',
+          },
+          {
+            signature: 'embed(text: string): Promise<EmbeddingResult>',
+            description: 'Embed a single text',
+          },
+          {
+            signature: 'embedBatch(texts: string[]): Promise<BatchResult>',
+            description: 'Embed multiple texts',
+          },
+          {
+            signature: 'embedDocument(text: string, options: DocOptions): Promise<Chunk[]>',
+            description: 'Chunk and embed a document',
+          },
+          {
+            signature: 'search(query: string, options: SearchOptions): Promise<SearchResult[]>',
+            description: 'Search for similar content',
+          },
+          {
+            signature: 'similarity(text1: string, text2: string): Promise<number>',
+            description: 'Calculate similarity between texts',
+          },
+        ],
+      },
+      {
+        name: 'Chunking Strategies',
+        description: 'Document chunking implementations',
+        constructor: 'createChunker()',
+        methods: [
+          {
+            signature: 'createFixedChunker()',
+            description: 'Fixed-size character chunking',
+          },
+          {
+            signature: 'createRecursiveChunker()',
+            description: 'Recursive text splitting',
+          },
+          {
+            signature: 'createMarkdownChunker()',
+            description: 'Markdown-aware chunking',
+          },
+          {
+            signature: 'createCodeChunker()',
+            description: 'Code-aware chunking by functions',
+          },
+          {
+            signature: 'createSemanticChunker()',
+            description: 'Semantic similarity-based chunking',
+          },
+        ],
+      },
+      {
+        name: 'Vector Stores',
+        description: 'Vector storage backends',
+        constructor: 'createStore(config)',
+        methods: [
+          {
+            signature: 'createMemoryStore({ dimensions })',
+            description: 'In-memory vector store',
+          },
+          {
+            signature: 'createPineconeStore({ apiKey, indexName })',
+            description: 'Pinecone vector store',
+          },
+          {
+            signature: 'createChromaStore({ url, collectionName })',
+            description: 'Chroma vector store',
+          },
+          {
+            signature: 'createQdrantStore({ url, collectionName })',
+            description: 'Qdrant vector store',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: '🖥️',
+    title: 'Surf (Browser Automation)',
+    classes: [
+      {
+        name: 'SurfAgent',
+        description: 'Computer-use agent with Claude vision',
+        constructor: `new SurfAgent(sessionId: string, backend: Backend, config: SurfConfig)`,
+        methods: [
+          {
+            signature: 'execute(task: string): Promise<SurfResult>',
+            description: 'Execute a natural language task',
+          },
+          {
+            signature: 'executeStream(task: string): AsyncIterable<SurfEvent>',
+            description: 'Stream execution events',
+          },
+          {
+            signature: 'stop(): void',
+            description: 'Stop current execution',
+          },
+          {
+            signature: 'getState(): SurfState',
+            description: 'Get current agent state',
+          },
+        ],
+        properties: [
+          { name: 'maxSteps', type: 'number', description: 'Maximum execution steps' },
+          { name: 'sandbox', type: 'SandboxConfig', description: 'Security sandbox settings' },
+        ],
+      },
+      {
+        name: 'Backends',
+        description: 'Desktop/browser backends',
+        constructor: 'createBackend(config)',
+        methods: [
+          {
+            signature: 'createNativeBackend()',
+            description: 'Native desktop backend (macOS, Linux, Windows)',
+          },
+          {
+            signature: 'new PuppeteerBackend({ headless, viewport })',
+            description: 'Puppeteer browser backend',
+          },
+          {
+            signature: 'new DockerBackend({ image, resolution })',
+            description: 'Docker container backend',
+          },
+        ],
+      },
+      {
+        name: 'Computer-Use Tools',
+        description: '8 built-in computer interaction tools',
+        constructor: 'createSurfTools(backend)',
+        methods: [
+          {
+            signature: 'screenshot',
+            description: 'Take a screenshot',
+          },
+          {
+            signature: 'click({ x, y })',
+            description: 'Click at coordinates',
+          },
+          {
+            signature: 'typeText({ text })',
+            description: 'Type text',
+          },
+          {
+            signature: 'scroll({ direction, amount })',
+            description: 'Scroll the screen',
+          },
+          {
+            signature: 'keyPress({ key })',
+            description: 'Press a key',
+          },
+          {
+            signature: 'drag({ startX, startY, endX, endY })',
+            description: 'Drag from one point to another',
+          },
+        ],
+      },
+    ],
+  },
+  {
     icon: '🤖',
     title: 'Agent',
     classes: [
