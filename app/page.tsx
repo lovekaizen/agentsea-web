@@ -261,9 +261,15 @@ export default function Home() {
                       <h3 className="card-title text-xl group-hover:text-gradient transition-all">
                         {pkg.title}
                       </h3>
-                      <div className="badge badge-outline badge-sm opacity-60">
-                        {pkg.version}
-                      </div>
+                      {pkg.isPublic ? (
+                        <div className="badge badge-outline badge-sm opacity-60">
+                          {pkg.version}
+                        </div>
+                      ) : (
+                        <div className="badge badge-warning badge-sm">
+                          WIP
+                        </div>
+                      )}
                     </div>
                   </div>
                   <p className="text-base-content/70 mb-4">{pkg.description}</p>
@@ -592,18 +598,10 @@ const keyFeatures = [
 
 const packages = [
   {
-    icon: '👥',
-    title: 'Crews',
-    version: 'v0.1.0',
-    description:
-      'Multi-agent orchestration with role-based coordination, delegation strategies, and workflow management.',
-    features: ['Role-based', 'Delegation', 'Workflows', 'Templates'],
-    link: '/docs/crews',
-  },
-  {
     icon: '🚀',
     title: 'Gateway',
     version: 'v0.1.0',
+    isPublic: true,
     description:
       'Intelligent LLM routing with load balancing, failover, and cost optimization across providers.',
     features: ['Load Balancing', 'Failover', 'Cost Optimization', 'Metrics'],
@@ -613,15 +611,37 @@ const packages = [
     icon: '🛡️',
     title: 'Guardrails',
     version: 'v0.1.0',
+    isPublic: true,
     description:
       'Safety and validation layer with content filtering, PII detection, and prompt injection protection.',
     features: ['Content Safety', 'PII Detection', 'Injection Protection'],
     link: '/docs/guardrails',
   },
   {
+    icon: '📐',
+    title: 'Structured Output',
+    version: 'v0.1.0',
+    isPublic: true,
+    description:
+      'Type-safe structured outputs with JSON schema validation, Zod integration, and automatic retries.',
+    features: ['JSON Schema', 'Zod Integration', 'Type Safety', 'Validation'],
+    link: '/docs/structured-output',
+  },
+  {
+    icon: '👥',
+    title: 'Crews',
+    version: 'v0.1.0',
+    isPublic: false,
+    description:
+      'Multi-agent orchestration with role-based coordination, delegation strategies, and workflow management.',
+    features: ['Role-based', 'Delegation', 'Workflows', 'Templates'],
+    link: '/docs/crews',
+  },
+  {
     icon: '📊',
     title: 'Evaluate',
     version: 'v0.1.0',
+    isPublic: false,
     description:
       'LLM evaluation platform with automated metrics, LLM-as-Judge, and human feedback collection.',
     features: ['Auto Metrics', 'LLM-as-Judge', 'Human Feedback', 'RLHF'],
@@ -631,6 +651,7 @@ const packages = [
     icon: '🧬',
     title: 'Embeddings',
     version: 'v0.1.0',
+    isPublic: false,
     description:
       'Vector embeddings toolkit with multi-provider support, intelligent chunking, and vector store integrations.',
     features: ['Multi-Provider', 'Chunking', 'Vector Stores', 'Caching'],
@@ -640,6 +661,7 @@ const packages = [
     icon: '🌊',
     title: 'Surf',
     version: 'v0.1.0',
+    isPublic: false,
     description:
       'Browser automation and computer use with vision-based control and Claude vision integration.',
     features: ['Vision Control', 'Browser Automation', 'Screen Capture'],
