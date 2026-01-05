@@ -8,7 +8,6 @@ import {
   Divider,
 } from '../../components/Section';
 
-
 export default function ToolsPage() {
   return (
     <PageContainer maxWidth="5xl">
@@ -37,12 +36,13 @@ export default function ToolsPage() {
           {builtInTools.map((tool, index) => (
             <div
               key={index}
-              className="p-4 bg-white rounded-lg border border-gray-200"
+              className="pb-2 px-6 bg-white rounded-lg border border-gray-200"
             >
               <div className="flex items-start gap-3">
-                <div className="text-2xl">{tool.icon}</div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{tool.name}</h3>
+                  <h3 className="font-semibold text-gray-900">
+                    {tool.icon} {tool.name}
+                  </h3>
                   <p className="text-sm text-gray-600 mt-1">
                     {tool.description}
                   </p>
@@ -526,7 +526,10 @@ function runCalculation(input: CalcInput): Promise<CalcOutput> {
         </CodeBlock>
 
         <h3>Converting to Legacy Tools</h3>
-        <p>Convert isomorphic tools to the legacy Tool interface for compatibility:</p>
+        <p>
+          Convert isomorphic tools to the legacy Tool interface for
+          compatibility:
+        </p>
 
         <CodeBlock language="typescript">
           {`import { toLegacyTool, toLegacyTools } from '@lov3kaizen/agentsea-core';

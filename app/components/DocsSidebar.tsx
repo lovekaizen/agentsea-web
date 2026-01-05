@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 interface NavLink {
   href: string;
   label: string;
+  isWip?: boolean;
 }
 
 interface NavSection {
@@ -35,6 +36,18 @@ const sections: NavSection[] = [
       { href: '/docs/memory', label: 'Memory' },
       { href: '/docs/formatting', label: 'Content Formatting' },
       { href: '/docs/conversation', label: 'Conversation' },
+    ],
+  },
+  {
+    title: 'Packages',
+    links: [
+      { href: '/docs/gateway', label: 'Gateway (LLM Routing)' },
+      { href: '/docs/guardrails', label: 'Guardrails (Safety)' },
+      { href: '/docs/structured-output', label: 'Structured Output' },
+      { href: '/docs/crews', label: 'Crews (Multi-Agent)', isWip: true },
+      { href: '/docs/evaluate', label: 'Evaluate (LLM Quality)', isWip: true },
+      { href: '/docs/embeddings', label: 'Embeddings (Vectors)', isWip: true },
+      { href: '/docs/surf', label: 'Surf (Browser Automation)', isWip: true },
     ],
   },
   {
@@ -94,7 +107,12 @@ export default function DocsSidebar() {
                           : 'hover:bg-gradient-to-r hover:from-primary/10 hover:via-secondary/5 hover:to-transparent hover:text-primary transition-all duration-200'
                       }
                     >
-                      {link.label}
+                      <span className="flex items-center gap-2">
+                        {link.label}
+                        {link.isWip && (
+                          <span className="badge badge-warning badge-xs">WIP</span>
+                        )}
+                      </span>
                     </Link>
                   </li>
                 ))}

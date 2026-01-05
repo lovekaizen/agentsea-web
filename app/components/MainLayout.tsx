@@ -9,6 +9,7 @@ import { AGENTSEA_VERSION } from '../constants';
 interface NavLink {
   href: string;
   label: string;
+  isWip?: boolean;
 }
 
 interface NavSection {
@@ -42,8 +43,21 @@ const sections: NavSection[] = [
     ],
   },
   {
+    title: 'Packages',
+    links: [
+      { href: '/docs/gateway', label: 'Gateway (LLM Routing)' },
+      { href: '/docs/guardrails', label: 'Guardrails (Safety)' },
+      { href: '/docs/structured-output', label: 'Structured Output' },
+      { href: '/docs/crews', label: 'Crews (Multi-Agent)', isWip: true },
+      { href: '/docs/evaluate', label: 'Evaluate (LLM Quality)', isWip: true },
+      { href: '/docs/embeddings', label: 'Embeddings (Vectors)', isWip: true },
+      { href: '/docs/surf', label: 'Surf (Browser Automation)', isWip: true },
+    ],
+  },
+  {
     title: 'Features',
     links: [
+      { href: '/docs/react-hooks', label: 'React Hooks' },
       { href: '/docs/voice', label: 'Voice (TTS/STT)' },
       { href: '/docs/local-models', label: 'Local Models' },
       { href: '/docs/acp-integration', label: 'ACP Commerce' },
@@ -278,7 +292,12 @@ export default function MainLayout({
                               : 'hover:bg-gradient-to-r hover:from-sky-600/10 hover:to-cyan-500/10 transition-all'
                           }
                         >
-                          {link.label}
+                          <span className="flex items-center gap-2">
+                            {link.label}
+                            {link.isWip && (
+                              <span className="badge badge-warning badge-xs">WIP</span>
+                            )}
+                          </span>
                         </Link>
                       </li>
                     ))}
