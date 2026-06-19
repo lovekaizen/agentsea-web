@@ -24,8 +24,8 @@ export default function ProvidersPage() {
           </h3>
           <div className="text-blue-800 space-y-2">
             <p className="m-0">
-              <strong>Cloud Providers (6):</strong> Anthropic, OpenAI, Google,
-              Azure OpenAI, Mistral AI, Cohere
+              <strong>Cloud Providers (6):</strong> Anthropic, OpenAI, Google
+              Gemini, Mistral AI, DeepSeek, xAI (Grok)
             </p>
             <p className="m-0">
               <strong>Local Providers (6):</strong> Ollama, LM Studio, LocalAI,
@@ -79,15 +79,15 @@ export default function ProvidersPage() {
 
 const provider = new AnthropicProvider(process.env.ANTHROPIC_API_KEY);
 
-// Available models:
-// - claude-sonnet-4-20250514 (Latest, most capable)
-// - claude-3-5-sonnet-20241022
-// - claude-3-opus-20240229 (Highest intelligence)
-// - claude-3-haiku-20240307 (Fastest, cheapest)
+// Available models (selection):
+// - claude-opus-4-6 (Most capable)
+// - claude-sonnet-4-5-20250929 (Balanced, latest Sonnet)
+// - claude-haiku-4-5 (Fastest, cheapest)
+// - claude-3-7-sonnet-20250219 (Extended thinking)
 
 const agent = new Agent(
   {
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-5-20250929',
     provider: 'anthropic',
     temperature: 0.7,
     maxTokens: 4096,
@@ -121,8 +121,9 @@ const agent = new Agent(
 
         <h3>OpenAI (GPT)</h3>
         <p>
-          Pioneer in large language models, known for GPT-4 and strong
-          ecosystem.
+          Pioneer in large language models, known for the GPT and o-series and a
+          strong ecosystem. AgentSea ships with a registry of 60+ models across
+          providers, including the latest OpenAI releases.
         </p>
 
         <CodeBlock language="typescript">
@@ -130,15 +131,17 @@ const agent = new Agent(
 
 const provider = new OpenAIProvider(process.env.OPENAI_API_KEY);
 
-// Available models:
-// - gpt-4-turbo-preview (Most capable)
-// - gpt-4 (Reliable, proven)
-// - gpt-3.5-turbo (Fast, cost-effective)
-// - gpt-4-vision-preview (Vision support)
+// Available models (selection):
+// - gpt-5 (Most capable)
+// - gpt-4.1 (Strong general-purpose)
+// - gpt-4o (Multimodal, fast)
+// - gpt-4o-mini (Fast, cost-effective)
+// - o3 (Advanced reasoning)
+// - o4-mini (Efficient reasoning)
 
 const agent = new Agent(
   {
-    model: 'gpt-4-turbo-preview',
+    model: 'gpt-4.1',
     provider: 'openai',
     temperature: 0.8,
     maxTokens: 2048,
@@ -147,6 +150,17 @@ const agent = new Agent(
   toolRegistry,
 );`}
         </CodeBlock>
+
+        <AlertBox type="info">
+          <p className="m-0">
+            Reasoning models such as <code>o3</code> and <code>o4-mini</code>{' '}
+            have model-specific options. Use{' '}
+            <Link href="/docs/per-model-type-safety">
+              per-model type safety
+            </Link>{' '}
+            to get compile-time validation of which options each model supports.
+          </p>
+        </AlertBox>
 
         <div className="grid md:grid-cols-2 gap-4 my-4">
           <div>
@@ -177,19 +191,19 @@ const agent = new Agent(
         </p>
 
         <CodeBlock language="typescript">
-          {`import { GoogleProvider } from '@lov3kaizen/agentsea-core';
+          {`import { GeminiProvider } from '@lov3kaizen/agentsea-core';
 
-const provider = new GoogleProvider(process.env.GOOGLE_AI_API_KEY);
+const provider = new GeminiProvider(process.env.GOOGLE_AI_API_KEY);
 
 // Available models:
-// - gemini-2.0-flash-exp (Latest, fastest)
-// - gemini-1.5-pro (Most capable)
-// - gemini-1.5-flash (Fast, affordable)
+// - gemini-2.5-pro (Most capable)
+// - gemini-2.5-flash (Fast, affordable)
+// - gemini-2.0-flash (Low latency)
 
 const agent = new Agent(
   {
-    model: 'gemini-2.0-flash-exp',
-    provider: 'google',
+    model: 'gemini-2.5-flash',
+    provider: 'gemini',
     temperature: 0.7,
   },
   provider,
@@ -219,36 +233,75 @@ const agent = new Agent(
           </div>
         </div>
 
-        <h3>Other Cloud Providers</h3>
+        <h3>Mistral, DeepSeek &amp; xAI</h3>
+        <p>
+          Mistral AI, DeepSeek, and xAI (Grok) are first-class providers in the{' '}
+          <code>Provider</code> registry. They are created with the same
+          type-safe config builders as the other providers and run over an
+          OpenAI-compatible transport under the hood — just set the matching API
+          key environment variable.
+        </p>
 
-        <div className="space-y-4 my-6">
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h4 className="font-semibold mb-2">Azure OpenAI</h4>
-            <p className="text-sm mb-2">
-              Enterprise-grade OpenAI models with Azure infrastructure and
-              compliance.
-            </p>
-            <code className="text-xs">AzureOpenAIProvider</code>
-          </div>
+        <CodeBlock language="typescript">
+          {`import {
+  createProvider,
+  mistral,
+  deepseek,
+  xai,
+} from '@lov3kaizen/agentsea-core';
 
+// Mistral AI — set MISTRAL_API_KEY
+const mistralProvider = createProvider(
+  mistral('mistral-large-latest', { tools: [myTool] }),
+);
+
+// DeepSeek — set DEEPSEEK_API_KEY
+const deepseekProvider = createProvider(deepseek('deepseek-reasoner'));
+
+// xAI (Grok) — set XAI_API_KEY
+const grokProvider = createProvider(xai('grok-3'));`}
+        </CodeBlock>
+
+        <div className="grid md:grid-cols-3 gap-4 my-6">
           <div className="border border-gray-200 rounded-lg p-4">
             <h4 className="font-semibold mb-2">Mistral AI</h4>
             <p className="text-sm mb-2">
-              European AI company with strong open models and competitive
-              pricing.
+              European AI with strong open models and competitive pricing.
             </p>
-            <code className="text-xs">MistralAIProvider</code>
+            <code className="text-xs">
+              mistral-large-latest, mistral-small-latest, codestral-latest
+            </code>
           </div>
 
           <div className="border border-gray-200 rounded-lg p-4">
-            <h4 className="font-semibold mb-2">Cohere</h4>
+            <h4 className="font-semibold mb-2">DeepSeek</h4>
             <p className="text-sm mb-2">
-              Enterprise-focused AI with strong retrieval and generation
-              capabilities.
+              Cost-efficient chat and reasoning models with strong coding
+              ability.
             </p>
-            <code className="text-xs">CohereProvider</code>
+            <code className="text-xs">deepseek-chat, deepseek-reasoner</code>
+          </div>
+
+          <div className="border border-gray-200 rounded-lg p-4">
+            <h4 className="font-semibold mb-2">xAI (Grok)</h4>
+            <p className="text-sm mb-2">
+              Grok models with real-time knowledge and fast inference tiers.
+            </p>
+            <code className="text-xs">grok-3, grok-3-fast, grok-3-mini</code>
           </div>
         </div>
+
+        <AlertBox type="info">
+          <p className="m-0">
+            All providers share the same config-builder API
+            (<code>anthropic()</code>, <code>openai()</code>,{' '}
+            <code>gemini()</code>, <code>mistral()</code>,{' '}
+            <code>deepseek()</code>, <code>xai()</code>) so you get compile-time
+            validation of which options each model supports. See{' '}
+            <Link href="/docs/per-model-type-safety">per-model type safety</Link>
+            .
+          </p>
+        </AlertBox>
 
         <h2 id="local-providers">Local Providers</h2>
 
@@ -435,7 +488,7 @@ const provider = new OpenAICompatibleProvider({
               </tr>
               <tr className="border-t border-gray-200">
                 <td className="px-4 py-2">
-                  <strong>Google</strong>
+                  <strong>Google Gemini</strong>
                 </td>
                 <td className="px-4 py-2">⭐⭐⭐⭐⭐</td>
                 <td className="px-4 py-2">⭐⭐⭐⭐⭐</td>
@@ -450,18 +503,28 @@ const provider = new OpenAICompatibleProvider({
                 <td className="px-4 py-2">⭐⭐⭐⭐</td>
                 <td className="px-4 py-2">⭐⭐⭐⭐</td>
                 <td className="px-4 py-2">$$</td>
-                <td className="px-4 py-2">32K</td>
+                <td className="px-4 py-2">128K</td>
                 <td className="px-4 py-2">European compliance</td>
               </tr>
               <tr className="border-t border-gray-200">
                 <td className="px-4 py-2">
-                  <strong>Cohere</strong>
+                  <strong>DeepSeek</strong>
+                </td>
+                <td className="px-4 py-2">⭐⭐⭐⭐</td>
+                <td className="px-4 py-2">⭐⭐⭐⭐</td>
+                <td className="px-4 py-2">$</td>
+                <td className="px-4 py-2">128K</td>
+                <td className="px-4 py-2">Reasoning, coding (low cost)</td>
+              </tr>
+              <tr className="border-t border-gray-200">
+                <td className="px-4 py-2">
+                  <strong>xAI (Grok)</strong>
                 </td>
                 <td className="px-4 py-2">⭐⭐⭐⭐</td>
                 <td className="px-4 py-2">⭐⭐⭐⭐</td>
                 <td className="px-4 py-2">$$</td>
                 <td className="px-4 py-2">128K</td>
-                <td className="px-4 py-2">Enterprise RAG</td>
+                <td className="px-4 py-2">Real-time knowledge</td>
               </tr>
             </tbody>
           </table>
@@ -585,7 +648,7 @@ const provider = new OpenAICompatibleProvider({
             <p className="text-orange-800 text-sm m-0">
               <strong>Speed:</strong> Google Gemini Flash or Claude Haiku
               <br />
-              <strong>Quality:</strong> Claude Sonnet 4 or GPT-4 Turbo
+              <strong>Quality:</strong> Claude Opus 4.6 or GPT-5
               <br />
               <strong>Throughput:</strong> vLLM for production scale
             </p>

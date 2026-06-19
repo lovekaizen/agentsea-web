@@ -119,6 +119,30 @@ Calculate 42 * 58
 42 × 58 = 2,436`}
           </CodeBlock>
 
+          <h3>sea code</h3>
+          <p>
+            Launch an interactive <strong>agentic coding</strong> session. The
+            coding agent has 13 built-in tools for file operations, code editing,
+            search, shell execution, and git — and works with any provider. See
+            the{' '}
+            <Link href="/docs/agentic-coding">Agentic Coding guide</Link> for the
+            full tool reference.
+          </p>
+
+          <CodeBlock language="bash">
+            {`# Start an agentic coding session
+sea code
+
+# Use a specific provider/model
+sea code --provider anthropic --model claude-sonnet-4-20250514
+
+# Verbose mode with token usage and latency
+sea code --verbose
+
+# Limit tool iterations
+sea code --maxIterations 50`}
+          </CodeBlock>
+
           <h3>sea agent</h3>
           <p>Manage your agents - create, list, get, delete, run.</p>
 

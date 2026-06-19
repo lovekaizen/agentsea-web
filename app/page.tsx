@@ -64,7 +64,7 @@ export default function Home() {
                 <div className="text-sm text-white/60 mt-1">LLM Providers</div>
               </div>
               <div className="text-center">
-                <div className="stat-gradient">15+</div>
+                <div className="stat-gradient">20+</div>
                 <div className="text-sm text-white/60 mt-1">Packages</div>
               </div>
               <div className="text-center">
@@ -594,13 +594,19 @@ const keyFeatures = [
     description: 'Get started in 60 seconds',
     link: '/docs/cli',
   },
+  {
+    icon: '💻',
+    title: 'Agentic Coding',
+    description: '13 built-in coding tools',
+    link: '/docs/agentic-coding',
+  },
 ];
 
 const packages = [
   {
     icon: '🚀',
     title: 'Gateway',
-    version: 'v0.1.0',
+    version: 'v1.0.0',
     isPublic: true,
     description:
       'Intelligent LLM routing with load balancing, failover, and cost optimization across providers.',
@@ -610,7 +616,7 @@ const packages = [
   {
     icon: '🛡️',
     title: 'Guardrails',
-    version: 'v0.1.0',
+    version: 'v1.0.0',
     isPublic: true,
     description:
       'Safety and validation layer with content filtering, PII detection, and prompt injection protection.',
@@ -620,7 +626,7 @@ const packages = [
   {
     icon: '📐',
     title: 'Structured Output',
-    version: 'v0.1.0',
+    version: 'v1.0.0',
     isPublic: true,
     description:
       'Type-safe structured outputs with JSON schema validation, Zod integration, and automatic retries.',
@@ -630,8 +636,8 @@ const packages = [
   {
     icon: '👥',
     title: 'Crews',
-    version: 'v0.1.0',
-    isPublic: false,
+    version: 'v1.0.0',
+    isPublic: true,
     description:
       'Multi-agent orchestration with role-based coordination, delegation strategies, and workflow management.',
     features: ['Role-based', 'Delegation', 'Workflows', 'Templates'],
@@ -640,8 +646,8 @@ const packages = [
   {
     icon: '📊',
     title: 'Evaluate',
-    version: 'v0.1.0',
-    isPublic: false,
+    version: 'v1.0.0',
+    isPublic: true,
     description:
       'LLM evaluation platform with automated metrics, LLM-as-Judge, and human feedback collection.',
     features: ['Auto Metrics', 'LLM-as-Judge', 'Human Feedback', 'RLHF'],
@@ -650,8 +656,8 @@ const packages = [
   {
     icon: '🧬',
     title: 'Embeddings',
-    version: 'v0.1.0',
-    isPublic: false,
+    version: 'v1.0.0',
+    isPublic: true,
     description:
       'Vector embeddings toolkit with multi-provider support, intelligent chunking, and vector store integrations.',
     features: ['Multi-Provider', 'Chunking', 'Vector Stores', 'Caching'],
@@ -660,12 +666,82 @@ const packages = [
   {
     icon: '🌊',
     title: 'Surf',
-    version: 'v0.1.0',
-    isPublic: false,
+    version: 'v1.0.0',
+    isPublic: true,
     description:
       'Browser automation and computer use with vision-based control and Claude vision integration.',
     features: ['Vision Control', 'Browser Automation', 'Screen Capture'],
     link: '/docs/surf',
+  },
+  {
+    icon: '🔴',
+    title: 'Red Team',
+    version: 'v1.0.0',
+    isPublic: true,
+    description:
+      'AI safety and red-teaming toolkit with adversarial attacks, vulnerability scanning, and compliance checks.',
+    features: ['Adversarial', 'Jailbreak Detection', 'Compliance', 'Audit'],
+    link: '/docs/redteam',
+  },
+  {
+    icon: '💰',
+    title: 'Costs',
+    version: 'v1.0.0',
+    isPublic: true,
+    description:
+      'Real-time AI cost tracking with a 60+ model pricing registry, budget enforcement, and Stripe billing.',
+    features: ['60+ Models', 'Budgets', 'Optimization', 'Billing'],
+    link: '/docs/costs',
+  },
+  {
+    icon: '📈',
+    title: 'Analytics',
+    version: 'v1.0.0',
+    isPublic: true,
+    description:
+      'Conversation analytics with intent classification, sentiment tracking, flow analysis, and insights.',
+    features: ['Intent', 'Sentiment', 'Flow Analysis', 'KPIs'],
+    link: '/docs/analytics',
+  },
+  {
+    icon: '🐛',
+    title: 'Debugger',
+    version: 'v1.0.0',
+    isPublic: true,
+    description:
+      'Step-through agent execution with decision-tree visualization, checkpoint replay, and what-if testing.',
+    features: ['Step-Through', 'Replay', 'What-If', 'Visualization'],
+    link: '/docs/debugger',
+  },
+  {
+    icon: '💾',
+    title: 'Cache',
+    version: 'v1.0.0',
+    isPublic: true,
+    description:
+      'Semantic caching layer for LLM responses with exact-match, similarity, and hybrid strategies.',
+    features: ['Exact Match', 'Semantic', 'Hybrid', 'Streaming Replay'],
+    link: '/docs/cache',
+  },
+  {
+    icon: '📥',
+    title: 'Ingest',
+    version: 'v1.0.0',
+    isPublic: true,
+    description:
+      'Document processing pipeline for PDF, DOCX, HTML, and Markdown with chunking, OCR, and extraction.',
+    features: ['PDF/DOCX', 'Chunking', 'OCR', 'Tables/Images'],
+    link: '/docs/ingest',
+  },
+  {
+    icon: '📝',
+    title: 'Prompts',
+    version: 'v1.0.0',
+    isPublic: true,
+    description:
+      'Self-hosted prompt management with Git-like version control, A/B testing, and environment promotion.',
+    features: ['Versioning', 'A/B Testing', 'Promotion', 'Collaboration'],
+    link: '/docs/prompts',
   },
 ];
 

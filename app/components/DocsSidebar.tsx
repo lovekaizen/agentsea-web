@@ -22,6 +22,7 @@ const sections: NavSection[] = [
       { href: '/docs/installation', label: 'Installation' },
       { href: '/docs/quick-start', label: 'Quick Start' },
       { href: '/docs/cli', label: 'CLI Tool' },
+      { href: '/docs/agentic-coding', label: 'Agentic Coding' },
     ],
   },
   {
@@ -39,15 +40,43 @@ const sections: NavSection[] = [
     ],
   },
   {
-    title: 'Packages',
+    title: 'Orchestration & Routing',
     links: [
+      { href: '/docs/crews', label: 'Crews (Multi-Agent)' },
       { href: '/docs/gateway', label: 'Gateway (LLM Routing)' },
-      { href: '/docs/guardrails', label: 'Guardrails (Safety)' },
+    ],
+  },
+  {
+    title: 'Data & Retrieval',
+    links: [
+      { href: '/docs/embeddings', label: 'Embeddings (Vectors)' },
+      { href: '/docs/cache', label: 'Cache (Semantic)' },
       { href: '/docs/structured-output', label: 'Structured Output' },
-      { href: '/docs/crews', label: 'Crews (Multi-Agent)', isWip: true },
-      { href: '/docs/evaluate', label: 'Evaluate (LLM Quality)', isWip: true },
-      { href: '/docs/embeddings', label: 'Embeddings (Vectors)', isWip: true },
-      { href: '/docs/surf', label: 'Surf (Browser Automation)', isWip: true },
+      { href: '/docs/ingest', label: 'Ingest (Documents)' },
+      { href: '/docs/prompts', label: 'Prompts (Versioning)' },
+    ],
+  },
+  {
+    title: 'Safety & Evaluation',
+    links: [
+      { href: '/docs/guardrails', label: 'Guardrails (Safety)' },
+      { href: '/docs/evaluate', label: 'Evaluate (LLM Quality)' },
+      { href: '/docs/redteam', label: 'Red Teaming' },
+    ],
+  },
+  {
+    title: 'Observability',
+    links: [
+      { href: '/docs/observability', label: 'Logging & Tracing' },
+      { href: '/docs/analytics', label: 'Conversation Analytics' },
+      { href: '/docs/costs', label: 'Cost Tracking' },
+      { href: '/docs/debugger', label: 'Agent Debugger' },
+    ],
+  },
+  {
+    title: 'Automation',
+    links: [
+      { href: '/docs/surf', label: 'Surf (Computer-Use)' },
     ],
   },
   {
@@ -72,7 +101,6 @@ const sections: NavSection[] = [
     title: 'Advanced',
     links: [
       { href: '/docs/multi-tenancy', label: 'Multi-Tenancy' },
-      { href: '/docs/observability', label: 'Observability' },
       { href: '/docs/nestjs', label: 'NestJS Integration' },
     ],
   },

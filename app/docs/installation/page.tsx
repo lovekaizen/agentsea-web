@@ -72,6 +72,51 @@ pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs`}
           </CodeBlock>
         </Section>
 
+        <Section title="Add-on Packages" id="add-on-packages">
+          <p>
+            AgentSea is a modular monorepo. Install only the packages you need —
+            each is published under the <code>@lov3kaizen/agentsea-*</code> scope
+            and is framework-agnostic:
+          </p>
+
+          <CodeBlock language="bash">
+            {`# Orchestration & routing
+pnpm add @lov3kaizen/agentsea-crews      # Multi-agent crews
+pnpm add @lov3kaizen/agentsea-gateway    # LLM gateway & routing
+
+# Data & retrieval
+pnpm add @lov3kaizen/agentsea-memory     # Advanced memory stores
+pnpm add @lov3kaizen/agentsea-embeddings # Vector embeddings
+pnpm add @lov3kaizen/agentsea-cache      # Semantic response cache
+pnpm add @lov3kaizen/agentsea-structured # Zod structured output
+pnpm add @lov3kaizen/agentsea-ingest     # Document ingestion
+pnpm add @lov3kaizen/agentsea-prompts    # Prompt management
+
+# Safety & evaluation
+pnpm add @lov3kaizen/agentsea-guardrails # Safety & validation
+pnpm add @lov3kaizen/agentsea-evaluate   # LLM evaluation
+pnpm add @lov3kaizen/agentsea-redteam    # Red teaming
+
+# Observability & operations
+pnpm add @lov3kaizen/agentsea-analytics  # Conversation analytics
+pnpm add @lov3kaizen/agentsea-costs      # Cost tracking
+pnpm add @lov3kaizen/agentsea-debugger   # Agent debugger
+
+# Automation & UI
+pnpm add @lov3kaizen/agentsea-surf       # Computer-use agent
+pnpm add @lov3kaizen/agentsea-react      # React components`}
+          </CodeBlock>
+
+          <AlertBox type="info">
+            <p className="m-0">
+              Prefer the CLI? Install it globally with{' '}
+              <code>npm install -g @lov3kaizen/agentsea-cli</code> and run{' '}
+              <code>sea code</code> to start an{' '}
+              <Link href="/docs/agentic-coding">agentic coding session</Link>.
+            </p>
+          </AlertBox>
+        </Section>
+
         <Section title="API Keys" id="api-keys">
           <p>You'll need API keys from your chosen LLM provider:</p>
 

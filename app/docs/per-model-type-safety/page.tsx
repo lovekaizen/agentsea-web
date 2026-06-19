@@ -191,6 +191,37 @@ const ollamaConfig = ollama('llama3.2', {
           </p>
         </AlertBox>
 
+        <h3>Mistral, DeepSeek &amp; xAI</h3>
+
+        <p>
+          Mistral AI, DeepSeek, and xAI (Grok) ship with the same typed
+          config-builder API. Each builder validates the model id and the
+          options that model supports at compile time, and{' '}
+          <code>createProvider</code> wires up the right OpenAI-compatible
+          transport and API key for you.
+        </p>
+
+        <CodeBlock language="typescript">
+          {`import { mistral, deepseek, xai, createProvider } from '@lov3kaizen/agentsea-core';
+
+// Mistral — set MISTRAL_API_KEY
+const mistralConfig = mistral('mistral-large-latest', {
+  tools: [myTool],
+  systemPrompt: 'You are helpful',
+  temperature: 0.7,
+});
+
+// DeepSeek — set DEEPSEEK_API_KEY
+const deepseekConfig = deepseek('deepseek-reasoner', {
+  systemPrompt: 'Think step by step',
+});
+
+// xAI (Grok) — set XAI_API_KEY
+const grokConfig = xai('grok-3', { tools: [myTool] });
+
+const provider = createProvider(mistralConfig);`}
+        </CodeBlock>
+
         <Divider />
 
         <h2 id="model-capabilities">Model Capabilities Reference</h2>
