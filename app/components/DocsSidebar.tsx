@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 interface NavLink {
   href: string;
   label: string;
-  isWip?: boolean;
+  status?: 'beta' | 'wip';
 }
 
 interface NavSection {
@@ -137,8 +137,11 @@ export default function DocsSidebar() {
                     >
                       <span className="flex items-center gap-2">
                         {link.label}
-                        {link.isWip && (
+                        {link.status === 'wip' && (
                           <span className="badge badge-warning badge-xs">WIP</span>
+                        )}
+                        {link.status === 'beta' && (
+                          <span className="badge badge-info badge-xs">Beta</span>
                         )}
                       </span>
                     </Link>
