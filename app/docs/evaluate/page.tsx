@@ -262,17 +262,72 @@ const [train, test] = dataset.split(0.8);`}
         </CodeBlock>
 
         <h3>HuggingFace Integration</h3>
-        <CodeBlock language="typescript">
-          {`import { loadHuggingFaceDataset } from '@lov3kaizen/agentsea-evaluate/datasets';
 
-const dataset = await loadHuggingFaceDataset('squad', {
-  split: 'validation',
-  inputField: 'question',
-  outputField: 'answers.text[0]',
-  contextField: 'context',
-  limit: 1000,
-});`}
+        <h4>Import from the Hub</h4>
+        <p>
+          <code>EvalDataset.fromHuggingFace</code> loads rows from the public
+          HuggingFace{' '}
+          <a href="https://datasets-server.huggingface.co">datasets-server</a>{' '}
+          REST API — no SDK dependency is required. Rows are mapped onto eval
+          items using the configured field names.
+        </p>
+        <CodeBlock language="typescript">
+          {`import { EvalDataset } from '@lov3kaizen/agentsea-evaluate';
+
+const dataset = await EvalDataset.fromHuggingFace('squad', {
+  split: 'validation', // defaults to 'train'
+  subset: 'default', // datasets-server config / subset, defaults to 'default'
+  inputField: 'question', // defaults to 'input'
+  outputField: 'answers', // defaults to 'output'
+  contextField: 'context', // optional, maps to item.context[]
+  limit: 1000, // defaults to 100
+});
+
+console.log(dataset.size);
+console.log(dataset.getItems()[0]);`}
         </CodeBlock>
+        <AlertBox type="info">
+          <span>
+            To read gated or private datasets, set the <code>HF_TOKEN</code>{' '}
+            environment variable. It is sent as a bearer token on the
+            datasets-server request.
+          </span>
+        </AlertBox>
+
+        <h4>Export to the Hub</h4>
+        <p>
+          <code>DatasetExporter</code> pushes a preference dataset to the
+          HuggingFace Hub as DPO-format JSONL, generating a dataset card
+          (README) alongside the data. Hub upload uses the optional{' '}
+          <code>@huggingface/hub</code> package and requires a write-scoped
+          token.
+        </p>
+        <CodeBlock language="typescript">
+          {`import { DatasetExporter } from '@lov3kaizen/agentsea-evaluate/datasets';
+
+const exporter = new DatasetExporter();
+
+const result = await exporter.exportPreferences(preferenceDataset, {
+  format: 'huggingface',
+  formatOptions: {
+    name: 'my-org/preference-dataset', // target Hub repo
+    token: process.env.HF_TOKEN, // write-scoped HF token
+    private: true,
+    license: 'mit',
+    tags: ['preference', 'dpo', 'rlhf'],
+  },
+});
+
+console.log(result.url);
+// https://huggingface.co/datasets/my-org/preference-dataset`}
+        </CodeBlock>
+        <AlertBox type="info">
+          <span>
+            <code>name</code> and <code>token</code> may also be supplied at the
+            top level as <code>repoName</code> and <code>token</code> on the
+            export options.
+          </span>
+        </AlertBox>
 
         <h2>Continuous Evaluation</h2>
         <p>Monitor production quality with automated evaluation pipelines:</p>
@@ -302,6 +357,79 @@ await evaluator.log({
   expectedOutput: groundTruth, // Optional
 });`}
         </CodeBlock>
+
+        <h3>Alert Channels</h3>
+        <p>
+          The <code>AlertManager</code> delivers quality-degradation alerts over
+          multiple channels. Define rules per metric, then attach one or more
+          channels. Webhook, Slack, email, and PagerDuty are all supported.
+        </p>
+        <CodeBlock language="typescript">
+          {`import { AlertManager } from '@lov3kaizen/agentsea-evaluate/continuous';
+
+const alerts = new AlertManager({
+  rules: {
+    accuracy: { metric: 'accuracy', threshold: 0.8, direction: 'below', severity: 'critical' },
+    toxicity: { metric: 'toxicity', threshold: 0.1, direction: 'above', severity: 'warning' },
+  },
+  cooldownMs: 300_000, // suppress repeats for 5 minutes (default)
+  channels: [
+    { type: 'slack', webhook: 'https://hooks.slack.com/services/...' },
+    { type: 'webhook', webhook: 'https://example.com/alerts' },
+  ],
+});
+
+// Feed metric values; a breached rule fires the channels.
+alerts.check('accuracy', 0.74);`}
+        </CodeBlock>
+
+        <h4>Email (SMTP)</h4>
+        <p>
+          The <code>email</code> channel sends alerts over SMTP using the
+          optional <code>nodemailer</code> package (install it to enable this
+          channel). It requires <code>to</code> recipients and an{' '}
+          <code>smtp.host</code>; the <code>from</code> address defaults to the
+          SMTP auth user.
+        </p>
+        <CodeBlock language="typescript">
+          {`const channel = {
+  type: 'email',
+  to: ['oncall@example.com', 'quality@example.com'],
+  from: 'alerts@example.com', // optional, defaults to smtp.auth.user
+  smtp: {
+    host: 'smtp.example.com',
+    port: 587, // defaults to 587
+    secure: false, // defaults to false
+    auth: { user: 'apikey', pass: process.env.SMTP_PASSWORD },
+  },
+};`}
+        </CodeBlock>
+
+        <h4>PagerDuty</h4>
+        <p>
+          The <code>pagerduty</code> channel triggers an incident through the
+          PagerDuty{' '}
+          <a href="https://developer.pagerduty.com/docs/events-api-v2/overview/">
+            Events API v2
+          </a>{' '}
+          enqueue endpoint. Provide an integration{' '}
+          <code>routingKey</code> (it falls back to <code>apiKey</code> when not
+          set). Repeated alerts for the same metric are de-duplicated into a
+          single incident.
+        </p>
+        <CodeBlock language="typescript">
+          {`const channel = {
+  type: 'pagerduty',
+  routingKey: process.env.PAGERDUTY_ROUTING_KEY, // Events API v2 integration key
+};`}
+        </CodeBlock>
+        <AlertBox type="info">
+          <span>
+            Alert severity (<code>info</code>, <code>warning</code>,{' '}
+            <code>critical</code>) comes from the matching rule and is mapped to
+            the PagerDuty severity on each event.
+          </span>
+        </AlertBox>
 
         <h2>API Reference</h2>
 

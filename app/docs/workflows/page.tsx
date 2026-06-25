@@ -193,7 +193,25 @@ const result = await workflow.execute(
         </CodeBlock>
 
         <h2>Error Handling</h2>
-        <p>Configure how workflows handle errors:</p>
+        <p>
+          Configure how workflows handle agent errors with the{' '}
+          <code>errorHandling</code> strategy. It is a single string value, not
+          an object:
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-6">
+          {errorStrategies.map((strategy, index) => (
+            <div
+              key={index}
+              className="p-4 bg-white rounded-lg border border-gray-200"
+            >
+              <h3 className="font-mono text-sm font-semibold text-purple-700 mb-1">
+                {strategy.name}
+              </h3>
+              <p className="text-sm text-gray-600">{strategy.description}</p>
+            </div>
+          ))}
+        </div>
 
         <CodeBlock language="typescript">
           {`const workflow = WorkflowFactory.create(
@@ -201,11 +219,8 @@ const result = await workflow.execute(
     name: 'resilient-workflow',
     type: 'sequential',
     agents: [...],
-    errorHandling: {
-      strategy: 'continue', // 'stop', 'continue', or 'retry'
-      maxRetries: 3,
-      retryDelay: 1000, // milliseconds
-    },
+    // 'fail-fast' (default) | 'retry' | 'fallback' | 'continue'
+    errorHandling: 'continue',
   },
   provider,
   toolRegistry,
@@ -218,6 +233,53 @@ try {
   console.error('Workflow failed:', error);
 }`}
         </CodeBlock>
+
+        <h2>Retry Strategy</h2>
+        <AlertBox type="info">
+          As of v1.1.0, the <code>&apos;retry&apos;</code> strategy performs
+          real retries. A failing agent is re-invoked up to{' '}
+          <code>retry.maxAttempts</code> times before the error propagates.
+          (Previously this was a no-op that simply re-threw the error.)
+        </AlertBox>
+
+        <p>
+          Pair <code>errorHandling: &apos;retry&apos;</code> with an optional{' '}
+          <code>retry</code> config to tune attempts and backoff:
+        </p>
+
+        <CodeBlock language="typescript">
+          {`const workflow = WorkflowFactory.create(
+  {
+    name: 'resilient-workflow',
+    type: 'sequential',
+    agents: [...],
+    errorHandling: 'retry',
+    retry: {
+      maxAttempts: 5,        // re-invoke the agent up to 5 times
+      initialDelayMs: 500,   // base delay before backing off
+      backoff: 'exponential', // 'linear' | 'exponential'
+      maxDelayMs: 10000,     // optional cap on the computed delay
+    },
+  },
+  provider,
+  toolRegistry,
+);
+
+// The agent is retried on failure. If every attempt fails,
+// the final error propagates to the workflow's error handler.
+const result = await workflow.execute(input, context);`}
+        </CodeBlock>
+
+        <p>
+          When the <code>retry</code> config is omitted, retries default to{' '}
+          <strong>3 attempts</strong> with <strong>no delay</strong> and{' '}
+          <strong>exponential</strong> backoff. Delays only apply when{' '}
+          <code>initialDelayMs</code> is greater than <code>0</code>:{' '}
+          <code>linear</code> waits <code>initialDelayMs * attempt</code>, while{' '}
+          <code>exponential</code> waits{' '}
+          <code>initialDelayMs * 2 ** (attempt - 1)</code>, each capped by{' '}
+          <code>maxDelayMs</code>.
+        </p>
 
         <h2>Workflow Context</h2>
         <p>Pass data between agents using workflow context:</p>
@@ -406,5 +468,28 @@ const workflowTypes = [
     icon: '👔',
     name: 'Supervisor',
     description: 'A supervisor routes tasks dynamically to specialized agents',
+  },
+];
+
+const errorStrategies = [
+  {
+    name: "'fail-fast'",
+    description:
+      'Default. The agent runs once and any error immediately propagates, terminating the workflow.',
+  },
+  {
+    name: "'retry'",
+    description:
+      'Re-invokes the failing agent up to retry.maxAttempts times with optional backoff. The error propagates only after every attempt fails.',
+  },
+  {
+    name: "'fallback'",
+    description:
+      'Returns a fallback response noting the failure instead of throwing, letting the workflow continue.',
+  },
+  {
+    name: "'continue'",
+    description:
+      'Skips the failed agent and continues the workflow with the remaining agents.',
   },
 ];

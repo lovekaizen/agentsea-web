@@ -91,6 +91,84 @@ const result = await crew.kickoff();
 console.log(result.finalOutput);`}
         </CodeBlock>
 
+        <h2>Execution Model</h2>
+        <p>
+          As of v1.1.0, crew agents <strong>execute against a real LLM by
+          default</strong>. Each agent runs through a core-backed executor
+          (<code>CoreExecutor</code>) that calls the configured provider, so a
+          crew produces genuine model output rather than placeholder text.
+        </p>
+
+        <AlertBox type="info">
+          <span>
+            Real execution requires <code>@lov3kaizen/agentsea-core</code>{' '}
+            (a peer dependency) and an API key for the chosen provider. Core is
+            imported lazily on first execution, so orchestration scaffolding and
+            mocked runs never need provider SDKs or keys. Supported providers
+            for the default executor are <code>anthropic</code>,{' '}
+            <code>openai</code>, <code>gemini</code>, and <code>ollama</code>.
+          </span>
+        </AlertBox>
+
+        <h3>Mock Execution (Offline / Tests)</h3>
+        <p>
+          Opt into deterministic mock output with <code>mock: true</code>. No
+          provider SDK, network access, or API key is required, which makes it
+          ideal for offline scaffolding and tests.
+        </p>
+
+        <CodeBlock language="typescript">
+          {`const crew = createCrew({
+  name: 'my-crew',
+  agents: [...],
+  delegationStrategy: 'best-match',
+  mock: true, // deterministic, offline — no LLM call
+});`}
+        </CodeBlock>
+
+        <h3>Provider Injection</h3>
+        <p>
+          Instead of having the executor lazily construct a provider by name,
+          you can inject a pre-built core <code>CoreLLMProvider</code> via the{' '}
+          <code>provider</code> option. This is useful for dependency injection,
+          custom provider instances, and deterministic end-to-end tests with no
+          network. (The <code>provider</code> option is ignored when{' '}
+          <code>execute</code> or <code>mock</code> is set.)
+        </p>
+
+        <CodeBlock language="typescript">
+          {`import { createCrew, type CoreLLMProvider } from '@lov3kaizen/agentsea-crews';
+
+// Any object matching CoreLLMProvider satisfies the seam — a concrete core
+// provider (e.g. AnthropicProvider) or a deterministic test double.
+const testProvider: CoreLLMProvider = {
+  async generateResponse(messages, config) {
+    return {
+      content: 'deterministic response',
+      usage: { inputTokens: 10, outputTokens: 5 },
+    };
+  },
+};
+
+const crew = createCrew({
+  name: 'my-crew',
+  agents: [...],
+  delegationStrategy: 'best-match',
+  provider: testProvider, // injected instead of loaded by name
+});`}
+        </CodeBlock>
+
+        <AlertBox type="info">
+          <span>
+            For any provider not covered by the default executor, pass a custom{' '}
+            <code>execute</code> function on the crew config. It receives the
+            formatted task input and the agent&apos;s generated system prompt and
+            takes precedence over the default core-backed executor.
+          </span>
+        </AlertBox>
+
+        <Divider />
+
         <h2>Delegation Strategies</h2>
         <p>Choose how tasks are assigned to agents:</p>
 

@@ -20,8 +20,8 @@ export default function EmbeddingsPage() {
       <AlertBox type="info" gradient>
         <span>
           The Embeddings package provides multi-provider support, smart chunking
-          strategies, and vector store integrations with Pinecone, Chroma, and
-          Qdrant.
+          strategies, and vector store integrations with Pinecone, Chroma,
+          Qdrant, pgvector, Weaviate, and Milvus.
         </span>
       </AlertBox>
 
@@ -143,6 +143,37 @@ const provider = createLocalProvider({
     return texts.map((text) => new Array(384).fill(0).map(() => Math.random()));
   },
 });`}
+        </CodeBlock>
+
+        <h3>Local ONNX Models</h3>
+        <p>
+          Instead of supplying an <code>embedFn</code>, point{' '}
+          <code>modelPath</code> at an ONNX feature-extraction model (a local
+          directory or a HuggingFace repo id). The provider loads it via
+          Transformers.js and handles tokenization, the ONNX runtime, and
+          mean-pooling for you.
+        </p>
+        <AlertBox type="info">
+          <span>
+            Loading ONNX models from <code>modelPath</code> requires the
+            optional <code>@xenova/transformers</code> dependency. Install it, or
+            pass an <code>embedFn</code> instead.
+          </span>
+        </AlertBox>
+        <CodeBlock language="bash">{`pnpm add @xenova/transformers`}</CodeBlock>
+        <CodeBlock language="typescript">
+          {`import { createLocalProvider } from '@lov3kaizen/agentsea-embeddings';
+
+const provider = createLocalProvider({
+  // Local directory or a HuggingFace repo id
+  modelPath: 'Xenova/all-MiniLM-L6-v2',
+  dimensions: 384,
+  normalize: true, // L2-normalize the pooled output (default)
+});
+
+// First call lazily loads the ONNX pipeline
+const result = await provider.embed('Hello, world!');
+console.log('Dimensions:', result.dimensions);`}
         </CodeBlock>
 
         <h2>Chunking Strategies</h2>
@@ -350,6 +381,69 @@ const store = createQdrantStore({
 await store.init();`}
         </CodeBlock>
 
+        <h3>pgvector</h3>
+        <AlertBox type="info">
+          <span>
+            pgvector, Weaviate, and Milvus are constructed through the{' '}
+            <code>createStore(type, config)</code> factory and rely on optional
+            peer drivers (<code>pg</code>, <code>weaviate-ts-client</code>, and{' '}
+            <code>@zilliz/milvus2-sdk-node</code> respectively). Install the
+            driver for the backend you use.
+          </span>
+        </AlertBox>
+        <CodeBlock language="bash">{`pnpm add pg`}</CodeBlock>
+        <CodeBlock language="typescript">
+          {`import { createStore } from '@lov3kaizen/agentsea-embeddings';
+
+const store = createStore('pgvector', {
+  type: 'pgvector',
+  connectionString: 'postgres://user:pass@localhost:5432/mydb',
+  tableName: 'embeddings',
+  dimensions: 1536,
+  metric: 'cosine',
+  indexType: 'hnsw', // or 'ivfflat'
+  indexParams: { m: 16, efConstruction: 64 },
+});
+
+await store.init();`}
+        </CodeBlock>
+
+        <h3>Weaviate</h3>
+        <CodeBlock language="bash">{`pnpm add weaviate-ts-client`}</CodeBlock>
+        <CodeBlock language="typescript">
+          {`import { createStore } from '@lov3kaizen/agentsea-embeddings';
+
+const store = createStore('weaviate', {
+  type: 'weaviate',
+  url: 'http://localhost:8080',
+  apiKey: process.env.WEAVIATE_API_KEY, // optional
+  className: 'Document',
+  dimensions: 1536,
+  metric: 'cosine',
+});
+
+await store.init();`}
+        </CodeBlock>
+
+        <h3>Milvus</h3>
+        <CodeBlock language="bash">{`pnpm add @zilliz/milvus2-sdk-node`}</CodeBlock>
+        <CodeBlock language="typescript">
+          {`import { createStore } from '@lov3kaizen/agentsea-embeddings';
+
+const store = createStore('milvus', {
+  type: 'milvus',
+  url: 'http://localhost:19530',
+  username: process.env.MILVUS_USER, // optional
+  password: process.env.MILVUS_PASSWORD, // optional
+  collectionName: 'documents',
+  dimensions: 1536,
+  metric: 'cosine',
+  indexType: 'HNSW', // 'IVF_FLAT' | 'IVF_SQ8' | 'IVF_PQ' | 'HNSW' | 'ANNOY'
+});
+
+await store.init();`}
+        </CodeBlock>
+
         <h2>Version Management</h2>
         <CodeBlock language="typescript">
           {`import { createVersionRegistry } from '@lov3kaizen/agentsea-embeddings';
@@ -499,6 +593,7 @@ const features = [
   {
     icon: '🗄️',
     name: 'Vector Stores',
-    description: 'Pinecone, Chroma, Qdrant, and in-memory adapters',
+    description:
+      'Pinecone, Chroma, Qdrant, pgvector, Weaviate, Milvus, and in-memory adapters',
   },
 ];

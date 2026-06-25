@@ -30,8 +30,10 @@ export default function SurfPage() {
           {`pnpm add @lov3kaizen/agentsea-surf
 
 # Optional dependencies
-pnpm add puppeteer  # For browser automation
-pnpm add sharp      # For image processing`}
+pnpm add puppeteer   # Browser automation (default engine)
+pnpm add playwright  # Browser automation (chromium/firefox/webkit)
+pnpm add sharp       # Image processing
+pnpm add rfb2        # VNC remote-display backend`}
         </CodeBlock>
 
         <h2>Key Features</h2>
@@ -100,6 +102,28 @@ main().catch(console.error);`}
         </CodeBlock>
 
         <h2>Backends</h2>
+        <p>
+          Surf ships with backends for native desktops, browsers (Puppeteer or
+          Playwright), Docker, Kubernetes, and remote displays (VNC/RDP). Each
+          can be constructed directly, or selected by type through the{' '}
+          <code>createBackend(config)</code> factory:
+        </p>
+        <CodeBlock language="typescript">
+          {`import { createBackend } from '@lov3kaizen/agentsea-surf';
+
+// createBackend returns a Promise<DesktopBackend>
+const backend = await createBackend({
+  type: 'browser',
+  options: { engine: 'playwright', browserType: 'chromium' },
+});
+
+await backend.connect();`}
+        </CodeBlock>
+        <p>
+          Supported <code>type</code> values: <code>native</code>,{' '}
+          <code>browser</code>, <code>docker</code>, <code>kubernetes</code>,{' '}
+          <code>vnc</code>, and <code>rdp</code>.
+        </p>
 
         <h3>Native Backend</h3>
         <p>
@@ -113,8 +137,11 @@ const backend = createNativeBackend({ displayIndex: 0 });
 await backend.connect();`}
         </CodeBlock>
 
-        <h3>Browser Backend (Puppeteer)</h3>
-        <p>Automate web browsers with Puppeteer:</p>
+        <h3>Browser Backend (Puppeteer or Playwright)</h3>
+        <p>
+          Automate web browsers with Puppeteer (the default engine) or
+          Playwright:
+        </p>
         <CodeBlock language="typescript">
           {`import { PuppeteerBackend } from '@lov3kaizen/agentsea-surf';
 
@@ -122,6 +149,28 @@ const backend = new PuppeteerBackend({
   headless: false,
   viewport: { width: 1920, height: 1080 },
   initialUrl: 'https://example.com',
+});
+
+await backend.connect();`}
+        </CodeBlock>
+        <p>
+          Playwright adds Firefox and WebKit support via{' '}
+          <code>browserType</code>. Select it through <code>createBackend</code>{' '}
+          by setting <code>engine: &apos;playwright&apos;</code> (the default
+          engine remains <code>&apos;puppeteer&apos;</code>):
+        </p>
+        <CodeBlock language="typescript">
+          {`import { createBackend } from '@lov3kaizen/agentsea-surf';
+
+const backend = await createBackend({
+  type: 'browser',
+  options: {
+    engine: 'playwright',
+    browserType: 'webkit', // 'chromium' | 'firefox' | 'webkit'
+    headless: true,
+    viewport: { width: 1920, height: 1080 },
+    initialUrl: 'https://example.com',
+  },
 });
 
 await backend.connect();`}
@@ -137,6 +186,89 @@ const backend = new DockerBackend({
   resolution: { width: 1920, height: 1080, scaleFactor: 1 },
   removeOnDisconnect: true,
 });
+
+await backend.connect();`}
+        </CodeBlock>
+
+        <h3>Kubernetes Backend</h3>
+        <p>
+          Run a desktop pod in a Kubernetes cluster, driven via{' '}
+          <code>kubectl exec</code>. Requires <code>kubectl</code> on PATH and an
+          image that ships an X server plus <code>xdotool</code>/
+          <code>scrot</code> (the same desktop image used for Docker works):
+        </p>
+        <CodeBlock language="typescript">
+          {`import { createBackend } from '@lov3kaizen/agentsea-surf';
+
+const backend = await createBackend({
+  type: 'kubernetes',
+  options: {
+    namespace: 'agentsea',
+    image: 'agentsea/desktop:ubuntu-22.04',
+    resolution: { width: 1920, height: 1080, scaleFactor: 1 },
+    resources: {
+      requests: { cpu: '500m', memory: '1Gi' },
+      limits: { cpu: '2', memory: '4Gi' },
+    },
+    deleteOnDisconnect: true,
+  },
+});
+
+await backend.connect();`}
+        </CodeBlock>
+
+        <h3>Remote-Display Backends (VNC / RDP)</h3>
+        <p>
+          Drive an existing remote desktop over the VNC (RFB) or RDP protocol.
+          Both translate Surf actions into pointer/key events:
+        </p>
+        <CodeBlock language="typescript">
+          {`import { createBackend } from '@lov3kaizen/agentsea-surf';
+
+// VNC
+const vnc = await createBackend({
+  type: 'vnc',
+  options: { host: '127.0.0.1', port: 5900, password: 'secret' },
+});
+
+// RDP
+const rdp = await createBackend({
+  type: 'rdp',
+  options: {
+    host: '127.0.0.1',
+    port: 3389,
+    username: 'user',
+    password: 'secret',
+    domain: 'WORKGROUP',
+  },
+});
+
+await vnc.connect();`}
+        </CodeBlock>
+        <AlertBox type="warning">
+          <span>
+            Pointer/key/input translation is fully implemented and unit-tested,
+            but <strong>frame capture</strong> (screenshots) and the{' '}
+            <strong>RDP transport</strong> are experimental. The optional{' '}
+            <code>rfb2</code> (VNC) and RDP client packages cannot assemble
+            framebuffers into PNGs on their own. For production, inject a custom{' '}
+            <code>RemoteDisplayClient</code> via the backend&apos;s{' '}
+            <code>{`{ client }`}</code> dependency.
+          </span>
+        </AlertBox>
+        <CodeBlock language="typescript">
+          {`import {
+  VNCBackend,
+  type RemoteDisplayClient,
+} from '@lov3kaizen/agentsea-surf';
+
+// Inject your own client for reliable frame capture + transport
+const client: RemoteDisplayClient = createMyRemoteDisplayClient();
+
+const backend = new VNCBackend(
+  { host: '127.0.0.1', port: 5900 },
+  { client },
+);
 
 await backend.connect();`}
         </CodeBlock>
@@ -413,7 +545,8 @@ const features = [
   {
     icon: '🔌',
     name: 'Multiple Backends',
-    description: 'Native (macOS, Linux, Windows), Puppeteer, Docker',
+    description:
+      'Native, Puppeteer, Playwright, Docker, Kubernetes, VNC, RDP',
   },
   {
     icon: '👁️',

@@ -97,6 +97,39 @@ const batchCollector = new BatchCollector({
 });`}
         </CodeBlock>
 
+        <h2>Session Retrieval</h2>
+        <p>
+          <code>SessionManager</code> persists every session to storage, so you
+          can look one up even after it has ended or expired. Use{' '}
+          <code>await manager.fetch(id)</code> to retrieve any session — it
+          returns the active session or falls back to persistent storage. The
+          synchronous <code>get(id)</code> only returns sessions still active in
+          memory:
+        </p>
+        <CodeBlock language="typescript">
+          {`import { SessionManager } from '@lov3kaizen/agentsea-analytics/collection';
+
+const manager = new SessionManager(storage, config);
+
+const session = await manager.create({ userId: 'user-456' });
+await manager.end(session.id);
+
+// get() is synchronous and in-memory only — null once a session ends/expires
+manager.get(session.id); // null (no longer active)
+
+// fetch() falls back to storage, returning ended/expired sessions
+const restored = await manager.fetch(session.id); // Session | null`}
+        </CodeBlock>
+
+        <AlertBox type="info">
+          <span>
+            Reach for <code>fetch(id)</code> whenever a session may have left
+            memory (ended, expired, or created in a previous process). Keep{' '}
+            <code>get(id)</code> for hot-path checks on currently active
+            sessions.
+          </span>
+        </AlertBox>
+
         <h2>Intent Classification</h2>
         <p>
           Classify user intents with custom taxonomies. The classifier returns a
