@@ -9,7 +9,7 @@ import { AGENTSEA_VERSION } from '../constants';
 interface NavLink {
   href: string;
   label: string;
-  isWip?: boolean;
+  status?: 'beta' | 'wip';
 }
 
 interface NavSection {
@@ -48,10 +48,10 @@ const sections: NavSection[] = [
       { href: '/docs/gateway', label: 'Gateway (LLM Routing)' },
       { href: '/docs/guardrails', label: 'Guardrails (Safety)' },
       { href: '/docs/structured-output', label: 'Structured Output' },
-      { href: '/docs/crews', label: 'Crews (Multi-Agent)', isWip: true },
-      { href: '/docs/evaluate', label: 'Evaluate (LLM Quality)', isWip: true },
-      { href: '/docs/embeddings', label: 'Embeddings (Vectors)', isWip: true },
-      { href: '/docs/surf', label: 'Surf (Browser Automation)', isWip: true },
+      { href: '/docs/crews', label: 'Crews (Multi-Agent)' },
+      { href: '/docs/evaluate', label: 'Evaluate (LLM Quality)' },
+      { href: '/docs/embeddings', label: 'Embeddings (Vectors)' },
+      { href: '/docs/surf', label: 'Surf (Browser Automation)' },
     ],
   },
   {
@@ -294,8 +294,11 @@ export default function MainLayout({
                         >
                           <span className="flex items-center gap-2">
                             {link.label}
-                            {link.isWip && (
+                            {link.status === 'wip' && (
                               <span className="badge badge-warning badge-xs">WIP</span>
+                            )}
+                            {link.status === 'beta' && (
+                              <span className="badge badge-info badge-xs">Beta</span>
                             )}
                           </span>
                         </Link>
