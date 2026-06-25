@@ -147,47 +147,238 @@ console.log('Findings:', compliance.findings);`}
         </CodeBlock>
 
         <h2>Audit & Evidence</h2>
-        <p>Collect evidence and maintain audit trails:</p>
+        <p>
+          The <code>AuditLogger</code> keeps an append-only, hash-chained trail:
+          every entry stores the hash of the previous one, so any later mutation
+          is detectable via <code>verifyIntegrity()</code>. Collect evidence and
+          maintain audit trails:
+        </p>
         <CodeBlock language="typescript">
           {`import { AuditLogger, EvidenceCollector } from '@lov3kaizen/agentsea-redteam';
 
-const auditLogger = new AuditLogger({ storage: 'sqlite' });
+const auditLogger = new AuditLogger();
 const evidenceCollector = new EvidenceCollector();
 
-// Log security events
+// Log a security event (id, timestamp, and hashes are filled in for you)
 auditLogger.log({
-  event: 'vulnerability-found',
+  eventType: 'finding_created',
+  action: 'vulnerability-found',
+  actor: { id: 'scanner', type: 'system' },
+  resource: { id: 'my-agent', type: 'agent' },
+  outcome: 'success',
   severity: 'high',
   details: { type: 'prompt-injection', category: 'direct' },
 });
 
-// Collect evidence
-evidenceCollector.capture({
-  input: attackInput,
-  output: agentResponse,
-  timestamp: Date.now(),
-});`}
+// Collect evidence and bundle it into a hashed package
+evidenceCollector.collect({
+  type: 'transcript',
+  content: JSON.stringify({ input: attackInput, output: agentResponse }),
+});
+const pkg = evidenceCollector.createPackage('case-001');
+
+// Verify the chain has not been tampered with
+const integrity = auditLogger.verifyIntegrity();
+console.log('Audit status:', integrity.status); // 'valid' | 'tampered'`}
         </CodeBlock>
 
+        <h2>Persistent Audit Logging</h2>
+        <p>
+          By default the hash chain lives in memory. Attach an{' '}
+          <code>AuditStore</code> to make it survive process restarts. The
+          built-in <code>FileAuditStore</code> is an append-only JSONL backend —
+          each entry is one JSON line, so writes are O(1) appends and the whole
+          tamper-evident chain can be replayed (and re-verified) on load with{' '}
+          <code>loadFromStore()</code>.
+        </p>
+        <CodeBlock language="typescript">
+          {`import {
+  AuditLogger,
+  createFileAuditStore,
+} from '@lov3kaizen/agentsea-redteam';
+
+// Append-only JSONL store, durable on every log() call
+const store = createFileAuditStore('./audit/redteam.jsonl');
+const auditLogger = new AuditLogger({ store });
+
+// On startup, replay the persisted chain to resume the existing trail
+const loaded = await auditLogger.loadFromStore();
+console.log(\`Resumed \${loaded} audit entries\`);
+
+// New entries link onto the restored chain and are persisted as they happen
+auditLogger.log({
+  eventType: 'scan_completed',
+  action: 'scheduled-scan',
+  actor: { id: 'ci', type: 'system' },
+  resource: { id: 'my-agent', type: 'agent' },
+  outcome: 'success',
+});
+
+// The replayed-plus-new chain still verifies end to end
+console.log(auditLogger.verifyIntegrity().status); // 'valid'`}
+        </CodeBlock>
+        <AlertBox type="info">
+          <span>
+            Writes use synchronous file appends, so an entry is durable the
+            moment <code>log()</code> returns — losing the most recent entries on
+            a crash would otherwise break the chain. Implement the{' '}
+            <code>AuditStore</code> interface (<code>append</code>,{' '}
+            <code>loadAll</code>, <code>clear</code>) to back the trail with your
+            own datastore.
+          </span>
+        </AlertBox>
+
         <h2>Continuous Testing</h2>
-        <p>Schedule automated security tests with alerting:</p>
+        <p>
+          <code>ContinuousTesting</code> runs a test function on demand or on a
+          schedule, records each run, and feeds the resulting metrics into an{' '}
+          <code>AlertManager</code>. Provide a <code>runner</code> that returns a
+          summary plus the metrics you want to alert on:
+        </p>
         <CodeBlock language="typescript">
           {`import {
   ContinuousTesting,
-  Scheduler,
   AlertManager,
 } from '@lov3kaizen/agentsea-redteam';
 
-const continuous = new ContinuousTesting({
-  scheduler: new Scheduler({ cron: '0 */6 * * *' }), // Every 6 hours
-  alertManager: new AlertManager({
-    channels: ['slack', 'email'],
-    threshold: 'medium',
-  }),
+const alerts = new AlertManager({
+  channels: [
+    {
+      id: 'sec-slack',
+      type: 'slack',
+      name: 'Security Slack',
+      enabled: true,
+      config: { webhookUrl: process.env.SLACK_WEBHOOK_URL },
+      severities: ['warning', 'critical'],
+    },
+  ],
+  rules: [
+    {
+      id: 'risk-high',
+      name: 'Risk score too high',
+      enabled: true,
+      severity: 'critical',
+      condition: { type: 'threshold', metric: 'riskScore', operator: 'greater', value: 70 },
+      channelIds: ['sec-slack'],
+    },
+  ],
 });
 
-continuous.start();`}
+const continuous = new ContinuousTesting({
+  runner: async () => {
+    const results = await redTeam.run();
+    return {
+      summary: { /* RunSummary */ },
+      metrics: { riskScore: results.summary.riskScore },
+    };
+  },
+  alerts,
+});
+
+// Run once on demand (also evaluates rules and delivers any alerts)
+const run = await continuous.runOnce('manual');
+console.log('Triggered alerts:', run.alerts.length);`}
         </CodeBlock>
+
+        <h2>Cron-Driven Schedules</h2>
+        <p>
+          Schedule recurring runs with <code>scheduleRuns()</code>. The built-in
+          frequencies (<code>hourly</code>, <code>daily</code>,{' '}
+          <code>weekly</code>, <code>monthly</code>) cover the common cases, and{' '}
+          <code>frequency: 'custom'</code> lets you supply a standard{' '}
+          <code>cronExpression</code> (parsed with <code>cron-parser</code>) plus
+          an optional <code>timezone</code>:
+        </p>
+        <CodeBlock language="typescript">
+          {`// Run every 6 hours via a cron expression
+continuous.scheduleRuns({
+  frequency: 'custom',
+  cronExpression: '0 */6 * * *',
+  timezone: 'America/New_York',
+});
+
+// Start the wall-clock loop (ticks every minute by default)
+continuous.scheduler.start();
+
+// ...or drive it deterministically in tests
+await continuous.scheduler.tick(Date.now());`}
+        </CodeBlock>
+        <p>
+          You can also compute the next fire time directly with the{' '}
+          <code>nextCronAt</code> helper:
+        </p>
+        <CodeBlock language="typescript">
+          {`import { nextCronAt } from '@lov3kaizen/agentsea-redteam';
+
+// Next fire time (epoch ms) strictly after \`from\`; null for an invalid expression
+const next = nextCronAt('0 9 * * 1', Date.now(), 'UTC'); // Mondays at 09:00 UTC`}
+        </CodeBlock>
+
+        <h2>Alert Delivery</h2>
+        <p>
+          <code>AlertManager</code> evaluates threshold/change rules against a
+          metrics snapshot and delivers a notification to each configured
+          channel. <code>deliver()</code> actually contacts the channels —
+          webhook, Slack, Teams, and Discord post via <code>fetch</code>,
+          PagerDuty uses the Events API v2 (the channel&apos;s{' '}
+          <code>config.apiKey</code> is the routing key), and email goes through
+          the optional <code>nodemailer</code> dependency. Per-channel{' '}
+          <code>severities</code> route alerts, and each attempt — including
+          failures — is recorded on the alert&apos;s{' '}
+          <code>notificationHistory</code> so one bad channel never blocks the
+          others.
+        </p>
+        <CodeBlock language="typescript">
+          {`import { AlertManager } from '@lov3kaizen/agentsea-redteam';
+
+const manager = new AlertManager({
+  channels: [
+    {
+      id: 'oncall',
+      type: 'pagerduty',
+      name: 'On-call',
+      enabled: true,
+      config: { apiKey: process.env.PAGERDUTY_ROUTING_KEY }, // Events API v2 routing key
+      severities: ['critical'],
+    },
+    {
+      id: 'team-email',
+      type: 'email',
+      name: 'Security Team',
+      enabled: true,
+      config: {
+        emails: ['security@example.com'],
+        settings: { smtp: { host: 'smtp.example.com', port: 587 } },
+      },
+      severities: ['warning', 'critical'],
+    },
+  ],
+  rules: [
+    {
+      id: 'vulns-found',
+      name: 'Vulnerabilities found',
+      enabled: true,
+      severity: 'critical',
+      condition: { type: 'threshold', metric: 'vulnerabilities', operator: 'greater', value: 0 },
+      channelIds: ['oncall', 'team-email'],
+    },
+  ],
+});
+
+// Evaluate rules against metrics and deliver to matching channels
+const triggered = await manager.evaluateAndDeliver({ vulnerabilities: 3 });
+for (const alert of triggered) {
+  console.log(alert.title, alert.notificationHistory); // per-channel sent/failed records
+}`}
+        </CodeBlock>
+        <AlertBox type="info">
+          <span>
+            Email alerts require the optional <code>nodemailer</code> package —
+            install it (or use a different channel type) and provide{' '}
+            <code>config.settings.smtp.host</code>. All other channel types work
+            out of the box using <code>fetch</code>.
+          </span>
+        </AlertBox>
 
         <h2>CI/CD Integration</h2>
         <p>Run security tests in your CI pipeline:</p>
