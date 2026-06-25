@@ -606,7 +606,7 @@ const packages = [
   {
     icon: '🚀',
     title: 'Gateway',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Intelligent LLM routing with load balancing, failover, and cost optimization across providers.',
@@ -616,7 +616,7 @@ const packages = [
   {
     icon: '🛡️',
     title: 'Guardrails',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Safety and validation layer with content filtering, PII detection, and prompt injection protection.',
@@ -626,7 +626,7 @@ const packages = [
   {
     icon: '📐',
     title: 'Structured Output',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Type-safe structured outputs with JSON schema validation, Zod integration, and automatic retries.',
@@ -636,7 +636,7 @@ const packages = [
   {
     icon: '👥',
     title: 'Crews',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Multi-agent orchestration with role-based coordination, delegation strategies, and workflow management.',
@@ -646,7 +646,7 @@ const packages = [
   {
     icon: '📊',
     title: 'Evaluate',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'LLM evaluation platform with automated metrics, LLM-as-Judge, and human feedback collection.',
@@ -656,7 +656,7 @@ const packages = [
   {
     icon: '🧬',
     title: 'Embeddings',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Vector embeddings toolkit with multi-provider support, intelligent chunking, and vector store integrations.',
@@ -666,7 +666,7 @@ const packages = [
   {
     icon: '🌊',
     title: 'Surf',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Browser automation and computer use with vision-based control and Claude vision integration.',
@@ -676,7 +676,7 @@ const packages = [
   {
     icon: '🔴',
     title: 'Red Team',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'AI safety and red-teaming toolkit with adversarial attacks, vulnerability scanning, and compliance checks.',
@@ -686,7 +686,7 @@ const packages = [
   {
     icon: '💰',
     title: 'Costs',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Real-time AI cost tracking with a 60+ model pricing registry, budget enforcement, and Stripe billing.',
@@ -696,7 +696,7 @@ const packages = [
   {
     icon: '📈',
     title: 'Analytics',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Conversation analytics with intent classification, sentiment tracking, flow analysis, and insights.',
@@ -706,7 +706,7 @@ const packages = [
   {
     icon: '🐛',
     title: 'Debugger',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Step-through agent execution with decision-tree visualization, checkpoint replay, and what-if testing.',
@@ -716,7 +716,7 @@ const packages = [
   {
     icon: '💾',
     title: 'Cache',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Semantic caching layer for LLM responses with exact-match, similarity, and hybrid strategies.',
@@ -726,7 +726,7 @@ const packages = [
   {
     icon: '📥',
     title: 'Ingest',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Document processing pipeline for PDF, DOCX, HTML, and Markdown with chunking, OCR, and extraction.',
@@ -736,7 +736,7 @@ const packages = [
   {
     icon: '📝',
     title: 'Prompts',
-    version: 'v1.0.0',
+    version: 'v1.1.0',
     isPublic: true,
     description:
       'Self-hosted prompt management with Git-like version control, A/B testing, and environment promotion.',
