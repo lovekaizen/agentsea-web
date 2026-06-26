@@ -10,6 +10,7 @@ const description =
   'Build powerful agentic AI applications with AgentSea — for TypeScript/Node and natively for Elixir/OTP (14 libraries on Hex). Multi-provider support, workflow orchestration, MCP protocol, and enterprise-grade observability.';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://agentsea.dev'),
   title: 'AgentSea - Unite and Orchestrate AI Agents',
   description,
   keywords: [

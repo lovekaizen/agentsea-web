@@ -117,6 +117,39 @@ const response = await agent.execute(
     ],
   },
   {
+    icon: '💜',
+    title: 'AgentSea on the BEAM (Elixir)',
+    description:
+      'The same agent in the native Elixir/OTP edition — a supervised process you start and run. All 14 libraries are published on Hex.',
+    tags: ['Elixir', 'OTP', 'Agent'],
+    category: 'Elixir',
+    difficulty: 'Beginner' as const,
+    code: `# mix.exs
+def deps do
+  [
+    {:agentsea_core, "~> 0.1"},
+    {:agentsea_providers, "~> 0.1"}
+  ]
+end
+
+# anywhere in your app
+config = %AgentSea.Agent.Config{
+  name: :assistant,
+  model: "claude-opus-4-8",
+  provider: {AgentSea.Providers.Anthropic, []},
+  system_prompt: "You are a helpful assistant."
+}
+
+{:ok, agent} = AgentSea.Agent.start_link(config)
+{:ok, response} = AgentSea.Agent.run(agent, "What is 42 * 58?")
+IO.puts(response.content)`,
+    useCases: [
+      'Elixir / Phoenix apps that need agents',
+      'Fault-tolerant agent fleets on the BEAM',
+      'An OpenAI-compatible gateway in Elixir',
+    ],
+  },
+  {
     icon: '📝',
     title: 'Content Pipeline',
     description:
