@@ -317,6 +317,74 @@ export default function Home() {
       {/* Gradient Divider */}
       <div className="divider-gradient"></div>
 
+      {/* Elixir / BEAM */}
+      <section className="bg-gradient-mesh py-24 px-4 relative overflow-hidden">
+        <div className="orb orb-2"></div>
+        <div className="orb orb-3"></div>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center mb-12">
+            <span className="badge badge-gradient px-4 py-3 mb-4">Elixir</span>
+            <h2 className="text-5xl font-bold mb-6 text-white">
+              Native on the <span className="text-gradient-cool">BEAM</span>
+            </h2>
+            <div className="text-xl text-white/70">
+              AgentSea also ships as a native Elixir/OTP library — agents are
+              supervised processes, crews are supervisors, and you stream tokens
+              live over Phoenix LiveView. All 14 libraries are published on Hex.
+            </div>
+          </div>
+          <div className="flex justify-center mb-8">
+            <div className="mockup-code shadow-2xl max-w-3xl w-full glow-blue">
+              <pre data-prefix="$">
+                <code>{`mix deps.get`}</code>
+              </pre>
+              <pre data-prefix=">" className="text-success">
+                <code>{`14 agentsea_* libraries on Hex`}</code>
+              </pre>
+              <pre data-prefix="1">
+                <code>{`config = %AgentSea.Agent.Config{`}</code>
+              </pre>
+              <pre data-prefix="2">
+                <code>{`  model: "claude-opus-4-8",`}</code>
+              </pre>
+              <pre data-prefix="3">
+                <code>{`  provider: {AgentSea.Providers.Anthropic, []}}`}</code>
+              </pre>
+              <pre data-prefix="4">
+                <code>{`{:ok, agent} = AgentSea.Agent.start_link(config)`}</code>
+              </pre>
+              <pre data-prefix="5">
+                <code>{`{:ok, res} = AgentSea.Agent.run(agent, "Hello!")`}</code>
+              </pre>
+            </div>
+          </div>
+          <div className="text-center">
+            <Link href="/docs/elixir" className="btn btn-gradient btn-lg gap-2">
+              <span className="flex items-center gap-2">
+                Explore the Elixir SDK
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Gradient Divider */}
+      <div className="divider-gradient"></div>
+
       {/* All Features Grid */}
       <section className="py-24 px-4 bg-base-100">
         <div className="max-w-7xl mx-auto">

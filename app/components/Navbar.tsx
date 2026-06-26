@@ -48,6 +48,9 @@ export default function Navbar() {
               <Link href="/docs" onClick={() => (document.activeElement as HTMLElement)?.blur()}>Documentation</Link>
             </li>
             <li>
+              <Link href="/docs/elixir" onClick={() => (document.activeElement as HTMLElement)?.blur()}>Elixir</Link>
+            </li>
+            <li>
               <Link href="/examples" onClick={() => (document.activeElement as HTMLElement)?.blur()}>Examples</Link>
             </li>
             <li>
@@ -70,6 +73,9 @@ export default function Navbar() {
         <ul className="menu menu-horizontal px-1">
           <li>
             <Link href="/docs">Documentation</Link>
+          </li>
+          <li>
+            <Link href="/docs/elixir">Elixir</Link>
           </li>
           <li>
             <Link href="/examples">Examples</Link>

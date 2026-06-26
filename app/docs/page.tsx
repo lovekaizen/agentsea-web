@@ -76,6 +76,36 @@ const response = await agent.execute('Hello!', context);`}
         </CodeBlock>
       </Section>
 
+      {/* Elixir SDK callout */}
+      <div className="bg-base-200 rounded-xl p-6 mt-6 border border-primary/30 relative overflow-hidden">
+        <div className="relative z-10 grid md:grid-cols-2 gap-6 items-center">
+          <div>
+            <span className="badge badge-gradient mb-3">Also on the BEAM</span>
+            <h3 className="font-bold text-xl mb-2 text-gradient">
+              AgentSea for Elixir
+            </h3>
+            <p className="text-sm text-base-content/70 mb-4">
+              A native Elixir/OTP edition where agents are supervised processes,
+              crews are supervisors, and you stream tokens live over Phoenix
+              LiveView. All 14 libraries are published on Hex.
+            </p>
+            <Link href="/docs/elixir" className="btn btn-gradient btn-sm">
+              <span>Explore the Elixir SDK →</span>
+            </Link>
+          </div>
+          <CodeBlock language="elixir">
+            {`config = %AgentSea.Agent.Config{
+  name: :assistant,
+  model: "claude-opus-4-8",
+  provider: {AgentSea.Providers.Anthropic, []}
+}
+
+{:ok, agent} = AgentSea.Agent.start_link(config)
+{:ok, res} = AgentSea.Agent.run(agent, "Hello!")`}
+          </CodeBlock>
+        </div>
+      </div>
+
       <Divider />
 
       {/* Key Features */}

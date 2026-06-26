@@ -26,6 +26,16 @@ const sections: NavSection[] = [
     ],
   },
   {
+    title: 'Elixir SDK',
+    links: [
+      { href: '/docs/elixir', label: 'Overview & Install' },
+      { href: '/docs/elixir/agents', label: 'Agents' },
+      { href: '/docs/elixir/crews', label: 'Crews' },
+      { href: '/docs/elixir/gateway', label: 'Gateway' },
+      { href: '/docs/elixir/rag', label: 'Embeddings & RAG' },
+    ],
+  },
+  {
     title: 'Core Concepts',
     links: [
       { href: '/docs/agents', label: 'Agents' },
