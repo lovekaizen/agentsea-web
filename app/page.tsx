@@ -1,7 +1,6 @@
-import Image from 'next/image';
 import Link from 'next/link';
-
-const GITHUB_URL = 'https://github.com/lovekaizen/agentsea';
+import SiteFooter from './components/docs/SiteFooter';
+import SiteTopBar from './components/docs/SiteTopBar';
 
 const features = [
   {
@@ -21,32 +20,32 @@ const features = [
 const packages = [
   {
     name: '@lov3kaizen/agentsea-core',
-    href: '/docs/installation',
+    href: '/docs/packages/core',
     body: 'Framework-agnostic core library for building agentic AI applications in Node.js.',
   },
   {
     name: '@lov3kaizen/agentsea-cli',
-    href: '/docs/cli',
+    href: '/docs/packages/cli',
     body: 'Command-line interface for the AgentSea ADK to set up providers, create agents, and chat or run them from a terminal.',
   },
   {
     name: '@lov3kaizen/agentsea-gateway',
-    href: '/docs/gateway',
+    href: '/docs/packages/gateway',
     body: 'An LLM gateway with an OpenAI-compatible API over OpenAI, Anthropic and Google providers, with routing, caching and metrics.',
   },
   {
     name: '@lov3kaizen/agentsea-guardrails',
-    href: '/docs/guardrails',
+    href: '/docs/packages/guardrails',
     body: 'A guard engine that checks text for toxicity, PII, prompt injection, schema and budget limits, and applies a block, transform or warn action.',
   },
   {
     name: '@lov3kaizen/agentsea-crews',
-    href: '/docs/crews',
+    href: '/docs/packages/crews',
     body: 'Multi-agent orchestration for building teams of AI agents that work through a shared list of tasks.',
   },
   {
     name: '@lov3kaizen/agentsea-memory',
-    href: '/docs/memory',
+    href: '/docs/packages/memory',
     body: 'A memory store and retrieval layer for agents, with in-memory, Redis, PostgreSQL, SQLite and Pinecone backends.',
   },
 ];
@@ -54,39 +53,7 @@ const packages = [
 export default function Home() {
   return (
     <div className="bg-surface-paper text-brand-navy">
-      <header className="flex h-[72px] items-center justify-between bg-brand-deep px-4 md:px-16">
-        <Link href="/" aria-label="AgentSea home" className="shrink-0">
-          <Image
-            src="/svg/agentsea-logo.svg"
-            alt="AgentSea"
-            width={92}
-            height={28}
-            priority
-            className="h-7 w-auto brightness-0 invert"
-          />
-        </Link>
-
-        <nav aria-label="Primary" className="hidden items-center gap-8 text-base text-brand-tint md:flex">
-          <Link href="/docs" className="hover:text-white">Docs</Link>
-          <Link href="/api" className="hover:text-white">API</Link>
-          <Link href="#packages" className="hover:text-white">Packages</Link>
-          <a href={`${GITHUB_URL}/releases`} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-            Changelog
-          </a>
-        </nav>
-
-        <div className="flex items-center gap-6 text-base text-brand-tint">
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-            GitHub
-          </a>
-          <Link
-            href="/docs/installation"
-            className="rounded-lg bg-brand-seafoam px-4 py-2 text-sm font-semibold text-brand-deep hover:brightness-95"
-          >
-            Get started
-          </Link>
-        </div>
-      </header>
+      <SiteTopBar />
 
       <section className="flex min-h-[600px] flex-col justify-center bg-gradient-to-b from-brand-ocean to-brand-deep px-4 py-24 md:px-16">
         <p className="text-sm font-semibold text-brand-seafoam">TypeScript ADK for AI agents</p>
@@ -147,18 +114,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="flex flex-wrap items-center gap-x-2 gap-y-2 bg-brand-deep px-4 py-8 text-sm text-brand-tint md:px-16">
-        <span>AgentSea · MIT licence ·</span>
-        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a>
-        <span>·</span>
-        <a href={`${GITHUB_URL}/discussions`} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-          Discussions
-        </a>
-        <span>·</span>
-        <a href={`${GITHUB_URL}/issues`} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-          Issues
-        </a>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
