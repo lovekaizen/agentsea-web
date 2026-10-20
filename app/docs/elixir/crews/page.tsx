@@ -1,41 +1,51 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '@/app/components/PageContainer';
-import { PageHeader, Section, CodeBlock, AlertBox } from '@/app/components/Section';
+import DocsShell from '../../../components/docs/DocsShell';
+import DocSection from '../../../components/docs/DocSection';
+import CodeBlock from '../../../components/docs/CodeBlock';
+import Callout from '../../../components/docs/Callout';
 
-export const metadata = {
-  title: 'Crews — AgentSea for Elixir',
+export const metadata: Metadata = {
+  title: 'Crews | AgentSea for Elixir',
   description: 'Multi-agent coordination with delegation strategies and a gen_statem task DAG.',
 };
 
+const toc = [
+  { id: 'roles', label: 'Roles & capabilities' },
+  { id: 'running', label: 'Building & running a crew' },
+  { id: 'strategies', label: 'Delegation strategies' },
+  { id: 'controls', label: 'Lifecycle controls' },
+  { id: 'observability', label: 'Observability' },
+];
+
 export default function ElixirCrewsPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Crews"
-        titleGradient="purple"
-        description="Multi-agent coordination — delegation strategies and a dependency-aware task DAG."
-      />
+    <DocsShell
+      eyebrow="Guide"
+      title="Crews"
+      lead="Multi-agent coordination: delegation strategies and a dependency-aware task DAG."
+      active="packages"
+      toc={toc}
+    >
+      <Callout kind="note">
+        <code className="font-mono text-sm">agentsea_crews</code> models a crew as a{' '}
+        <code className="font-mono text-sm">DynamicSupervisor</code> of agents with a{' '}
+        <code className="font-mono text-sm">gen_statem</code> coordinator. See the API on{' '}
+        <a href="https://hexdocs.pm/agentsea_crews" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-deep underline">
+          HexDocs
+        </a>
+        .
+      </Callout>
 
-      <div className="prose max-w-none">
-        <AlertBox type="info">
-          <p className="m-0">
-            <code>agentsea_crews</code> models a crew as a <code>DynamicSupervisor</code>
-            of agents with a <code>gen_statem</code> coordinator. See the API on{' '}
-            <a href="https://hexdocs.pm/agentsea_crews" target="_blank" rel="noopener noreferrer">
-              HexDocs
-            </a>
-            .
-          </p>
-        </AlertBox>
-
-        <Section title="Roles & capabilities" id="roles">
-          <p>
-            Crew agents carry a <code>role</code> with <code>capabilities</code>. The
-            delegation strategy uses them to pick who handles each task:
-          </p>
-
-          <CodeBlock language="elixir">
-            {`alias AgentSea.{Agent, Role, Capability}
+      <DocSection id="roles" title="Roles & capabilities">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Crew agents carry a <code className="font-mono text-sm">role</code> with{' '}
+          <code className="font-mono text-sm">capabilities</code>. The delegation strategy uses them to pick who
+          handles each task:
+        </p>
+        <CodeBlock
+          lang="EX"
+          code={`alias AgentSea.{Agent, Role, Capability}
 
 coder = %Agent.Config{
   name: :coder,
@@ -50,18 +60,18 @@ writer = %Agent.Config{
   provider: {AgentSea.Providers.Anthropic, []},
   role: %Role{name: "writer", capabilities: [%Capability{name: "writing", proficiency: :expert}]}
 }`}
-          </CodeBlock>
-        </Section>
+        />
+      </DocSection>
 
-        <Section title="Building & running a crew" id="running">
-          <p>
-            Define a <code>Crew.Spec</code>, start it (under your supervision tree in real
-            apps), add tasks, then <code>kickoff/1</code>. Tasks with satisfied
-            dependencies run concurrently; the call returns when everything settles.
-          </p>
-
-          <CodeBlock language="elixir">
-            {`spec = %AgentSea.Crew.Spec{
+      <DocSection id="running" title="Building & running a crew">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Define a <code className="font-mono text-sm">Crew.Spec</code>, start it (under your supervision tree in real
+          apps), add tasks, then <code className="font-mono text-sm">kickoff/1</code>. Tasks with satisfied dependencies
+          run concurrently; the call returns when everything settles.
+        </p>
+        <CodeBlock
+          lang="EX"
+          code={`spec = %AgentSea.Crew.Spec{
   name: :build_crew,
   agents: [coder, writer],
   strategy: AgentSea.Crew.Delegation.BestMatch
@@ -87,51 +97,54 @@ writer = %Agent.Config{
 result.success          # true if no task failed
 result.results          # %{task_id => response}
 result.failures         # %{task_id => reason}`}
-          </CodeBlock>
-        </Section>
+        />
+      </DocSection>
 
-        <Section title="Delegation strategies" id="strategies">
-          <p>How a task is assigned to an agent:</p>
-          <ul>
-            <li>
-              <code>AgentSea.Crew.Delegation.BestMatch</code> — the most capable agent for
-              the task&apos;s required capabilities.
-            </li>
-            <li>
-              <code>AgentSea.Crew.Delegation.RoundRobin</code> — even distribution.
-            </li>
-            <li>
-              <code>AgentSea.Crew.Delegation.Auction</code> — a timed <code>GenServer</code>
-              fan-out where agents bid (role match × model price tier); highest bid wins.
-            </li>
-          </ul>
-        </Section>
+      <DocSection id="strategies" title="Delegation strategies">
+        <p className="text-base leading-relaxed text-brand-navy">How a task is assigned to an agent:</p>
+        <ul className="flex list-disc flex-col gap-2 pl-6 text-base leading-relaxed text-brand-navy">
+          <li>
+            <code className="font-mono text-sm">AgentSea.Crew.Delegation.BestMatch</code>: the most capable agent for
+            the task&apos;s required capabilities.
+          </li>
+          <li>
+            <code className="font-mono text-sm">AgentSea.Crew.Delegation.RoundRobin</code>: even distribution.
+          </li>
+          <li>
+            <code className="font-mono text-sm">AgentSea.Crew.Delegation.Auction</code>: a timed{' '}
+            <code className="font-mono text-sm">GenServer</code> fan-out where agents bid (role match × model price
+            tier); highest bid wins.
+          </li>
+        </ul>
+      </DocSection>
 
-        <Section title="Lifecycle controls" id="controls">
-          <p>
-            The coordinator is a state machine: <code>:idle → :running → :completed</code>,
-            with <code>:paused</code> and <code>:aborted</code> branches.
-          </p>
-
-          <CodeBlock language="elixir">
-            {`AgentSea.Crew.pause(:build_crew)    # stop dispatching new tasks; in-flight finish
+      <DocSection id="controls" title="Lifecycle controls">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The coordinator is a state machine: <code className="font-mono text-sm">:idle → :running → :completed</code>,
+          with <code className="font-mono text-sm">:paused</code> and <code className="font-mono text-sm">:aborted</code>{' '}
+          branches.
+        </p>
+        <CodeBlock
+          lang="EX"
+          code={`AgentSea.Crew.pause(:build_crew)    # stop dispatching new tasks; in-flight finish
 AgentSea.Crew.resume(:build_crew)   # continue from where it left off
 AgentSea.Crew.abort(:build_crew)    # cancel in-flight tasks; kickoff caller gets {:error, :aborted}
 AgentSea.Crew.status(:build_crew)   # :idle | :running | :paused | :completed | :aborted`}
-          </CodeBlock>
-        </Section>
+        />
+      </DocSection>
 
-        <Section title="Observability" id="observability">
-          <p>
-            Every kickoff, task, and delegation emits <code>:telemetry</code> events
-            (<code>[:agentsea, :crew, :kickoff | :task, …]</code>). Attach your own
-            handler, or run <code>agentsea_web</code> for a live Phoenix LiveView
-            dashboard of the whole fleet. See{' '}
-            <Link href="/docs/elixir/gateway">the gateway page</Link> for routing and the
-            OpenAI-compatible endpoint.
-          </p>
-        </Section>
-      </div>
-    </PageContainer>
+      <DocSection id="observability" title="Observability">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Every kickoff, task, and delegation emits <code className="font-mono text-sm">:telemetry</code> events
+          (<code className="font-mono text-sm">[:agentsea, :crew, :kickoff | :task, …]</code>). Attach your own handler,
+          or run <code className="font-mono text-sm">agentsea_web</code> for a live Phoenix LiveView dashboard of the
+          whole fleet. See{' '}
+          <Link href="/docs/elixir/gateway" className="font-semibold text-brand-deep underline">
+            the gateway page
+          </Link>{' '}
+          for routing and the OpenAI-compatible endpoint.
+        </p>
+      </DocSection>
+    </DocsShell>
   );
 }

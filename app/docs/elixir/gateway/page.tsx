@@ -1,37 +1,47 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '@/app/components/PageContainer';
-import { PageHeader, Section, CodeBlock, AlertBox } from '@/app/components/Section';
+import DocsShell from '../../../components/docs/DocsShell';
+import DocSection from '../../../components/docs/DocSection';
+import CodeBlock from '../../../components/docs/CodeBlock';
+import Callout from '../../../components/docs/Callout';
+import BulletPanel from '../../../components/docs/BulletPanel';
 
-export const metadata = {
-  title: 'Gateway — AgentSea for Elixir',
+export const metadata: Metadata = {
+  title: 'Gateway | AgentSea for Elixir',
   description: 'Strategy routing, circuit breaking, failover, streaming, and an OpenAI-compatible endpoint.',
 };
 
+const toc = [
+  { id: 'route', label: 'Configure & route' },
+  { id: 'strategies', label: 'Strategies' },
+  { id: 'streaming', label: 'Streaming' },
+  { id: 'openai-endpoint', label: 'OpenAI-compatible endpoint' },
+  { id: 'next', label: 'Next' },
+];
+
 export default function ElixirGatewayPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Gateway"
-        titleGradient="purple"
-        description="Route across providers with failover, circuit breaking, and real token streaming."
-      />
+    <DocsShell
+      eyebrow="Guide"
+      title="Gateway"
+      lead="Route across providers with failover, circuit breaking, and real token streaming."
+      active="packages"
+      toc={toc}
+    >
+      <Callout kind="note">
+        <code className="font-mono text-sm">agentsea_gateway</code> picks a provider per request by strategy, trips a{' '}
+        <code className="font-mono text-sm">:fuse</code> circuit breaker on repeated failures, and fails over to the next
+        candidate. API on{' '}
+        <a href="https://hexdocs.pm/agentsea_gateway" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-deep underline">
+          HexDocs
+        </a>
+        .
+      </Callout>
 
-      <div className="prose max-w-none">
-        <AlertBox type="info">
-          <p className="m-0">
-            <code>agentsea_gateway</code> picks a provider per request by strategy, trips a{' '}
-            <code>:fuse</code> circuit breaker on repeated failures, and fails over to the
-            next candidate. API on{' '}
-            <a href="https://hexdocs.pm/agentsea_gateway" target="_blank" rel="noopener noreferrer">
-              HexDocs
-            </a>
-            .
-          </p>
-        </AlertBox>
-
-        <Section title="Configure & route" id="route">
-          <CodeBlock language="elixir">
-            {`alias AgentSea.Gateway
+      <DocSection id="route" title="Configure & route">
+        <CodeBlock
+          lang="EX"
+          code={`alias AgentSea.Gateway
 alias AgentSea.Gateway.{Config, Provider}
 
 config = %Config{
@@ -49,30 +59,43 @@ messages = [%{role: :user, content: "Summarize OTP in a sentence."}]
 
 response.content   # the answer
 served_by          # which provider handled it`}
-          </CodeBlock>
-        </Section>
+        />
+      </DocSection>
 
-        <Section title="Strategies" id="strategies">
-          <ul>
-            <li><code>AgentSea.Gateway.Router.Failover</code> — try in order, fall through on error.</li>
-            <li><code>AgentSea.Gateway.Router.RoundRobin</code> — spread load evenly.</li>
-            <li><code>AgentSea.Gateway.Router.CostOptimized</code> — cheapest viable model first.</li>
-            <li><code>AgentSea.Gateway.Router.LatencyOptimized</code> — fastest by observed latency.</li>
-          </ul>
-          <p>
-            Each provider has a <code>:fuse</code> circuit breaker: after repeated
-            failures the breaker blows and that provider is skipped until it resets.
-          </p>
-        </Section>
+      <DocSection id="strategies" title="Strategies">
+        <BulletPanel
+          items={[
+            <>
+              <code className="font-mono text-sm">AgentSea.Gateway.Router.Failover</code>: try in order, fall through on
+              error.
+            </>,
+            <>
+              <code className="font-mono text-sm">AgentSea.Gateway.Router.RoundRobin</code>: spread load evenly.
+            </>,
+            <>
+              <code className="font-mono text-sm">AgentSea.Gateway.Router.CostOptimized</code>: cheapest viable model
+              first.
+            </>,
+            <>
+              <code className="font-mono text-sm">AgentSea.Gateway.Router.LatencyOptimized</code>: fastest by observed
+              latency.
+            </>,
+          ]}
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          Each provider has a <code className="font-mono text-sm">:fuse</code> circuit breaker: after repeated failures
+          the breaker blows and that provider is skipped until it resets.
+        </p>
+      </DocSection>
 
-        <Section title="Streaming" id="streaming">
-          <p>
-            <code>stream/3</code> returns a lazy stream of normalized events from the
-            first streamable provider:
-          </p>
-
-          <CodeBlock language="elixir">
-            {`{:ok, stream, _provider} = Gateway.stream(gw, messages)
+      <DocSection id="streaming" title="Streaming">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code className="font-mono text-sm">stream/3</code> returns a lazy stream of normalized events from the first
+          streamable provider:
+        </p>
+        <CodeBlock
+          lang="EX"
+          code={`{:ok, stream, _provider} = Gateway.stream(gw, messages)
 
 Enum.each(stream, fn
   {:content, delta} -> IO.write(delta)
@@ -80,42 +103,46 @@ Enum.each(stream, fn
   :done             -> IO.puts("")
   _other            -> :ok
 end)`}
-          </CodeBlock>
-        </Section>
+        />
+      </DocSection>
 
-        <Section title="OpenAI-compatible endpoint" id="openai-endpoint">
-          <p>
-            <code>agentsea_web</code> exposes <code>POST /v1/chat/completions</code> backed
-            by the gateway — point any OpenAI client (or <code>curl</code>) at it. With{' '}
-            <code>stream: true</code> it forwards each provider event as a real SSE chunk.
-          </p>
-
-          <CodeBlock language="bash">
-            {`curl http://localhost:4002/v1/chat/completions \\
+      <DocSection id="openai-endpoint" title="OpenAI-compatible endpoint">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code className="font-mono text-sm">agentsea_web</code> exposes{' '}
+          <code className="font-mono text-sm">POST /v1/chat/completions</code> backed by the gateway. Point any OpenAI
+          client (or <code className="font-mono text-sm">curl</code>) at it. With{' '}
+          <code className="font-mono text-sm">stream: true</code> it forwards each provider event as a real SSE chunk.
+        </p>
+        <CodeBlock
+          lang="BASH"
+          code={`curl http://localhost:4002/v1/chat/completions \\
   -H "content-type: application/json" \\
   -d '{
     "model": "agentsea",
     "messages": [{"role": "user", "content": "hello"}],
     "stream": true
   }'`}
-          </CodeBlock>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          Configure which gateway backs the endpoint via{' '}
+          <code className="font-mono text-sm">config :agentsea_web, :gateway, MyApp.Gateway</code>. The same app also
+          serves a Phoenix LiveView dashboard that renders agent, tool, crew, gateway, and guardrail telemetry live.
+        </p>
+      </DocSection>
 
-          <p>
-            Configure which gateway backs the endpoint via{' '}
-            <code>config :agentsea_web, :gateway, MyApp.Gateway</code>. The same app also
-            serves a Phoenix LiveView dashboard that renders agent, tool, crew, gateway,
-            and guardrail telemetry live.
-          </p>
-        </Section>
-
-        <Section title="Next" id="next">
-          <p>
-            Add retrieval with <Link href="/docs/elixir/rag">Embeddings &amp; RAG</Link>,
-            or wire tools and guardrails on the{' '}
-            <Link href="/docs/elixir/agents">Agents page</Link>.
-          </p>
-        </Section>
-      </div>
-    </PageContainer>
+      <DocSection id="next" title="Next">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Add retrieval with{' '}
+          <Link href="/docs/elixir/rag" className="font-semibold text-brand-deep underline">
+            Embeddings &amp; RAG
+          </Link>
+          , or wire tools and guardrails on the{' '}
+          <Link href="/docs/elixir/agents" className="font-semibold text-brand-deep underline">
+            Agents page
+          </Link>
+          .
+        </p>
+      </DocSection>
+    </DocsShell>
   );
 }
