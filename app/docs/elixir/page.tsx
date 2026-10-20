@@ -1,108 +1,88 @@
-import Link from 'next/link';
-import PageContainer from '@/app/components/PageContainer';
-import { PageHeader, Section, CodeBlock, AlertBox } from '@/app/components/Section';
+import type { Metadata } from 'next';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
 
-export const metadata = {
-  title: 'AgentSea for Elixir',
-  description:
-    'The native Elixir/OTP edition of AgentSea — agents as supervised processes, published on Hex.',
+export const metadata: Metadata = {
+  title: 'AgentSea for Elixir | AgentSea',
+  description: 'The native Elixir/OTP edition of AgentSea: agents as supervised processes, published on Hex.',
 };
 
-const packages: { name: string; blurb: string }[] = [
-  { name: 'agentsea_core', blurb: 'Agent GenServer + run loop; Provider/Tool/Memory behaviours; buffer & summary memory.' },
-  { name: 'agentsea_providers', blurb: 'Anthropic provider over Req — complete/2 and real SSE stream/2.' },
-  { name: 'agentsea_crews', blurb: 'Multi-agent coordination; delegation strategies; a gen_statem task-DAG coordinator.' },
-  { name: 'agentsea_gateway', blurb: 'Strategy routing, :fuse circuit breaking, failover, health tracking, streaming.' },
-  { name: 'agentsea_web', blurb: 'Phoenix LiveView dashboard + an OpenAI-compatible chat completions endpoint.' },
-  { name: 'agentsea_structured', blurb: 'Extract a validated Ecto struct from an LLM, with validation-retry.' },
-  { name: 'agentsea_embeddings', blurb: 'Embedder/VectorStore behaviours; in-memory, pgvector, Qdrant & Pinecone stores; RAG.' },
-  { name: 'agentsea_bumblebee', blurb: 'In-process Hugging Face embeddings and Whisper STT via Bumblebee + Nx.' },
-  { name: 'agentsea_ingest', blurb: 'A Broadway document ingestion pipeline: chunk → embed → store.' },
-  { name: 'agentsea_evaluate', blurb: 'Concurrent eval metrics, including an LLM-as-judge.' },
-  { name: 'agentsea_mcp', blurb: 'Model Context Protocol client with stdio and streamable-HTTP transports.' },
-  { name: 'agentsea_surf', blurb: 'A Node/Playwright browser-automation sidecar exposed as agent tools.' },
-  { name: 'agentsea_voice', blurb: 'TTS/STT behaviours with OpenAI and ElevenLabs adapters.' },
-  { name: 'agentsea_guardrails', blurb: 'Input/output validation: max-length, blocklist, PII redaction, LLM moderation.' },
+const toc = [
+  { id: 'install', label: 'Install' },
+  { id: 'example', label: 'Example' },
+  { id: 'apps', label: 'Apps' },
+  { id: 'caveats', label: 'Caveats' },
+];
+
+const apps: { name: string; description: string }[] = [
+  { name: 'agentsea_core', description: 'Agent GenServer and run loop.' },
+  { name: 'agentsea_providers', description: 'Anthropic provider over Req.' },
+  { name: 'agentsea_crews', description: 'DynamicSupervisor and Registry for agents.' },
+  {
+    name: 'agentsea_gateway',
+    description: 'Routing across providers (failover, round-robin, cost-optimized, latency-optimized).',
+  },
+  { name: 'agentsea_web', description: 'Phoenix LiveView fleet dashboard fed by telemetry and PubSub.' },
+  { name: 'agentsea_structured', description: 'Structured extraction into Ecto changesets.' },
+  { name: 'agentsea_embeddings', description: 'Embedder and VectorStore behaviours.' },
+  {
+    name: 'agentsea_bumblebee',
+    description: 'In-process Hugging Face embedder and Whisper speech-to-text via Bumblebee and Nx.',
+  },
+  { name: 'agentsea_ingest', description: 'Broadway pipeline: chunk, embed, store.' },
+  {
+    name: 'agentsea_evaluate',
+    description: 'Concurrent evaluation metrics (exact-match, contains, LLM-as-judge) and aggregation.',
+  },
+  {
+    name: 'agentsea_guardrails',
+    description: 'Input and output guardrail pipeline: max length, blocklist, PII redaction, LLM moderation.',
+  },
+  { name: 'agentsea_mcp', description: 'MCP client with stdio and streamable-HTTP transports.' },
+  { name: 'agentsea_surf', description: 'Browser sidecar over a Port, exposed as agent tools.' },
+  {
+    name: 'agentsea_voice',
+    description: 'TTS and STT behaviours with OpenAI (TTS and STT) and ElevenLabs (TTS) adapters over Req.',
+  },
 ];
 
 export default function ElixirOverviewPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="AgentSea for Elixir"
-        titleGradient="purple"
-        badge="Now on Hex"
-        description="A native Elixir/OTP edition of AgentSea — agents are supervised processes, not objects."
-      />
-
-      <div className="prose max-w-none">
-        <AlertBox type="info">
-          <p className="m-0">
-            This is the <strong>Elixir SDK</strong>. The rest of these docs cover the
-            TypeScript/Node packages (<code>@lov3kaizen/agentsea-*</code>). The Elixir
-            edition is a ground-up rewrite that keeps AgentSea&apos;s <em>concepts</em>
-            {' '}(Agent, Provider, Tool, Memory, Crew, Gateway, …) and discards the
-            TypeScript <em>shapes</em>.
+    <DocsShell
+      eyebrow="Elixir SDK"
+      title="AgentSea for Elixir"
+      lead="An Elixir/OTP implementation of AgentSea. Each agent is a GenServer."
+      badges={['v0.1.0', 'On Hex']}
+      active="packages"
+      toc={toc}
+    >
+      <DocSection id="install" num="01" title="Install">
+        <div className="flex flex-col gap-6 md:flex-row">
+          <p className="text-base leading-relaxed text-brand-navy md:w-[300px] md:shrink-0">
+            Add these dependencies to <code className="font-mono text-sm">mix.exs</code>, then run{' '}
+            <code className="font-mono text-sm">mix deps.get</code>. Requires Elixir 1.14 or later.
           </p>
-        </AlertBox>
-
-        <Section title="Why Elixir?" id="why">
-          <p>
-            Where OTP already solves it, AgentSea deletes the abstraction and uses the
-            primitive. An agent is a <code>GenServer</code> that owns its conversation
-            state; a crew is a <code>DynamicSupervisor</code> with a{' '}
-            <code>gen_statem</code> coordinator; delegation is message passing; the
-            auction is a timed fan-out; gateway failover is a restart strategy and a{' '}
-            <code>:fuse</code> circuit breaker; and you watch the whole fleet execute
-            live over <code>:telemetry</code> + Phoenix LiveView.
-          </p>
-          <p>
-            A tool that raises is isolated by a supervised <code>Task</code> and folded
-            into an <code>{`{:error, _}`}</code> result fed back to the model — the agent
-            process never dies for a tool fault.
-          </p>
-        </Section>
-
-        <Section title="Installation" id="installation">
-          <p>
-            AgentSea is published to Hex as an umbrella of independent{' '}
-            <code>agentsea_*</code> packages — add only the ones you need to your{' '}
-            <code>mix.exs</code>:
-          </p>
-
-          <CodeBlock language="elixir">
-            {`def deps do
+          <div className="min-w-0 md:flex-1">
+            <CodeBlock
+              lang="EX"
+              code={`def deps do
   [
     {:agentsea_core, "~> 0.1"},
     {:agentsea_providers, "~> 0.1"}
   ]
 end`}
-          </CodeBlock>
+            />
+          </div>
+        </div>
+      </DocSection>
 
-          <p>Then fetch:</p>
-
-          <CodeBlock language="bash">{`mix deps.get`}</CodeBlock>
-
-          <AlertBox type="success">
-            <p className="m-0">
-              Requires <strong>Elixir ~&gt; 1.14</strong> on <strong>Erlang/OTP 25+</strong>.
-              Every package ships its own docs on{' '}
-              <a href="https://hexdocs.pm" target="_blank" rel="noopener noreferrer">
-                HexDocs
-              </a>
-              .
-            </p>
-          </AlertBox>
-        </Section>
-
-        <Section title="Your first agent" id="first-agent">
-          <p>
-            An agent is a supervised process. Configure it with a model and a provider,
-            start it, and run it:
-          </p>
-
-          <CodeBlock language="elixir">
-            {`config = %AgentSea.Agent.Config{
+      <DocSection id="example" num="02" title="Example">
+        <CodeBlock
+          lang="EX"
+          code={`config = %AgentSea.Agent.Config{
   name: :assistant,
   model: "claude-opus-4-8",
   # {provider_module, opts}; the key also reads ANTHROPIC_API_KEY
@@ -110,72 +90,31 @@ end`}
 }
 
 {:ok, agent} = AgentSea.Agent.start_link(config)
-
 {:ok, response} = AgentSea.Agent.run(agent, "Explain OTP supervision in one sentence.")
 IO.puts(response.content)`}
-          </CodeBlock>
+        />
+      </DocSection>
 
-          <p>
-            In a real app you&apos;d start agents under your supervision tree rather than
-            with <code>start_link/1</code> directly.
-          </p>
-        </Section>
+      <DocSection id="apps" num="03" title="Apps">
+        <ApiList>
+          {apps.map((app) => (
+            <ApiRow key={app.name} name={app.name}>
+              {app.description}
+            </ApiRow>
+          ))}
+        </ApiList>
+      </DocSection>
 
-        <Section title="The packages" id="packages">
-          <p>
-            Fourteen focused libraries, each behind a behaviour so adapters are
-            swappable. Click through to the API reference on HexDocs.
-          </p>
-
-          <div className="overflow-x-auto">
-            <table>
-              <thead>
-                <tr>
-                  <th>Package</th>
-                  <th>What it does</th>
-                </tr>
-              </thead>
-              <tbody>
-                {packages.map((p) => (
-                  <tr key={p.name}>
-                    <td>
-                      <a
-                        href={`https://hexdocs.pm/${p.name}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <code>{p.name}</code>
-                      </a>
-                    </td>
-                    <td>{p.blurb}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Section>
-
-        <Section title="Where to next" id="next">
-          <ul>
-            <li>
-              <Link href="/docs/elixir/agents">Agents, Providers, Tools &amp; Memory</Link>{' '}
-              — the core building blocks.
-            </li>
-            <li>
-              <Link href="/docs/elixir/crews">Crews</Link> — multi-agent coordination and
-              the task DAG.
-            </li>
-            <li>
-              <Link href="/docs/elixir/gateway">Gateway</Link> — routing, failover, and the
-              OpenAI-compatible endpoint.
-            </li>
-            <li>
-              <Link href="/docs/elixir/rag">Embeddings &amp; RAG</Link> — vector stores,
-              ingestion, and retrieval.
-            </li>
-          </ul>
-        </Section>
-      </div>
-    </PageContainer>
+      <DocSection id="caveats" num="04" title="Caveats">
+        <BulletPanel
+          items={[
+            'All 14 packages are published on Hex at version 0.1.0.',
+            'Requires Elixir 1.14 or later. CI runs Elixir 1.18.4 on OTP 25.3; newer OTP versions are not tested.',
+            'Only Anthropic is supported as a chat provider. There is no OpenAI provider module yet.',
+            'Crew pause, resume and abort are available.',
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }
