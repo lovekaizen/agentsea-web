@@ -1,461 +1,317 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
+
+export const metadata: Metadata = {
+  title: 'Observability | AgentSea',
+  description:
+    'Logging, metrics and tracing in @lov3kaizen/agentsea-core: the Logger, MetricsCollector and Tracer classes, and how to wire them around agent runs.',
+};
+
+const toc = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'logging', label: 'Logging' },
+  { id: 'metrics', label: 'Metrics' },
+  { id: 'tracing', label: 'Tracing' },
+  { id: 'forwarding', label: 'Forwarding to monitoring' },
+  { id: 'performance', label: 'Performance monitoring' },
+  { id: 'related-packages', label: 'Related packages' },
+  { id: 'best-practices', label: 'Best practices' },
+  { id: 'next-steps', label: 'Next steps' },
+];
 
 export default function ObservabilityPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Observability"
-        titleGradient="blue"
-        description="Monitor, debug, and optimize your agentic applications with comprehensive logging, metrics, and distributed tracing."
-      />
-
-      <div className="prose max-w-none">
-        <h2>Observability Pillars</h2>
-        <p>AgentSea provides three core observability features:</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 not-prose mb-8">
-          {observabilityPillars.map((pillar, index) => (
-            <div
-              key={index}
-              className="p-4 bg-white rounded-lg border border-gray-200"
-            >
-              <div className="text-3xl mb-2">{pillar.icon}</div>
-              <h3 className="font-semibold text-gray-900 mb-2">
-                {pillar.name}
-              </h3>
-              <p className="text-sm text-gray-600">{pillar.description}</p>
-            </div>
-          ))}
-        </div>
-
-        <h2>Logging</h2>
-        <p>
-          Structured logging powered by Winston with JSON and simple formats:
+    <DocsShell
+      eyebrow="Concept"
+      title="Observability"
+      lead="Log, measure and trace agent runs with the logging, metrics and tracing classes in @lov3kaizen/agentsea-core."
+      active="concepts"
+      toc={toc}
+    >
+      <DocSection id="overview" num="01" title="Overview">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Core provides three building blocks:
         </p>
+        <ApiList>
+          <ApiRow name="Logger">Structured logging on top of winston, to the console and optionally a file.</ApiRow>
+          <ApiRow name="MetricsCollector / globalMetrics">
+            Records one entry per agent run, with latency, tokens and success. Summarizes and notifies subscribers.
+          </ApiRow>
+          <ApiRow name="Tracer / globalTracer">Spans with attributes, events and durations, grouped by trace ID.</ApiRow>
+        </ApiList>
+        <Callout kind="note">
+          The agent does not record metrics or spans on its own. Wrap the calls you want measured, as the examples
+          below do.
+        </Callout>
+      </DocSection>
 
-        <CodeBlock language="typescript">
-          {`import { Logger } from '@lov3kaizen/agentsea-core';
+      <DocSection id="logging" num="02" title="Logging">
+        <CodeBlock
+          lang="TS"
+          code={`import { Logger } from '@lov3kaizen/agentsea-core';
 
-// Create logger
 const logger = new Logger({
-  level: 'info', // 'error', 'warn', 'info', 'debug'
-  format: 'json', // or 'simple'
-  filename: './logs/app.log', // Optional file output
+  level: 'info',           // 'error' | 'warn' | 'info' | 'debug'
+  format: 'json',          // 'json' | 'simple' (applies to the file)
+  filename: './logs/app.log', // optional file output
+  console: true,           // default; set false to skip the console
 });
 
-// Log messages
-logger.error('Failed to connect', { error: err.message });
+logger.error('Failed to connect', { error: 'timeout' });
 logger.warn('Rate limit approaching', { usage: 95 });
-logger.info('Agent executed successfully', { agentName: 'chat-agent' });
-logger.debug('Tool called', { toolName: 'calculator', input: { a: 1, b: 2 } });`}
-        </CodeBlock>
+logger.info('Agent executed', { agentName: 'chat-agent' });
+logger.debug('Tool called', { toolName: 'calculator' });
 
-        <h3>Logging Agent Execution</h3>
-
-        <CodeBlock language="typescript">
-          {`import { Agent, Logger } from '@lov3kaizen/agentsea-core';
+// A child logger adds fixed fields to every entry
+const requestLogger = logger.child({ requestId: 'req-42' });
+requestLogger.info('Starting run');`}
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          Logging an agent run:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, Logger } from '@lov3kaizen/agentsea-core';
 
 const logger = new Logger({ level: 'info' });
 
-// Enable agent logging
-const agent = new Agent(config, provider, toolRegistry, memory);
-
-try {
-  logger.info('Agent execution started', {
-    agentName: agent.name,
+async function runAgent(agent: Agent, prompt: string, context: AgentContext) {
+  logger.info('Agent run started', {
+    agentName: agent.config.name,
     conversationId: context.conversationId,
   });
-
-  const response = await agent.execute(prompt, context);
-
-  logger.info('Agent execution completed', {
-    agentName: agent.name,
-    tokensUsed: response.metadata.tokensUsed,
-    toolsCalled: response.toolCalls.length,
-  });
-
-  return response;
-} catch (error) {
-  logger.error('Agent execution failed', {
-    agentName: agent.name,
-    error: error.message,
-    stack: error.stack,
-  });
-  throw error;
-}`}
-        </CodeBlock>
-
-        <h2>Metrics</h2>
-        <p>Track performance metrics for agents, tools, and workflows:</p>
-
-        <CodeBlock language="typescript">
-          {`import { Metrics, globalMetrics } from '@lov3kaizen/agentsea-core';
-
-// Use global metrics instance
-const metrics = globalMetrics;
-
-// Record metrics
-metrics.recordCounter('agent.executions', 1, {
-  agentName: 'chat-agent',
-  status: 'success',
-});
-
-metrics.recordHistogram('agent.latency', 1250, {
-  agentName: 'chat-agent',
-});
-
-metrics.recordGauge('agent.active_conversations', 42);
-
-// Get statistics
-const stats = metrics.getStatistics();
-console.log(stats);
-// {
-// 'agent.executions': { count: 100, sum: 100, ... },
-// 'agent.latency': { count: 100, min: 200, max: 3000, mean: 1250, ... }
-// }`}
-        </CodeBlock>
-
-        <h3>Automated Agent Metrics</h3>
-
-        <CodeBlock language="typescript">
-          {`import { Agent, globalMetrics } from '@lov3kaizen/agentsea-core';
-
-const agent = new Agent(config, provider, toolRegistry, memory);
-
-// Wrap execution with metrics
-async function executeWithMetrics(prompt: string, context: any) {
-  const startTime = Date.now();
-
   try {
     const response = await agent.execute(prompt, context);
-
-    // Record success metrics
-    globalMetrics.recordCounter('agent.executions', 1, {
-      agentName: agent.name,
-      status: 'success',
+    logger.info('Agent run completed', {
+      agentName: agent.config.name,
+      tokensUsed: response.metadata.tokensUsed,
+      toolCalls: response.toolCalls?.length ?? 0,
     });
-
-    globalMetrics.recordHistogram('agent.latency', Date.now() - startTime, {
-      agentName: agent.name,
-    });
-
-    globalMetrics.recordHistogram('agent.tokens', response.metadata.tokensUsed, {
-      agentName: agent.name,
-    });
-
     return response;
   } catch (error) {
-    // Record error metrics
-    globalMetrics.recordCounter('agent.executions', 1, {
-      agentName: agent.name,
-      status: 'error',
+    logger.error('Agent run failed', {
+      agentName: agent.config.name,
+      error: error instanceof Error ? error.message : String(error),
     });
-
-    globalMetrics.recordCounter('agent.errors', 1, {
-      agentName: agent.name,
-      errorType: error.constructor.name,
-    });
-
     throw error;
   }
 }`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h3>Subscribing to Metrics</h3>
+      <DocSection id="metrics" num="03" title="Metrics">
+        <p className="text-base leading-relaxed text-brand-navy">
+          A metric is an <code>AgentMetrics</code> record: <code>agentName</code>, <code>latencyMs</code>,{' '}
+          <code>tokensUsed</code>, <code>success</code>, an optional <code>error</code>, and a{' '}
+          <code>timestamp</code>. Record one per run:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, AgentContext, globalMetrics } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { globalMetrics } from '@lov3kaizen/agentsea-core';
-
-// Subscribe to metric updates
-globalMetrics.subscribe((metric) => {
-  console.log(\`Metric recorded: \${metric.name} = \${metric.value}\`);
-
-  // Send to monitoring service
-  if (metric.name === 'agent.latency' && metric.value > 5000) {
-    alertHighLatency(metric);
+async function executeWithMetrics(agent: Agent, prompt: string, context: AgentContext) {
+  const startedAt = Date.now();
+  try {
+    const response = await agent.execute(prompt, context);
+    globalMetrics.record({
+      agentName: agent.config.name,
+      latencyMs: Date.now() - startedAt,
+      tokensUsed: response.metadata.tokensUsed,
+      success: true,
+      timestamp: new Date(),
+    });
+    return response;
+  } catch (error) {
+    globalMetrics.record({
+      agentName: agent.config.name,
+      latencyMs: Date.now() - startedAt,
+      tokensUsed: 0,
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+      timestamp: new Date(),
+    });
+    throw error;
   }
-});`}
-        </CodeBlock>
+}`}
+        />
+        <p className="text-base leading-relaxed text-brand-navy">Read the recorded metrics:</p>
+        <ApiList>
+          <ApiRow name="getStats(agentName?)">
+            Returns <code>totalCalls</code>, <code>successRate</code>, <code>avgLatency</code>,{' '}
+            <code>totalTokens</code> and <code>errors</code>. Without a name, it covers all agents.
+          </ApiRow>
+          <ApiRow name="getAll()">Returns a copy of every recorded metric.</ApiRow>
+          <ApiRow name="getByAgent(name)">Returns the metrics for one agent.</ApiRow>
+          <ApiRow name="getByTimeRange(start, end)">Returns the metrics recorded in a time window.</ApiRow>
+          <ApiRow name="subscribe(listener)">Calls the listener for each new metric. Returns an unsubscribe function.</ApiRow>
+          <ApiRow name="clear()">Removes all recorded metrics.</ApiRow>
+        </ApiList>
+        <CodeBlock
+          lang="TS"
+          code={`const stats = globalMetrics.getStats('chat-agent');
+console.log(stats.totalCalls, stats.successRate, stats.avgLatency, stats.totalTokens);`}
+        />
+      </DocSection>
 
-        <h2>Distributed Tracing</h2>
-        <p>Track execution flow across agents, tools, and workflows:</p>
+      <DocSection id="tracing" num="04" title="Tracing">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code>startSpan(name, context?)</code> returns a span and a context. Pass that context to a child
+          span to nest it under the parent:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { globalTracer } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { Tracer, globalTracer } from '@lov3kaizen/agentsea-core';
-
-const tracer = globalTracer;
-
-// Create trace
-const trace = tracer.createTrace('user-request', {
-  userId: '12345',
-  operation: 'chat',
-});
-
-// Create spans for each operation
-const agentSpan = trace.createSpan('agent-execution', {
-  agentName: 'chat-agent',
-});
+const { span: runSpan, context: runContext } = globalTracer.startSpan('agent-run');
+globalTracer.setAttributes(runSpan.spanId, { agentName: 'chat-agent', userId: '12345' });
 
 try {
   const response = await agent.execute(prompt, context);
 
-  // Create nested span for tool execution
-  const toolSpan = agentSpan.createSpan('tool-call', {
-    toolName: 'calculator',
-  });
+  // A child span for a tool call, nested under the run
+  const { span: toolSpan } = globalTracer.startSpan('tool-call', runContext);
+  globalTracer.setAttributes(toolSpan.spanId, { toolName: 'calculator' });
+  globalTracer.endSpan(toolSpan.spanId);
 
-  const result = await executeTool('calculator', { a: 1, b: 2 });
-  toolSpan.end();
+  globalTracer.addEvent(runSpan.spanId, 'completed', { tokensUsed: response.metadata.tokensUsed });
+  globalTracer.endSpan(runSpan.spanId);
 
-  agentSpan.end();
-
-  // Get trace information
-  const duration = trace.getDuration();
-  const spans = trace.getSpans();
-  console.log(\`Total duration: \${duration}ms, Spans: \${spans.length}\`);
+  // All spans in the trace, and the run's duration in milliseconds
+  const spans = globalTracer.getTrace(runSpan.traceId);
+  console.log(spans.length, globalTracer.getSpanDuration(runSpan.spanId));
 } catch (error) {
-  agentSpan.end();
+  globalTracer.endSpan(runSpan.spanId, error instanceof Error ? error : new Error(String(error)));
   throw error;
 }`}
-        </CodeBlock>
+        />
+        <ApiList>
+          <ApiRow name="startSpan(name, context?)">Starts a span. Returns <code>{'{ span, context }'}</code>.</ApiRow>
+          <ApiRow name="endSpan(spanId, error?)">Ends a span. Passing an error marks it failed.</ApiRow>
+          <ApiRow name="setAttributes(spanId, attributes)">Attaches key/value pairs to a span.</ApiRow>
+          <ApiRow name="addEvent(spanId, name, attributes?)">Adds a timestamped event to a span.</ApiRow>
+          <ApiRow name="getSpan(spanId), getTrace(traceId)">Returns one span, or every span in a trace.</ApiRow>
+          <ApiRow name="getSpanDuration(spanId)">Returns the duration in milliseconds once the span has ended.</ApiRow>
+          <ApiRow name="export(), clear()">Returns all spans, or clears them.</ApiRow>
+        </ApiList>
+      </DocSection>
 
-        <h3>Automatic Tracing</h3>
+      <DocSection id="forwarding" num="05" title="Forwarding to monitoring">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Core has no built-in exporter for Prometheus, DataDog or other systems. To send metrics out, subscribe
+          to <code>globalMetrics</code> and forward each record with your own client:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { globalMetrics } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { Agent, globalTracer } from '@lov3kaizen/agentsea-core';
-
-// Wrap agent with automatic tracing
-function createTracedAgent(config, provider, toolRegistry, memory) {
-  const agent = new Agent(config, provider, toolRegistry, memory);
-
-  // Override execute method
-  const originalExecute = agent.execute.bind(agent);
-
-  agent.execute = async (prompt, context) => {
-    const trace = globalTracer.createTrace(\`agent:\${agent.name}\`, {
-      conversationId: context.conversationId,
-    });
-
-    const span = trace.createSpan('agent-execution', {
-      agentName: agent.name,
-      prompt: prompt.substring(0, 100),
-    });
-
-    try {
-      const response = await originalExecute(prompt, context);
-      span.end();
-      return response;
-    } catch (error) {
-      span.end();
-      throw error;
-    }
-  };
-
-  return agent;
-}
-
-const tracedAgent = createTracedAgent(config, provider, toolRegistry, memory);`}
-        </CodeBlock>
-
-        <h2>Integration with Monitoring Services</h2>
-
-        <h3>Prometheus</h3>
-
-        <CodeBlock language="typescript">
-          {`import { globalMetrics } from '@lov3kaizen/agentsea-core';
-import { register, Counter, Histogram } from 'prom-client';
-
-// Create Prometheus metrics
-const agentExecutions = new Counter({
-  name: 'agent_executions_total',
-  help: 'Total agent executions',
-  labelNames: ['agent_name', 'status'],
-});
-
-const agentLatency = new Histogram({
-  name: 'agent_latency_seconds',
-  help: 'Agent execution latency',
-  labelNames: ['agent_name'],
-  buckets: [0.1, 0.5, 1, 2, 5],
-});
-
-// Subscribe to AgentSea  metrics and forward to Prometheus
-globalMetrics.subscribe((metric) => {
-  if (metric.name === 'agent.executions') {
-    agentExecutions.inc({
-      agent_name: metric.tags.agentName,
-      status: metric.tags.status,
-    });
-  } else if (metric.name === 'agent.latency') {
-    agentLatency.observe(
-      { agent_name: metric.tags.agentName },
-      metric.value / 1000, // Convert to seconds
-    );
-  }
-});
-
-// Expose metrics endpoint
-app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', register.contentType);
-  res.end(await register.metrics());
-});`}
-        </CodeBlock>
-
-        <h3>DataDog</h3>
-
-        <CodeBlock language="typescript">
-          {`import { globalMetrics } from '@lov3kaizen/agentsea-core';
-import { StatsD } from 'node-statsd';
-
-const statsd = new StatsD({
-  host: 'localhost',
-  port: 8125,
-});
-
-// Forward metrics to DataDog
-globalMetrics.subscribe((metric) => {
-  const tags = Object.entries(metric.tags || {})
-    .map(([key, value]) => \`\${key}:\${value}\`)
-    .join(',');
-
-  if (metric.type === 'counter') {
-    statsd.increment(metric.name, 1, tags);
-  } else if (metric.type === 'histogram') {
-    statsd.histogram(metric.name, metric.value, tags);
-  } else if (metric.type === 'gauge') {
-    statsd.gauge(metric.name, metric.value, tags);
-  }
-});`}
-        </CodeBlock>
-
-        <h3>Custom Dashboard</h3>
-
-        <CodeBlock language="typescript">
-          {`import { globalMetrics, globalTracer } from '@lov3kaizen/agentsea-core';
-
-// Create dashboard endpoint
-app.get('/dashboard', (req, res) => {
-  const stats = globalMetrics.getStatistics();
-  const activeTraces = globalTracer.getActiveTraces();
-
-  res.json({
-    metrics: {
-      totalExecutions: stats['agent.executions']?.count || 0,
-      averageLatency: stats['agent.latency']?.mean || 0,
-      errorRate: calculateErrorRate(stats),
-      tokensUsed: stats['agent.tokens']?.sum || 0,
-    },
-    activeTraces: activeTraces.length,
-    uptime: process.uptime(),
+const unsubscribe = globalMetrics.subscribe((metric) => {
+  // Send to your monitoring client here
+  sendToMonitoring({
+    name: 'agent.run',
+    agent: metric.agentName,
+    latencyMs: metric.latencyMs,
+    tokens: metric.tokensUsed,
+    success: metric.success,
   });
-});`}
-        </CodeBlock>
 
-        <h2>Performance Monitoring</h2>
+  if (metric.latencyMs > 5000) {
+    console.warn(\`Slow run: \${metric.agentName} took \${metric.latencyMs} ms\`);
+  }
+});
 
-        <CodeBlock language="typescript">
-          {`import { globalMetrics } from '@lov3kaizen/agentsea-core';
+// Call unsubscribe() to stop forwarding`}
+        />
+      </DocSection>
 
-// Monitor performance periodically
+      <DocSection id="performance" num="06" title="Performance monitoring">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Check the summary on an interval and log anything out of range:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { globalMetrics, Logger } from '@lov3kaizen/agentsea-core';
+
+const logger = new Logger({ level: 'info' });
+
 setInterval(() => {
-  const stats = globalMetrics.getStatistics();
+  const stats = globalMetrics.getStats();
 
-  // Check for performance issues
-  if (stats['agent.latency']?.mean > 5000) {
-    logger.warn('High average latency detected', {
-      averageLatency: stats['agent.latency'].mean,
-    });
+  if (stats.avgLatency > 5000) {
+    logger.warn('High average latency', { avgLatency: stats.avgLatency });
   }
 
-  const errorRate = calculateErrorRate(stats);
+  const errorRate = stats.totalCalls > 0 ? stats.errors / stats.totalCalls : 0;
   if (errorRate > 0.05) {
-    logger.error('High error rate detected', {
-      errorRate: errorRate,
-    });
+    logger.error('High error rate', { errorRate });
   }
 
-  // Log summary
-  logger.info('Performance summary', {
-    executions: stats['agent.executions']?.count,
-    averageLatency: stats['agent.latency']?.mean,
-    errorRate: errorRate,
-  });
-}, 60000); // Every minute`}
-        </CodeBlock>
+  logger.info('Performance summary', { ...stats, errorRate });
+}, 60_000); // once a minute`}
+        />
+      </DocSection>
 
-        <h2>Best Practices</h2>
+      <DocSection id="related-packages" num="07" title="Related packages">
+        <BulletPanel
+          items={[
+            <>
+              <strong>@lov3kaizen/agentsea-analytics</strong>: conversation analytics, with intent classification, flow
+              analysis and sentiment. See the <Link href="/docs/analytics" className="font-semibold text-brand-ocean hover:underline">analytics reference</Link>.
+            </>,
+            <>
+              <strong>@lov3kaizen/agentsea-debugger</strong>: step-through debugging, execution recordings, checkpoints
+              and replay. See the <Link href="/docs/debugger" className="font-semibold text-brand-ocean hover:underline">debugger reference</Link>.
+            </>,
+            <>
+              <strong>@lov3kaizen/agentsea-costs</strong>: real-time cost tracking, budgets and attribution. See the{' '}
+              <Link href="/docs/costs" className="font-semibold text-brand-ocean hover:underline">costs reference</Link>.
+            </>,
+          ]}
+        />
+      </DocSection>
 
-        <ul>
-          <li>
-            <strong>Log Levels</strong>: Use appropriate log levels (error for
-            failures, info for important events, debug for detailed
-            troubleshooting)
-          </li>
-          <li>
-            <strong>Structured Logging</strong>: Include relevant context in log
-            messages (agent names, conversation IDs, etc.)
-          </li>
-          <li>
-            <strong>Metric Naming</strong>: Use consistent naming conventions
-            (e.g., <code>agent.executions</code>, <code>tool.calls</code>)
-          </li>
-          <li>
-            <strong>Sampling</strong>: Sample high-volume traces to reduce
-            overhead
-          </li>
-          <li>
-            <strong>Alerting</strong>: Set up alerts for critical metrics (error
-            rates, high latency)
-          </li>
-          <li>
-            <strong>Dashboards</strong>: Create dashboards to visualize key
-            metrics
-          </li>
-          <li>
-            <strong>Retention</strong>: Configure appropriate log and metric
-            retention periods
-          </li>
-        </ul>
+      <DocSection id="best-practices" num="08" title="Best practices">
+        <BulletPanel
+          items={[
+            <>
+              <strong>Log levels</strong>: use <code>error</code> for failures, <code>info</code> for important events
+              and <code>debug</code> for detail.
+            </>,
+            <>
+              <strong>Context</strong>: include agent names and conversation IDs. Use <code>child()</code> for fields
+              that repeat.
+            </>,
+            <>
+              <strong>Metric names and fields</strong>: use the same agent names everywhere so records can be grouped.
+            </>,
+            <>
+              <strong>Bound memory</strong>: <code>globalMetrics</code> and the tracer keep records in memory. Forward
+              them and call <code>clear()</code> on a schedule in long-running processes.
+            </>,
+            <>
+              <strong>Alerts</strong>: alert on error rate and latency, not on single failures.
+            </>,
+          ]}
+        />
+      </DocSection>
 
-        <h2>Next Steps</h2>
-        <ul>
-          <li>
-            <Link href="/docs/agents">Learn about Agents</Link>
-          </li>
-          <li>
-            <Link href="/docs/workflows">Explore Workflows</Link>
-          </li>
-          <li>
-            <Link href="/examples">View Observability Examples</Link>
-          </li>
-        </ul>
-      </div>
-    </PageContainer>
+      <DocSection id="next-steps" num="09" title="Next steps">
+        <BulletPanel
+          items={[
+            <Link key="agents" href="/docs/agents" className="text-brand-ocean hover:underline">
+              Learn about agents
+            </Link>,
+            <Link key="workflows" href="/docs/workflows" className="text-brand-ocean hover:underline">
+              Explore workflows
+            </Link>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }
-
-const observabilityPillars = [
-  {
-    icon: '📝',
-    name: 'Logging',
-    description: 'Structured logging with Winston for debugging and auditing',
-  },
-  {
-    icon: '📊',
-    name: 'Metrics',
-    description: 'Performance metrics for agents, tools, and workflows',
-  },
-  {
-    icon: '🔍',
-    name: 'Tracing',
-    description: 'Distributed tracing to understand execution flow',
-  },
-];
