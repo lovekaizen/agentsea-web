@@ -1,196 +1,220 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
+
+export const metadata: Metadata = {
+  title: 'Memory | AgentSea',
+  description:
+    'Memory stores keep an agent conversation history across calls: buffer, Redis, summary and tenant-aware stores, and how to write your own.',
+};
+
+const toc = [
+  { id: 'memory-types', label: 'Memory types' },
+  { id: 'buffer-memory', label: 'Buffer memory' },
+  { id: 'redis-memory', label: 'Redis memory' },
+  { id: 'summary-memory', label: 'Summary memory' },
+  { id: 'tenant-buffer-memory', label: 'Tenant buffer memory' },
+  { id: 'memory-interface', label: 'Memory interface' },
+  { id: 'custom-store', label: 'Custom memory store' },
+  { id: 'managing-history', label: 'Managing history' },
+  { id: 'session-data', label: 'Session data' },
+  { id: 'choosing-store', label: 'Choosing a store' },
+  { id: 'best-practices', label: 'Best practices' },
+  { id: 'next-steps', label: 'Next steps' },
+];
 
 export default function MemoryPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Memory"
-        titleGradient="blue"
-        description="Memory stores enable agents to maintain conversation context across multiple interactions, providing continuity and personalization."
-      />
-
-      <div className="prose max-w-none">
-        <h2>Memory Types</h2>
-        <p>AgentSea provides four memory store implementations:</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 not-prose mb-8">
-          {memoryTypes.map((type, index) => (
-            <div
-              key={index}
-              className="p-4 bg-white rounded-lg border border-gray-200"
-            >
-              <div className="text-3xl mb-2">{type.icon}</div>
-              <h3 className="font-semibold text-gray-900 mb-2">{type.name}</h3>
-              <p className="text-sm text-gray-600 mb-3">{type.description}</p>
-              <div className="text-xs text-gray-500">
-                <strong>Best for:</strong> {type.bestFor}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <h2>Buffer Memory</h2>
-        <p>
-          Simple in-memory storage that keeps the most recent messages. Fast and
-          easy to use.
+    <DocsShell
+      eyebrow="Concept"
+      title="Memory"
+      lead="Memory stores let an agent keep conversation context across calls, for continuity and personalization."
+      active="concepts"
+      toc={toc}
+    >
+      <DocSection id="memory-types" num="01" title="Memory types">
+        <p className="text-base leading-relaxed text-brand-navy">
+          AgentSea provides four memory stores in core. Pass one to the <code>Agent</code>{' '}
+          constructor as its fourth argument.
         </p>
+        <ApiList>
+          <ApiRow name="BufferMemory">
+            Keeps the most recent messages in process memory. Best for development, testing and
+            single-process apps.
+          </ApiRow>
+          <ApiRow name="RedisMemory">
+            Stores conversations in Redis, so several servers can share them. Best for production.
+          </ApiRow>
+          <ApiRow name="SummaryMemory">
+            Keeps the latest messages verbatim and summarizes older ones. Best for long conversations.
+          </ApiRow>
+          <ApiRow name="TenantBufferMemory">
+            Buffer memory keyed by tenant, so one tenant&apos;s conversations are not returned to another.
+            Best for multi-tenant apps.
+          </ApiRow>
+        </ApiList>
+      </DocSection>
 
-        <CodeBlock language="typescript">
-          {`import { Agent, BufferMemory, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
+      <DocSection id="buffer-memory" num="02" title="Buffer memory">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Keeps the most recent messages. Pass a number to cap how many are stored per conversation.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, BufferMemory, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
 
-// Create buffer memory with max 50 messages
+// Keep at most 50 messages per conversation
 const memory = new BufferMemory(50);
 
-// Create agent with memory
 const agent = new Agent(
   {
     name: 'chat-agent',
-    model: 'claude-sonnet-4-20250514',
+    description: 'Chat assistant with short-term memory',
+    model: 'claude-sonnet-4-6',
     provider: 'anthropic',
     systemPrompt: 'You are a helpful assistant.',
   },
   new AnthropicProvider(),
   new ToolRegistry(),
-  memory, // Pass memory to agent
-);
-
-// First conversation
-await agent.execute('My name is Alice', {
-  conversationId: 'user-123',
-  sessionData: {},
-  history: [],
-});
-
-// Agent remembers from previous message
-await agent.execute('What is my name?', {
-  conversationId: 'user-123',
-  sessionData: {},
-  history: [],
-});
-// Response: "Your name is Alice"`}
-        </CodeBlock>
-
-        <h2>Redis Memory</h2>
-        <p>
-          Persistent storage using Redis. Ideal for production applications with
-          multiple servers.
-        </p>
-
-        <CodeBlock language="typescript">
-          {`import { Agent, RedisMemory, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
-
-// Create Redis memory
-const memory = new RedisMemory({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
-  ttl: 86400, // 24 hours (optional)
-  keyPrefix: 'agent:', // Optional key prefix
-});
-
-// Create agent with Redis memory
-const agent = new Agent(
-  config,
-  new AnthropicProvider(),
-  new ToolRegistry(),
   memory,
 );
 
-// Memory persists across server restarts
+const context = { conversationId: 'user-123', sessionData: {}, history: [] };
+
+await agent.execute('My name is Alice', context);
+
+// The agent loads the saved history for user-123
+await agent.execute('What is my name?', context); // "Your name is Alice"`}
+        />
+      </DocSection>
+
+      <DocSection id="redis-memory" num="03" title="Redis memory">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Persists conversations in Redis. Use it when several servers handle the same conversations,
+          or when history must survive a restart.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, RedisMemory, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
+
+const memory = new RedisMemory({
+  host: 'localhost',                   // falls back to REDIS_HOST
+  port: 6379,                          // falls back to REDIS_PORT
+  password: process.env.REDIS_PASSWORD, // falls back to REDIS_PASSWORD
+  prefix: 'agent:',                    // optional key prefix
+  ttl: 86400,                          // seconds, set on each save
+});
+
+const agent = new Agent(config, new AnthropicProvider(), new ToolRegistry(), memory);
+
 await agent.execute('Remember: my favorite color is blue', context);
 
-// Later, even after server restart
-await agent.execute('What is my favorite color?', context);
-// Response: "Your favorite color is blue"
-
-// Cleanup when done
+// Close the connection when the process shuts down
 await memory.disconnect();`}
-        </CodeBlock>
-
-        <h2>Summary Memory</h2>
-        <p>
-          Automatically summarizes old messages to maintain context while
-          reducing token usage.
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          The constructor takes <code>host</code>, <code>port</code>, <code>password</code>,{' '}
+          <code>db</code>, <code>prefix</code> and <code>ttl</code>. It does not take a URL.
         </p>
+      </DocSection>
 
-        <CodeBlock language="typescript">
-          {`import { Agent, SummaryMemory, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
+      <DocSection id="summary-memory" num="04" title="Summary memory">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Keeps the latest messages as they are, and summarizes the older ones with a model. On load,
+          the summary comes first as a system message, followed by the recent messages.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { SummaryMemory, AnthropicProvider } from '@lov3kaizen/agentsea-core';
 
-// Create summary memory
 const memory = new SummaryMemory(
-  new AnthropicProvider(),
-  {
-    maxMessages: 20, // Keep last 20 messages
-    summaryModel: 'claude-haiku-4-20250514', // Use fast model for summaries
-    summaryPrompt: 'Summarize the key points from this conversation:', // Optional
-  },
-);
+  new AnthropicProvider(), // provider that writes the summaries
+  20,                      // maxRecentMessages: keep the last 20 verbatim (default 10)
+  'claude-haiku-4-5',      // summaryModel (default)
+);`}
+        />
+        <Callout kind="note">
+          Summary memory keeps its data in process memory, like buffer memory. It is not persisted.
+        </Callout>
+      </DocSection>
 
-// Create agent
-const agent = new Agent(
-  config,
-  new AnthropicProvider(),
-  new ToolRegistry(),
-  memory,
-);
-
-// As conversation grows, old messages are automatically summarized
-// This keeps token usage low while maintaining context`}
-        </CodeBlock>
-
-        <h2>Memory Interface</h2>
-        <p>All memory stores implement the same interface:</p>
-
-        <CodeBlock language="typescript">
-          {`interface MemoryStore {
-  // Save messages for a conversation
-  save(conversationId: string, messages: Message[]): Promise<void>;
-
-  // Load messages for a conversation
-  load(conversationId: string): Promise<Message[]>;
-
-  // Clear messages for a conversation
-  clear(conversationId: string): Promise<void>;
-
-  // Optional: Check if conversation exists
-  exists?(conversationId: string): Promise<boolean>;
-}`}
-        </CodeBlock>
-
-        <h2>Custom Memory Store</h2>
-        <p>
-          Create your own memory store by implementing the MemoryStore
-          interface:
+      <DocSection id="tenant-buffer-memory" num="05" title="Tenant buffer memory">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Buffer memory where each call also takes a tenant ID. Conversations are stored per tenant, so
+          a lookup under one tenant does not return another tenant&apos;s messages.
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { TenantBufferMemory } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { MemoryStore, Message } from '@lov3kaizen/agentsea-core';
+const memory = new TenantBufferMemory(50); // maxMessages
+
+// The tenant ID is the last argument of save, load and clear
+memory.save('conv-456', [
+  { role: 'user', content: 'How do I upgrade my plan?' },
+  { role: 'assistant', content: 'I can help you upgrade your plan...' },
+], 'tenant-123');
+
+const history = memory.load('conv-456', 'tenant-123');
+
+// Tenant A and tenant B stay apart, even with the same conversation ID
+const tenantA = memory.load('conv-1', 'tenant-a');
+const tenantB = memory.load('conv-1', 'tenant-b');
+
+memory.clear('conv-456', 'tenant-123');
+const conversationIds = memory.getConversationIds('tenant-123');`}
+        />
+        <Callout kind="warning">
+          <code>TenantBufferMemory</code> methods are synchronous, and they take the tenant ID as an extra
+          argument. The <code>Agent</code> calls its memory with the conversation ID only, so the agent
+          does not pass a tenant ID. For tenant isolation, call <code>save</code>, <code>load</code> and{' '}
+          <code>clear</code> with the tenant ID yourself, or use a separate memory store per tenant.
+        </Callout>
+        <Callout kind="note">
+          For tenant setup across the platform, see{' '}
+          <Link href="/docs/multi-tenancy" className="font-semibold text-brand-ocean hover:underline">
+            multi-tenancy
+          </Link>
+          .
+        </Callout>
+      </DocSection>
+
+      <DocSection id="memory-interface" num="06" title="Memory interface">
+        <p className="text-base leading-relaxed text-brand-navy">
+          An agent accepts any object that implements this interface:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`interface MemoryStore {
+  save(conversationId: string, messages: Message[]): Promise<void>;
+  load(conversationId: string): Promise<Message[]>;
+  clear(conversationId: string): Promise<void>;
+  search?(query: string, limit?: number): Promise<Message[]>; // optional
+}`}
+        />
+      </DocSection>
+
+      <DocSection id="custom-store" num="07" title="Custom memory store">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Implement <code>MemoryStore</code> to keep history in your own database:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, MemoryStore, Message } from '@lov3kaizen/agentsea-core';
 
 export class DatabaseMemory implements MemoryStore {
-  private db: Database;
-
-  constructor(databaseConnection: Database) {
-    this.db = databaseConnection;
-  }
+  constructor(private db: Database) {} // your database client
 
   async save(conversationId: string, messages: Message[]): Promise<void> {
     await this.db.conversations.upsert({
       where: { id: conversationId },
-      update: {
-        messages: messages,
-        updatedAt: new Date(),
-      },
-      create: {
-        id: conversationId,
-        messages: messages,
-        createdAt: new Date(),
-      },
+      update: { messages, updatedAt: new Date() },
+      create: { id: conversationId, messages, createdAt: new Date() },
     });
   }
 
@@ -198,8 +222,7 @@ export class DatabaseMemory implements MemoryStore {
     const conversation = await this.db.conversations.findUnique({
       where: { id: conversationId },
     });
-
-    return conversation?.messages || [];
+    return conversation?.messages ?? [];
   }
 
   async clear(conversationId: string): Promise<void> {
@@ -208,344 +231,137 @@ export class DatabaseMemory implements MemoryStore {
       data: { messages: [] },
     });
   }
-
-  async exists(conversationId: string): Promise<boolean> {
-    const count = await this.db.conversations.count({
-      where: { id: conversationId },
-    });
-    return count > 0;
-  }
 }
 
-// Use custom memory
-const memory = new DatabaseMemory(prismaClient);
+const memory = new DatabaseMemory(dbClient);
 const agent = new Agent(config, provider, toolRegistry, memory);`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Tenant Buffer Memory</h2>
-        <p>
-          Multi-tenant aware memory that isolates conversation data by tenant.
-          Essential for multi-tenant applications.
+      <DocSection id="managing-history" num="08" title="Managing history">
+        <p className="text-base leading-relaxed text-brand-navy">
+          You can read and clear a conversation outside an agent run:
         </p>
-
-        <CodeBlock language="typescript">
-          {`import { Agent, TenantBufferMemory, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
-
-// Create tenant-aware memory
-const memory = new TenantBufferMemory({ maxMessages: 50 });
-
-// Create agent with tenant memory
-const agent = new Agent(
-  {
-    name: 'support-agent',
-    model: 'claude-sonnet-4-20250514',
-    provider: 'anthropic',
-    systemPrompt: 'You are a customer support assistant.',
-  },
-  new AnthropicProvider(),
-  new ToolRegistry(),
-  { type: 'custom', store: memory },
-);
-
-// Save conversation for specific tenant
-await memory.save('tenant-123', 'conv-456', [
-  { role: 'user', content: 'How do I upgrade my plan?' },
-  { role: 'assistant', content: 'I can help you upgrade your plan...' },
-]);
-
-// Load conversation only for this tenant
-const history = await memory.load('tenant-123', 'conv-456');
-
-// Complete tenant isolation - Tenant A cannot access Tenant B's data
-const tenantAHistory = await memory.load('tenant-a', 'conv-1'); // ✅ Returns tenant A's data
-const tenantBHistory = await memory.load('tenant-b', 'conv-1'); // ✅ Returns tenant B's data (different)
-
-// Clear tenant-specific conversation
-await memory.clear('tenant-123', 'conv-456');
-
-// Get all conversation IDs for a tenant
-const conversationIds = await memory.getConversationIds('tenant-123');`}
-        </CodeBlock>
-
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-          <h3 className="text-lg font-semibold mb-2">
-            🏢 Multi-Tenancy Support
-          </h3>
-          <p className="mb-0">
-            TenantBufferMemory provides complete data isolation between tenants,
-            ensuring that one tenant's conversations are never accessible to
-            another. Use this with the{' '}
-            <Link
-              href="/docs/multi-tenancy"
-              className="text-sky-600 hover:underline"
-            >
-              Multi-Tenancy system
-            </Link>{' '}
-            for production SaaS applications.
-          </p>
-        </div>
-
-        <h2>Managing Conversation History</h2>
-        <p>Control how conversation history is managed:</p>
-
-        <CodeBlock language="typescript">
-          {`// Clear conversation history
-await memory.clear('conversation-123');
-
-// Load existing history
+        <CodeBlock
+          lang="TS"
+          code={`// Load the saved history
 const history = await memory.load('conversation-123');
 
-// Pass history directly to agent
-const response = await agent.execute('Hello', {
+// Clear it
+await memory.clear('conversation-123');
+
+// List conversation IDs (BufferMemory and RedisMemory)
+const ids = await memory.getConversationIds();`}
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          When an agent has a memory store, every <code>execute()</code> call loads history from that store
+          by <code>conversationId</code>. The <code>history</code> field of the context is used only when
+          the agent has no memory store, or when loading from the store fails.
+        </p>
+      </DocSection>
+
+      <DocSection id="session-data" num="09" title="Session data">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The context&apos;s <code>sessionData</code> field carries application data with a call. The agent loop
+          does not read it, and it does not add it to the prompt. To give the model a value, put it in the
+          system prompt or in the user message:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`const context = {
   conversationId: 'user-123',
-  sessionData: {},
-  history: history, // Use pre-loaded history
-});
-
-// Check if conversation exists
-const exists = await memory.exists('conversation-123');
-if (!exists) {
-  console.log('Starting new conversation');
-}`}
-        </CodeBlock>
-
-        <h2>Session Data</h2>
-        <p>Store additional context alongside messages:</p>
-
-        <CodeBlock language="typescript">
-          {`const context = {
-  conversationId: 'user-123',
-  sessionData: {
-    userId: '12345',
-    userName: 'Alice',
-    preferences: {
-      language: 'en',
-      timezone: 'America/Los_Angeles',
-    },
-    metadata: {
-      source: 'web',
-      device: 'desktop',
-    },
-  },
+  sessionData: { userId: '12345', timezone: 'America/Los_Angeles' },
   history: [],
 };
 
-const response = await agent.execute('What time is it?', context);
+const agent = new Agent(
+  {
+    // ...
+    systemPrompt: 'The user is in the America/Los_Angeles timezone. Give times in that zone.',
+  },
+  provider,
+  toolRegistry,
+  memory,
+);
 
-// Agent can reference session data in responses
-// "Based on your timezone (America/Los_Angeles), it is currently..."`}
-        </CodeBlock>
+const response = await agent.execute('What time is it?', context);`}
+        />
+      </DocSection>
 
-        <h2>Memory Best Practices</h2>
-
-        <h3>Choosing the Right Memory Store</h3>
-        <ul>
-          <li>
-            <strong>BufferMemory</strong>: Development, testing, single-server
-            apps
-          </li>
-          <li>
-            <strong>RedisMemory</strong>: Production, multi-server, high
-            availability
-          </li>
-          <li>
-            <strong>SummaryMemory</strong>: Long conversations, token
-            optimization
-          </li>
-          <li>
-            <strong>TenantBufferMemory</strong>: Multi-tenant SaaS applications
-            requiring data isolation
-          </li>
-        </ul>
-
-        <h3>Memory Configuration</h3>
-        <ul>
-          <li>
-            Set appropriate message limits to balance context and token usage
-          </li>
-          <li>Use TTL in Redis to automatically expire old conversations</li>
-          <li>Implement cleanup jobs to remove inactive conversations</li>
-          <li>Monitor memory usage in production environments</li>
-        </ul>
-
-        <h3>Privacy and Security</h3>
-        <ul>
-          <li>Encrypt sensitive data before storing in memory</li>
-          <li>Implement data retention policies</li>
-          <li>Provide user controls to delete their conversation history</li>
-          <li>Use conversation IDs that don't expose user information</li>
-        </ul>
-
-        <h2>Comparison Table</h2>
-
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+      <DocSection id="choosing-store" num="10" title="Choosing a store">
+        <div className="overflow-x-auto rounded-xl border border-rule bg-surface-paper">
+          <table className="min-w-full text-[15px] text-brand-navy">
+            <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Feature
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Buffer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Redis
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Summary
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tenant Buffer
-                </th>
+                <th className="px-4 py-3 text-left font-semibold text-brand-deep">Store</th>
+                <th className="px-4 py-3 text-left font-semibold text-brand-deep">Where history lives</th>
+                <th className="px-4 py-3 text-left font-semibold text-brand-deep">Survives restart</th>
+                <th className="px-4 py-3 text-left font-semibold text-brand-deep">Needs</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  Persistence
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ❌ No
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ✅ Yes
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Depends
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ❌ No
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  Speed
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚡ Fastest
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚡ Fast
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  🐢 Slower
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚡ Fastest
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  Scalability
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ❌ Single server
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ✅ Multi-server
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Depends
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ✅ Multi-tenant
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  Token Usage
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Medium
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Medium
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ✅ Optimized
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Medium
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  Setup
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ✅ Simple
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Redis required
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Extra LLM calls
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ✅ Simple
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  Tenant Isolation
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ❌ No
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Manual
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ⚠️ Manual
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  ✅ Built-in
-                </td>
-              </tr>
+            <tbody>
+              {[
+                ['BufferMemory', 'Process memory', 'No', 'Nothing extra'],
+                ['RedisMemory', 'Redis', 'Yes', 'A Redis server'],
+                ['SummaryMemory', 'Process memory', 'No', 'A provider to write summaries'],
+                ['TenantBufferMemory', 'Process memory, per tenant', 'No', 'Nothing extra'],
+              ].map((row) => (
+                <tr key={row[0]} className="border-t border-rule">
+                  <td className="px-4 py-3 font-semibold text-brand-deep">{row[0]}</td>
+                  <td className="px-4 py-3">{row[1]}</td>
+                  <td className="px-4 py-3">{row[2]}</td>
+                  <td className="px-4 py-3">{row[3]}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
+      </DocSection>
 
-        <h2>Next Steps</h2>
-        <ul>
-          <li>
-            <Link href="/docs/agents">Learn more about Agents</Link>
-          </li>
-          <li>
-            <Link href="/docs/workflows">Use Memory in Workflows</Link>
-          </li>
-          <li>
-            <Link href="/examples">View Memory Examples</Link>
-          </li>
-        </ul>
-      </div>
-    </PageContainer>
+      <DocSection id="best-practices" num="11" title="Best practices">
+        <BulletPanel
+          items={[
+            <>
+              <strong>Pick by deployment</strong>: buffer for development and single-process apps, Redis for
+              production and several servers, summary for long conversations.
+            </>,
+            <>
+              <strong>Set limits</strong>: a message cap on buffer memory, or a recent-message count on summary
+              memory, keeps token use in check.
+            </>,
+            <>
+              <strong>Expire old data</strong>: set <code>ttl</code> on Redis memory, and clean up inactive
+              conversations in other stores.
+            </>,
+            <>
+              <strong>Protect the data</strong>: encrypt sensitive content before you store it, set a retention
+              policy, and let users delete their history.
+            </>,
+            <>
+              <strong>Use opaque conversation IDs</strong> that do not reveal user information.
+            </>,
+          ]}
+        />
+      </DocSection>
+
+      <DocSection id="next-steps" num="12" title="Next steps">
+        <BulletPanel
+          items={[
+            <Link key="pkg" href="/docs/packages/memory" className="text-brand-ocean hover:underline">
+              Memory package reference
+            </Link>,
+            <Link key="agents" href="/docs/agents" className="text-brand-ocean hover:underline">
+              Agents
+            </Link>,
+            <Link key="conversation" href="/docs/conversation" className="text-brand-ocean hover:underline">
+              Conversation management
+            </Link>,
+            <Link key="tenancy" href="/docs/multi-tenancy" className="text-brand-ocean hover:underline">
+              Multi-tenancy
+            </Link>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }
-
-const memoryTypes = [
-  {
-    icon: '💾',
-    name: 'Buffer Memory',
-    description: 'In-memory storage that keeps the most recent N messages',
-    bestFor: 'Development, testing, simple applications',
-  },
-  {
-    icon: '🔴',
-    name: 'Redis Memory',
-    description: 'Persistent storage using Redis for production deployments',
-    bestFor: 'Production, multi-server, high availability',
-  },
-  {
-    icon: '📝',
-    name: 'Summary Memory',
-    description: 'Automatically summarizes old messages to reduce token usage',
-    bestFor: 'Long conversations, cost optimization',
-  },
-  {
-    icon: '🏢',
-    name: 'Tenant Buffer Memory',
-    description: 'Multi-tenant aware memory with complete data isolation',
-    bestFor: 'Multi-tenant SaaS applications',
-  },
-];
