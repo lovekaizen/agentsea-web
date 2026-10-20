@@ -1,70 +1,70 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
+
+export const metadata: Metadata = {
+  title: 'React hooks | AgentSea',
+  description:
+    'Build AI-powered React applications with the hooks for chat interfaces and agent execution.',
+};
+
+const toc = [
+  { id: 'installation', label: 'Installation' },
+  { id: 'available-hooks', label: 'Available hooks' },
+  { id: 'useChat', label: 'useChat' },
+  { id: 'useAgent', label: 'useAgent' },
+  { id: 'components', label: 'Components' },
+  { id: 'adapters', label: 'Connection adapters' },
+  { id: 'tool-states', label: 'Tool call states' },
+  { id: 'server-setup', label: 'Server-side setup' },
+  { id: 'next-steps', label: 'Next steps' },
+];
+
+const linkClass = 'text-brand-ocean underline-offset-2 hover:underline';
 
 export default function ReactHooksPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="React Hooks"
-        titleGradient="warm"
-        description="Build powerful AI-powered React applications with our hooks for chat interfaces and agent execution."
-      />
+    <DocsShell
+      eyebrow="Guide"
+      title="React hooks"
+      lead="Build AI-powered React applications with the hooks for chat interfaces and agent execution."
+      active="guides"
+      toc={toc}
+    >
+      <DocSection id="installation" num="01" title="Installation">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The <code>@lov3kaizen/agentsea-react</code> package provides React hooks and components for building AI chat
+          interfaces with streaming support, tool approval workflows, and thinking token visualization.
+        </p>
+        <CodeBlock lang="BASH" code={`npm install @lov3kaizen/agentsea-react\n# or\npnpm add @lov3kaizen/agentsea-react`} />
+      </DocSection>
 
-      <div className="prose max-w-none">
-        <AlertBox type="info">
-          The <code>@lov3kaizen/agentsea-react</code> package provides React
-          hooks and components for building AI chat interfaces with streaming
-          support, tool approval workflows, and thinking token visualization.
-        </AlertBox>
+      <DocSection id="available-hooks" num="02" title="Available hooks">
+        <ApiList>
+          <ApiRow name="useChat">
+            Full-featured chat hook with message management, streaming, tool approval, and thinking token support.
+          </ApiRow>
+          <ApiRow name="useAgent">Single-shot agent execution for one-off tasks and background operations.</ApiRow>
+          <ApiRow name="useFormattedContent">Format agent responses with Markdown rendering and code highlighting.</ApiRow>
+          <ApiRow name="useStreamingContent">Optimized streaming content handling with cursor animation.</ApiRow>
+        </ApiList>
+      </DocSection>
 
-        <h2>Installation</h2>
-        <CodeBlock language="bash">
-          {`npm install @lov3kaizen/agentsea-react
-# or
-pnpm add @lov3kaizen/agentsea-react`}
-        </CodeBlock>
-
-        <h2>Available Hooks</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-8">
-          {hooks.map((hook, index) => (
-            <div
-              key={index}
-              className="p-4 bg-white rounded-lg border border-gray-200"
-            >
-              <div className="flex items-start gap-3">
-                <div className="text-2xl">{hook.icon}</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 font-mono">
-                    {hook.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {hook.description}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <Divider />
-
-        <h2 id="useChat">useChat</h2>
-        <p>
-          The <code>useChat</code> hook provides full-featured chat
-          functionality with automatic message management, streaming support,
-          tool approval workflows, and thinking token visualization.
+      <DocSection id="useChat" num="03" title="useChat">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The <code>useChat</code> hook provides full-featured chat functionality with automatic message management,
+          streaming support, tool approval workflows, and thinking token visualization.
         </p>
 
-        <h3>Basic Usage</h3>
-        <CodeBlock language="tsx">
-          {`import { useChat } from '@lov3kaizen/agentsea-react';
+        <h3 className="text-lg font-semibold text-brand-deep">Basic usage</h3>
+        <CodeBlock
+          lang="TSX"
+          code={`import { useChat } from '@lov3kaizen/agentsea-react';
 
 function ChatInterface() {
   const {
@@ -124,11 +124,12 @@ function ChatInterface() {
     </div>
   );
 }`}
-        </CodeBlock>
+        />
 
-        <h3>Configuration Options</h3>
-        <CodeBlock language="typescript">
-          {`interface UseChatConfig {
+        <h3 className="text-lg font-semibold text-brand-deep">Configuration options</h3>
+        <CodeBlock
+          lang="TS"
+          code={`interface UseChatConfig {
   /** API endpoint for chat requests */
   endpoint: string;
 
@@ -171,11 +172,12 @@ function ChatInterface() {
   /** Maximum retry attempts on failure */
   maxRetries?: number;
 }`}
-        </CodeBlock>
+        />
 
-        <h3>Return Values</h3>
-        <CodeBlock language="typescript">
-          {`interface UseChatReturn {
+        <h3 className="text-lg font-semibold text-brand-deep">Return values</h3>
+        <CodeBlock
+          lang="TS"
+          code={`interface UseChatReturn {
   /** All messages in the conversation */
   messages: ChatMessage[];
 
@@ -218,14 +220,15 @@ function ChatInterface() {
   /** Set messages directly */
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
 }`}
-        </CodeBlock>
+        />
 
-        <h3>Tool Approval Workflow</h3>
-        <p>
+        <h3 className="text-lg font-semibold text-brand-deep">Tool approval workflow</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
           Handle tool approvals to give users control over sensitive operations:
         </p>
-        <CodeBlock language="tsx">
-          {`import { useChat } from '@lov3kaizen/agentsea-react';
+        <CodeBlock
+          lang="TSX"
+          code={`import { useChat } from '@lov3kaizen/agentsea-react';
 
 function ChatWithApproval() {
   const {
@@ -239,7 +242,7 @@ function ChatWithApproval() {
     endpoint: '/api/chat',
     agentId: 'my-agent',
     onToolApproval: (toolCall) => {
-      console.log('Tool needs approval:', toolCall.name);
+      console.log('Tool needs approval:', toolCall.tool);
     },
   });
 
@@ -255,7 +258,7 @@ function ChatWithApproval() {
       {/* Tool Approval UI */}
       {pendingApprovals.map((toolCall) => (
         <div key={toolCall.id} className="approval-dialog">
-          <h4>Tool Request: {toolCall.name}</h4>
+          <h4>Tool Request: {toolCall.tool}</h4>
           <p>{toolCall.approvalMessage || 'This tool needs your approval.'}</p>
           <pre>{JSON.stringify(toolCall.parameters, null, 2)}</pre>
           <div className="actions">
@@ -271,12 +274,15 @@ function ChatWithApproval() {
     </div>
   );
 }`}
-        </CodeBlock>
+        />
 
-        <h3>Thinking Token Support</h3>
-        <p>Display model reasoning (for Claude thinking tokens, o1-style models):</p>
-        <CodeBlock language="tsx">
-          {`const { thinkingContent, onThinking } = useChat({
+        <h3 className="text-lg font-semibold text-brand-deep">Thinking token support</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Display model reasoning (for Claude thinking tokens, o1-style models):
+        </p>
+        <CodeBlock
+          lang="TSX"
+          code={`const { thinkingContent } = useChat({
   endpoint: '/api/chat',
   agentId: 'reasoning-agent',
   onThinking: (thinking) => {
@@ -291,21 +297,19 @@ function ChatWithApproval() {
     <p>{thinkingContent}</p>
   </div>
 )}`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <Divider />
-
-        <h2 id="useAgent">useAgent</h2>
-        <p>
-          The <code>useAgent</code> hook is designed for single-shot agent
-          executions rather than maintaining conversation state. Ideal for
-          one-off tasks, background operations, and agent-driven UI
-          interactions.
+      <DocSection id="useAgent" num="04" title="useAgent">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The <code>useAgent</code> hook is designed for single-shot agent executions rather than maintaining
+          conversation state. Ideal for one-off tasks, background operations, and agent-driven UI interactions.
         </p>
 
-        <h3>Basic Usage</h3>
-        <CodeBlock language="tsx">
-          {`import { useAgent } from '@lov3kaizen/agentsea-react';
+        <h3 className="text-lg font-semibold text-brand-deep">Basic usage</h3>
+        <CodeBlock
+          lang="TSX"
+          code={`import { useAgent } from '@lov3kaizen/agentsea-react';
 
 function TaskRunner() {
   const {
@@ -344,12 +348,15 @@ function TaskRunner() {
     </div>
   );
 }`}
-        </CodeBlock>
+        />
 
-        <h3>Streaming Execution</h3>
-        <p>Use the async generator for real-time streaming updates:</p>
-        <CodeBlock language="tsx">
-          {`import { useAgent } from '@lov3kaizen/agentsea-react';
+        <h3 className="text-lg font-semibold text-brand-deep">Streaming execution</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Use the async generator for real-time streaming updates:
+        </p>
+        <CodeBlock
+          lang="TSX"
+          code={`import { useAgent } from '@lov3kaizen/agentsea-react';
 
 function StreamingTask() {
   const {
@@ -386,11 +393,12 @@ function StreamingTask() {
     </div>
   );
 }`}
-        </CodeBlock>
+        />
 
-        <h3>Configuration Options</h3>
-        <CodeBlock language="typescript">
-          {`interface UseAgentConfig {
+        <h3 className="text-lg font-semibold text-brand-deep">Configuration options</h3>
+        <CodeBlock
+          lang="TS"
+          code={`interface UseAgentConfig {
   /** API endpoint for agent requests */
   endpoint: string;
 
@@ -418,11 +426,12 @@ function StreamingTask() {
   /** Called when thinking tokens are received */
   onThinking?: (thinking: ThinkingPart) => void;
 }`}
-        </CodeBlock>
+        />
 
-        <h3>Return Values</h3>
-        <CodeBlock language="typescript">
-          {`interface UseAgentReturn {
+        <h3 className="text-lg font-semibold text-brand-deep">Return values</h3>
+        <CodeBlock
+          lang="TS"
+          code={`interface UseAgentReturn {
   /** Execute the agent with input */
   execute: (
     input: string,
@@ -468,76 +477,83 @@ function StreamingTask() {
   /** Reset state */
   reset: () => void;
 }`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <Divider />
-
-        <h2 id="components">Components</h2>
-
-        <h3>AgentResponse</h3>
-        <p>
-          Renders agent responses with full Markdown support, code highlighting,
-          and customizable styling:
+      <DocSection id="components" num="05" title="Components">
+        <h3 className="text-lg font-semibold text-brand-deep">AgentResponse</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Renders agent responses with full Markdown support, code highlighting, and customizable styling. It takes the
+          agent's response object as <code>response</code>.
         </p>
-        <CodeBlock language="tsx">
-          {`import { AgentResponse } from '@lov3kaizen/agentsea-react';
+        <CodeBlock
+          lang="TSX"
+          code={`import { AgentResponse } from '@lov3kaizen/agentsea-react';
+import type { AgentResponse as AgentResult } from '@lov3kaizen/agentsea-core';
 
-function ResponseDisplay({ content }: { content: string }) {
+function ResponseDisplay({ result }: { result: AgentResult }) {
   return (
     <AgentResponse
-      content={content}
+      response={result}
       className="my-custom-styles"
-      codeTheme="github-dark"
+      showMetadata
+      theme="auto"
     />
   );
 }`}
-        </CodeBlock>
+        />
 
-        <h3>StreamingResponse</h3>
-        <p>Optimized for rendering streaming content with cursor animation:</p>
-        <CodeBlock language="tsx">
-          {`import { StreamingResponse } from '@lov3kaizen/agentsea-react';
+        <h3 className="text-lg font-semibold text-brand-deep">StreamingResponse</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Renders an async stream of agent events as they arrive, with a cursor until the stream completes. It takes
+          the stream as <code>stream</code>.
+        </p>
+        <CodeBlock
+          lang="TSX"
+          code={`import { StreamingResponse } from '@lov3kaizen/agentsea-react';
+import type { StreamEvent } from '@lov3kaizen/agentsea-core';
 
-function LiveResponse({ content, isStreaming }: Props) {
+function LiveResponse({ stream }: { stream: AsyncIterable<StreamEvent> }) {
   return (
     <StreamingResponse
-      content={content}
-      isStreaming={isStreaming}
-      showCursor={true}
+      stream={stream}
+      theme="auto"
+      onComplete={(content) => console.log('Done:', content.length)}
     />
   );
 }`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <Divider />
-
-        <h2 id="adapters">Connection Adapters</h2>
-        <p>
-          The hooks support different connection adapters for various backend
-          configurations:
+      <DocSection id="adapters" num="06" title="Connection adapters">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The hooks support different connection adapters for various backend configurations:
         </p>
 
-        <h3>Server-Sent Events (SSE)</h3>
-        <CodeBlock language="tsx">
-          {`// Default adapter - ideal for streaming
+        <h3 className="text-lg font-semibold text-brand-deep">Server-Sent Events (SSE)</h3>
+        <CodeBlock
+          lang="TSX"
+          code={`// Default adapter - ideal for streaming
 const { sendMessage } = useChat({
   endpoint: '/api/chat',
   adapter: 'sse', // default
 });`}
-        </CodeBlock>
+        />
 
-        <h3>HTTP Stream (NDJSON)</h3>
-        <CodeBlock language="tsx">
-          {`// Better compatibility for some backends
+        <h3 className="text-lg font-semibold text-brand-deep">HTTP stream (NDJSON)</h3>
+        <CodeBlock
+          lang="TSX"
+          code={`// Better compatibility for some backends
 const { sendMessage } = useChat({
   endpoint: '/api/chat',
   adapter: 'http',
 });`}
-        </CodeBlock>
+        />
 
-        <h3>Custom Adapter</h3>
-        <CodeBlock language="tsx">
-          {`import { createSSEAdapter } from '@lov3kaizen/agentsea-react';
+        <h3 className="text-lg font-semibold text-brand-deep">Custom adapter</h3>
+        <CodeBlock
+          lang="TSX"
+          code={`import { createSSEAdapter } from '@lov3kaizen/agentsea-react';
 
 // Create and customize adapter
 const myAdapter = createSSEAdapter();
@@ -546,15 +562,14 @@ const { sendMessage } = useChat({
   endpoint: '/api/chat',
   adapter: myAdapter,
 });`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <Divider />
-
-        <h2 id="tool-states">Tool Call States</h2>
-        <p>Track tool execution through its lifecycle:</p>
-
-        <CodeBlock language="typescript">
-          {`type ToolCallState =
+      <DocSection id="tool-states" num="07" title="Tool call states">
+        <p className="text-base leading-relaxed text-brand-navy">Track tool execution through its lifecycle:</p>
+        <CodeBlock
+          lang="TS"
+          code={`type ToolCallState =
   | 'awaiting-input'      // Tool call received but no arguments yet
   | 'input-streaming'     // Partial arguments being received
   | 'input-complete'      // All arguments received, ready to execute
@@ -564,34 +579,37 @@ const { sendMessage } = useChat({
   | 'result-streaming'    // Result is being streamed
   | 'complete'            // Tool execution complete
   | 'error';              // Tool execution failed`}
-        </CodeBlock>
+        />
 
-        <h3>Tracking Tool Calls</h3>
-        <CodeBlock language="tsx">
-          {`const { activeToolCalls } = useChat({ ... });
+        <h3 className="text-lg font-semibold text-brand-deep">Tracking tool calls</h3>
+        <CodeBlock
+          lang="TSX"
+          code={`const { activeToolCalls } = useChat({ ... });
 
 // Display tool status
 {activeToolCalls.map((tool) => (
   <div key={tool.id} className={\`tool-status \${tool.state}\`}>
-    <span>{tool.name}</span>
+    <span>{tool.tool}</span>
     <span className="state">{tool.state}</span>
     {tool.state === 'executing' && <Spinner />}
     {tool.state === 'complete' && <CheckIcon />}
     {tool.state === 'error' && <ErrorIcon />}
   </div>
 ))}`}
-        </CodeBlock>
+        />
+        <Callout kind="note">
+          A tracked tool call names its tool in the <code>tool</code> field, the same field as the core{' '}
+          <code>ToolCall</code> type.
+        </Callout>
+      </DocSection>
 
-        <Divider />
-
-        <h2>Server-Side Setup</h2>
-        <p>
-          Your API endpoint should return SSE or NDJSON formatted chunks. Here's
-          an example NestJS setup:
+      <DocSection id="server-setup" num="08" title="Server-side setup">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Your API endpoint should return SSE or NDJSON formatted chunks. Here is an example NestJS setup:
         </p>
-
-        <CodeBlock language="typescript">
-          {`// NestJS controller example
+        <CodeBlock
+          lang="TS"
+          code={`// NestJS controller example
 import { AgentService } from '@lov3kaizen/agentsea-nestjs';
 
 @Controller('api')
@@ -602,60 +620,58 @@ export class ChatController {
   @Header('Content-Type', 'text/event-stream')
   async chat(@Body() body: ChatRequest, @Res() res: Response) {
     const agent = this.agentService.getAgent(body.agentId);
+    const input = body.messages[body.messages.length - 1].content;
 
-    for await (const chunk of agent.streamExecute(body.messages)) {
-      res.write(\`data: \${JSON.stringify(chunk)}\\n\\n\`);
+    for await (const event of agent.executeStream(input, {
+      conversationId: body.conversationId,
+      sessionData: {},
+      history: [],
+    })) {
+      res.write(\`data: \${JSON.stringify(event)}\\n\\n\`);
     }
 
     res.write('data: [DONE]\\n\\n');
     res.end();
   }
 }`}
-        </CodeBlock>
+        />
+        <Callout kind="warning">
+          The example writes the core <code>StreamEvent</code> objects as they are. The hook expects{' '}
+          <code>ChatStreamChunk</code> objects, so check the event shapes against your setup before you rely on it.
+        </Callout>
+      </DocSection>
 
-        <h2>Next Steps</h2>
-        <ul>
-          <li>
-            <Link href="/docs/tools">Learn about Isomorphic Tools</Link>
-          </li>
-          <li>
-            <Link href="/docs/agents">Configure Agents</Link>
-          </li>
-          <li>
-            <Link href="/docs/nestjs">NestJS Integration</Link>
-          </li>
-          <li>
-            <Link href="/examples">View Examples</Link>
-          </li>
-        </ul>
-      </div>
-    </PageContainer>
+      <DocSection id="next-steps" num="09" title="Next steps">
+        <BulletPanel
+          items={[
+            <>
+              <Link href="/docs/tools" className={linkClass}>
+                Learn about isomorphic tools
+              </Link>
+            </>,
+            <>
+              <Link href="/docs/agents" className={linkClass}>
+                Configure agents
+              </Link>
+            </>,
+            <>
+              <Link href="/docs/nestjs" className={linkClass}>
+                NestJS integration
+              </Link>
+            </>,
+            <>
+              <Link href="/docs/packages/react" className={linkClass}>
+                React package reference
+              </Link>
+            </>,
+            <>
+              <Link href="/examples" className={linkClass}>
+                View examples
+              </Link>
+            </>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }
-
-const hooks = [
-  {
-    icon: '💬',
-    name: 'useChat',
-    description:
-      'Full-featured chat hook with message management, streaming, tool approval, and thinking token support.',
-  },
-  {
-    icon: '🤖',
-    name: 'useAgent',
-    description:
-      'Single-shot agent execution for one-off tasks and background operations.',
-  },
-  {
-    icon: '📝',
-    name: 'useFormattedContent',
-    description:
-      'Format agent responses with Markdown rendering and code highlighting.',
-  },
-  {
-    icon: '🌊',
-    name: 'useStreamingContent',
-    description:
-      'Optimized streaming content handling with cursor animation.',
-  },
-];
