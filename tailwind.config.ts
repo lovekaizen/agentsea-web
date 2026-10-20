@@ -11,6 +11,35 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        // FigCraft "agentsea-docs" design tokens (notes/figma/agentsea-docs.figcraft)
+        brand: {
+          ocean: "#0284C7",
+          deep: "#0C4A6E",
+          navy: "#1E3A5F",
+          seafoam: "#2DD4BF",
+          tint: "#E0F2FE",
+        },
+        surface: {
+          paper: "#FFFFFF",
+          sky: "#F0F9FF",
+          code: "#0B1F33",
+          "code-strip": "#12314D",
+          band: "#E6F4FB",
+        },
+        ink: {
+          muted: "#4B6B84",
+          eyebrow: "#0369A1",
+        },
+        rule: "#D6E6F0",
+      },
+      fontFamily: {
+        // JetBrains Mono is loaded in app/layout.tsx as --font-jetbrains-mono
+        mono: ["var(--font-jetbrains-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
+      },
+      fontSize: {
+        // Design type scale: display 56 and label 13 are not in Tailwind's defaults
+        display: ["56px", { lineHeight: "1.15", fontWeight: "700" }],
+        label: ["13px", { lineHeight: "1.5", fontWeight: "600" }],
       },
     },
   },
