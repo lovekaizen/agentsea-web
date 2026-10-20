@@ -1,114 +1,166 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
+
+export const metadata: Metadata = {
+  title: 'Per-model type safety | AgentSea',
+  description:
+    'Compile-time TypeScript errors for model options that a model does not support, using per-model config builders in AgentSea.',
+};
+
+const toc = [
+  { id: 'why', label: 'Why per-model type safety' },
+  { id: 'quick-start', label: 'Quick start' },
+  { id: 'config-builders', label: 'Config builders' },
+  { id: 'creating-providers', label: 'Creating providers' },
+  { id: 'capability-reference', label: 'Capability reference' },
+  { id: 'runtime-checks', label: 'Runtime capability checks' },
+  { id: 'type-level-checks', label: 'Type-level checks' },
+  { id: 'migration', label: 'Migration guide' },
+  { id: 'next-steps', label: 'Next steps' },
+];
+
+const cell = 'border-t border-rule px-3 py-2 text-center';
+const headCell = 'border-b border-rule px-3 py-2 text-center font-semibold text-brand-deep';
 
 export default function PerModelTypeSafetyPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Per-Model Type Safety"
-        titleGradient="purple"
-        description="Get compile-time TypeScript errors for invalid model options. Inspired by TanStack AI."
-      />
-
-      <div className="prose max-w-none">
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6 my-8">
-          <h3 className="text-lg font-semibold text-purple-900 mb-2">
-            🎯 Why Per-Model Type Safety?
-          </h3>
-          <div className="text-purple-800 space-y-2">
-            <p className="m-0">
-              Different AI models have different capabilities. <strong>o1-mini</strong> doesn&apos;t support tools.
-              <strong> o1</strong> doesn&apos;t support system prompts. <strong>Claude 3 Haiku</strong> doesn&apos;t support extended thinking.
-            </p>
-            <p className="m-0">
-              Without type safety, you discover these issues at runtime. With per-model type safety,
-              TypeScript catches them at compile time with helpful error messages.
-            </p>
-          </div>
+    <DocsShell
+      eyebrow="Concept"
+      title="Per-model type safety"
+      lead="Get compile-time TypeScript errors for model options that a model does not support. Inspired by TanStack AI."
+      active="concepts"
+      toc={toc}
+    >
+      <DocSection id="why" num="01" title="Why per-model type safety">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Different models have different capabilities. <code>o1-mini</code> does not support
+          tools. <code>o1</code> does not support system prompts. Claude Haiku 4.5 does not support
+          extended thinking.
+        </p>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Without type safety, you find these mismatches at runtime. With per-model type safety,
+          TypeScript reports them while you write the code.
+        </p>
+        <div className="overflow-x-auto rounded-xl border border-rule bg-surface-paper">
+          <table className="min-w-full text-[15px] text-brand-navy">
+            <thead>
+              <tr>
+                <th className="px-3 py-2 text-left font-semibold text-brand-deep">Model</th>
+                <th className={headCell}>Tools</th>
+                <th className={headCell}>System prompt</th>
+                <th className={headCell}>Vision</th>
+                <th className={headCell}>Extended thinking</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ['Claude 3.5 Sonnet', 'Yes', 'Yes', 'Yes', 'Yes'],
+                ['Claude 3 Haiku', 'Yes', 'Yes', 'Yes', 'No'],
+                ['GPT-4o', 'Yes', 'Yes', 'Yes', 'No'],
+                ['o1', 'Yes', 'No', 'Yes', 'Yes'],
+                ['o1-mini', 'No', 'No', 'No', 'Yes'],
+                ['Gemini 1.5 Pro', 'Yes', 'Yes', 'Yes', 'No'],
+              ].map((row) => (
+                <tr key={row[0]}>
+                  <td className="border-t border-rule px-3 py-2 font-semibold text-brand-deep">{row[0]}</td>
+                  {row.slice(1).map((value, index) => (
+                    <td key={index} className={cell}>
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+      </DocSection>
 
-        <h2 id="quick-start">Quick Start</h2>
+      <DocSection id="quick-start" num="02" title="Quick start">
+        <CodeBlock
+          lang="TS"
+          code={`import { anthropic, openai, createProvider } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { anthropic, openai, createProvider } from '@lov3kaizen/agentsea-core';
-
-// ✅ Valid: Claude 3.5 Sonnet supports tools and extended thinking
-const claudeConfig = anthropic('claude-3-5-sonnet-20241022', {
+// Valid: Claude Sonnet 4.5 supports tools and extended thinking
+const claudeConfig = anthropic('claude-sonnet-4-5-20250929', {
   tools: [myTool],
   systemPrompt: 'You are helpful',
   thinking: { type: 'enabled', budgetTokens: 10000 },
   temperature: 0.7,
 });
 
-// ✅ Valid: o1 supports tools but NOT system prompts
+// Valid: o1 supports tools but NOT system prompts
 const o1Config = openai('o1', {
   tools: [myTool],
   reasoningEffort: 'high',
-  // systemPrompt: '...' // ❌ TypeScript error!
+  // systemPrompt: '...' // Error: not allowed for o1
 });
 
-// ❌ TypeScript error: o1-mini doesn't support tools
+// Error: o1-mini does not support tools
 const o1MiniConfig = openai('o1-mini', {
   // tools: [myTool], // Error: 'tools' does not exist in type
   reasoningEffort: 'medium',
 });
 
-// Create type-safe providers
 const provider = createProvider(claudeConfig);
-console.log('Supports vision:', provider.supportsCapability('vision')); // true`}
-        </CodeBlock>
+console.log(provider.supportsCapability('vision'));`}
+        />
+      </DocSection>
 
-        <Divider />
+      <DocSection id="config-builders" num="03" title="Config builders">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Each provider has a config builder. It takes a model ID and returns a config whose
+          options match that model.
+        </p>
 
-        <h2 id="config-builders">Config Builders</h2>
-        <p>AgentSea provides type-safe config builder functions for each provider:</p>
+        <h3 className="text-lg font-semibold text-brand-deep">anthropic(model, config?)</h3>
+        <CodeBlock
+          lang="TS"
+          code={`import { anthropic } from '@lov3kaizen/agentsea-core';
 
-        <h3>Anthropic</h3>
-
-        <CodeBlock language="typescript">
-          {`import { anthropic } from '@lov3kaizen/agentsea-core';
-
-// Claude 3.5 Sonnet - supports EVERYTHING
-const sonnetConfig = anthropic('claude-3-5-sonnet-20241022', {
+// Claude Opus 4.8: tools and system prompts. Thinking is adaptive on 4.6+ models,
+// so budgetTokens-style config is not part of the type for them.
+const config = anthropic('claude-opus-4-8', {
   tools: [myTool],
   systemPrompt: 'You are a helpful assistant',
-  thinking: { type: 'enabled', budgetTokens: 10000 }, // Extended thinking
   temperature: 0.7,
   maxTokens: 4096,
   providerOptions: {
     metadata: { userId: 'user-123' },
-    betas: ['computer-use-2024-10-22'],
   },
 });
 
-// Claude 3 Haiku - NO extended thinking
-const haikuConfig = anthropic('claude-3-haiku-20240307', {
+// Claude Sonnet 4.5: explicit extended thinking
+const thinkingConfig = anthropic('claude-sonnet-4-5-20250929', {
+  tools: [myTool],
+  thinking: { type: 'enabled', budgetTokens: 10000 },
+});
+
+// Claude Haiku 4.5: no extended thinking
+const haikuConfig = anthropic('claude-haiku-4-5-20251001', {
   tools: [myTool],
   systemPrompt: 'You are fast',
-  // thinking: { ... } // ❌ TypeScript error! Haiku doesn't support thinking
+  // thinking: { ... } // Error: not allowed for Haiku 4.5
 });`}
-        </CodeBlock>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          Typed models include <code>claude-opus-4-8</code> (the default), <code>claude-opus-4-7</code>,{' '}
+          <code>claude-opus-4-6</code>, <code>claude-sonnet-4-6</code>, <code>claude-haiku-4-5</code>,{' '}
+          <code>claude-fable-5</code>, <code>claude-sonnet-4-5-20250929</code>,{' '}
+          <code>claude-opus-4-5-20251101</code> and the Claude 3.x family.
+        </p>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-4">
-          <p className="text-sm text-blue-800 m-0">
-            <strong>Supported Anthropic Models:</strong> claude-3-5-sonnet-*, claude-3-5-haiku-*,
-            claude-3-opus-*, claude-3-sonnet-*, claude-3-haiku-*, claude-opus-4-*, claude-sonnet-4-*
-          </p>
-        </div>
+        <h3 className="text-lg font-semibold text-brand-deep">openai(model, config?)</h3>
+        <CodeBlock
+          lang="TS"
+          code={`import { openai } from '@lov3kaizen/agentsea-core';
 
-        <h3>OpenAI</h3>
-
-        <CodeBlock language="typescript">
-          {`import { openai } from '@lov3kaizen/agentsea-core';
-
-// GPT-4o - supports tools, system prompts, structured output
+// GPT-4o: tools and system prompts
 const gpt4oConfig = openai('gpt-4o', {
   tools: [myTool],
   systemPrompt: 'You are helpful',
@@ -120,41 +172,36 @@ const gpt4oConfig = openai('gpt-4o', {
   },
 });
 
-// o1 - supports tools and reasoning, but NOT system prompts
+// o1: tools and reasoning, but no system prompt
 const o1Config = openai('o1', {
   tools: [myTool],
   reasoningEffort: 'high',
-  // systemPrompt: '...' // ❌ TypeScript error!
 });
 
-// o1-mini - NO tools, NO system prompts
+// o1-mini: reasoning only
 const o1MiniConfig = openai('o1-mini', {
   reasoningEffort: 'medium',
-  // tools: [...] // ❌ TypeScript error!
-  // systemPrompt: '...' // ❌ TypeScript error!
 });
 
-// o3-mini - supports tools but NOT system prompts
+// o3-mini: tools, but no system prompt
 const o3MiniConfig = openai('o3-mini', {
   tools: [myTool],
   reasoningEffort: 'high',
 });`}
-        </CodeBlock>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          Typed models include <code>gpt-5.5</code>, <code>gpt-5.4-mini</code>, <code>gpt-5</code>,{' '}
+          <code>gpt-4.1</code>, <code>gpt-4o</code>, <code>gpt-4o-mini</code>, <code>gpt-4-turbo</code>,{' '}
+          <code>gpt-4</code>, <code>gpt-3.5-turbo</code> and the reasoning models <code>o3</code>,{' '}
+          <code>o3-mini</code>, <code>o1</code> and <code>o1-mini</code>.
+        </p>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-4">
-          <p className="text-sm text-blue-800 m-0">
-            <strong>Supported OpenAI Models:</strong> gpt-4o*, gpt-4-turbo*, gpt-4, gpt-3.5-turbo*,
-            o1, o1-mini, o1-preview, o3-mini
-          </p>
-        </div>
+        <h3 className="text-lg font-semibold text-brand-deep">gemini(model, config?)</h3>
+        <CodeBlock
+          lang="TS"
+          code={`import { gemini } from '@lov3kaizen/agentsea-core';
 
-        <h3>Gemini</h3>
-
-        <CodeBlock language="typescript">
-          {`import { gemini } from '@lov3kaizen/agentsea-core';
-
-// Gemini 1.5 Pro - supports everything
-const geminiConfig = gemini('gemini-1.5-pro', {
+const geminiConfig = gemini('gemini-2.5-pro', {
   tools: [myTool],
   systemPrompt: 'You are helpful',
   topK: 40,
@@ -165,14 +212,19 @@ const geminiConfig = gemini('gemini-1.5-pro', {
     ],
   },
 });`}
-        </CodeBlock>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          Typed models include <code>gemini-3.5-flash</code>, <code>gemini-3.1-pro-preview</code>,{' '}
+          <code>gemini-2.5-pro</code>, <code>gemini-2.5-flash</code>, <code>gemini-2.0-flash</code>,{' '}
+          <code>gemini-1.5-pro</code>, <code>gemini-1.5-flash</code> and <code>gemini-1.5-flash-8b</code>.
+        </p>
 
-        <h3>Ollama (Local)</h3>
+        <h3 className="text-lg font-semibold text-brand-deep">ollama(model, config?)</h3>
+        <CodeBlock
+          lang="TS"
+          code={`import { ollama } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { ollama } from '@lov3kaizen/agentsea-core';
-
-// Ollama - dynamic models (less strict typing)
+// Ollama models are user-defined, so the model ID is not checked strictly
 const ollamaConfig = ollama('llama3.2', {
   tools: [myTool],
   systemPrompt: 'You are helpful',
@@ -182,371 +234,300 @@ const ollamaConfig = ollama('llama3.2', {
     numGpu: 1,
   },
 });`}
-        </CodeBlock>
+        />
+        <Callout kind="note">
+          Ollama model IDs are not a fixed list, so type checks are looser here. Whether a model
+          supports tools depends on the model you pull.
+        </Callout>
 
-        <AlertBox type="info" gradient>
-          <p>
-            Ollama models are dynamic (user-defined), so type safety is less strict.
-            Tool support depends on the specific model being used.
-          </p>
-        </AlertBox>
-
-        <h3>Mistral, DeepSeek &amp; xAI</h3>
-
-        <p>
-          Mistral AI, DeepSeek, and xAI (Grok) ship with the same typed
-          config-builder API. Each builder validates the model id and the
-          options that model supports at compile time, and{' '}
-          <code>createProvider</code> wires up the right OpenAI-compatible
-          transport and API key for you.
+        <h3 className="text-lg font-semibold text-brand-deep">mistral(), deepseek(), xai()</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Mistral, DeepSeek and xAI use the same builder shape. Each checks the model ID and the
+          options that model supports. <code>createProvider</code> sets up the OpenAI-compatible
+          transport and reads the matching key variable: <code>MISTRAL_API_KEY</code>,{' '}
+          <code>DEEPSEEK_API_KEY</code> or <code>XAI_API_KEY</code>.
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { mistral, deepseek, xai, createProvider } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { mistral, deepseek, xai, createProvider } from '@lov3kaizen/agentsea-core';
-
-// Mistral — set MISTRAL_API_KEY
 const mistralConfig = mistral('mistral-large-latest', {
   tools: [myTool],
   systemPrompt: 'You are helpful',
   temperature: 0.7,
 });
 
-// DeepSeek — set DEEPSEEK_API_KEY
 const deepseekConfig = deepseek('deepseek-reasoner', {
   systemPrompt: 'Think step by step',
 });
 
-// xAI (Grok) — set XAI_API_KEY
 const grokConfig = xai('grok-3', { tools: [myTool] });
 
 const provider = createProvider(mistralConfig);`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <Divider />
+      <DocSection id="creating-providers" num="04" title="Creating providers">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code>createProvider()</code> takes any config builder result and returns a provider
+          wrapper. Provider-specific factories also accept an explicit API key.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import {
+  anthropic,
+  openai,
+  createProvider,
+  createAnthropicProvider,
+} from '@lov3kaizen/agentsea-core';
 
-        <h2 id="model-capabilities">Model Capabilities Reference</h2>
+// Generic factory
+const claudeProvider = createProvider(anthropic('claude-opus-4-8', { tools: [myTool] }));
+const gptProvider = createProvider(openai('gpt-4o', { tools: [myTool] }));
 
-        <h3>Anthropic Models</h3>
-        <div className="overflow-x-auto my-6">
-          <table className="min-w-full border border-gray-200 text-sm">
-            <thead className="bg-gray-100">
+// Provider-specific factory, with an explicit key
+const claude = createAnthropicProvider(
+  anthropic('claude-opus-4-8', { tools: [myTool] }),
+  { apiKey: process.env.ANTHROPIC_API_KEY },
+);
+
+console.log(claude.config.model); // 'claude-opus-4-8'
+console.log(claude.supportsCapability('vision'));
+console.log(claude.getModelInfo()?.capabilities.contextWindow);`}
+        />
+      </DocSection>
+
+      <DocSection id="capability-reference" num="05" title="Capability reference">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The tables below are illustrative. The typed registry includes the latest Claude, GPT-5,
+          o3 and Gemini 3 and 2.5 models. For exact capabilities, context window and maximum
+          output of a specific model, call <code>getModelInfo(model)</code>.
+        </p>
+
+        <h3 className="text-lg font-semibold text-brand-deep">Anthropic</h3>
+        <div className="overflow-x-auto rounded-xl border border-rule bg-surface-paper">
+          <table className="min-w-full text-[15px] text-brand-navy">
+            <thead>
               <tr>
-                <th className="px-4 py-2 text-left">Model</th>
-                <th className="px-4 py-2 text-center">Tools</th>
-                <th className="px-4 py-2 text-center">Vision</th>
-                <th className="px-4 py-2 text-center">Thinking</th>
-                <th className="px-4 py-2 text-center">Context</th>
-                <th className="px-4 py-2 text-center">Max Output</th>
+                <th className="px-3 py-2 text-left font-semibold text-brand-deep">Model</th>
+                <th className={headCell}>Tools</th>
+                <th className={headCell}>Vision</th>
+                <th className={headCell}>Thinking</th>
+                <th className={headCell}>Context</th>
+                <th className={headCell}>Max output</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>claude-3-5-sonnet-*</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">200K</td>
-                <td className="px-4 py-2 text-center">8,192</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>claude-3-5-haiku-*</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">200K</td>
-                <td className="px-4 py-2 text-center">8,192</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>claude-3-opus-*</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">200K</td>
-                <td className="px-4 py-2 text-center">4,096</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>claude-opus-4-5-*</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">200K</td>
-                <td className="px-4 py-2 text-center">32,000</td>
-              </tr>
+              {[
+                ['claude-3-5-sonnet-*', 'Yes', 'Yes', 'Yes', '200K', '8,192'],
+                ['claude-3-5-haiku-*', 'Yes', 'Yes', 'No', '200K', '8,192'],
+                ['claude-3-opus-*', 'Yes', 'Yes', 'No', '200K', '4,096'],
+                ['claude-opus-4-5-*', 'Yes', 'Yes', 'Yes', '200K', '32,000'],
+              ].map((row) => (
+                <tr key={row[0]}>
+                  <td className="border-t border-rule px-3 py-2 font-semibold text-brand-deep">{row[0]}</td>
+                  {row.slice(1).map((value, index) => (
+                    <td key={index} className={cell}>
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
 
-        <h3>OpenAI Models</h3>
-        <div className="overflow-x-auto my-6">
-          <table className="min-w-full border border-gray-200 text-sm">
-            <thead className="bg-gray-100">
+        <h3 className="text-lg font-semibold text-brand-deep">OpenAI</h3>
+        <div className="overflow-x-auto rounded-xl border border-rule bg-surface-paper">
+          <table className="min-w-full text-[15px] text-brand-navy">
+            <thead>
               <tr>
-                <th className="px-4 py-2 text-left">Model</th>
-                <th className="px-4 py-2 text-center">Tools</th>
-                <th className="px-4 py-2 text-center">System Prompt</th>
-                <th className="px-4 py-2 text-center">Vision</th>
-                <th className="px-4 py-2 text-center">Thinking</th>
-                <th className="px-4 py-2 text-center">Context</th>
+                <th className="px-3 py-2 text-left font-semibold text-brand-deep">Model</th>
+                <th className={headCell}>Tools</th>
+                <th className={headCell}>System</th>
+                <th className={headCell}>Vision</th>
+                <th className={headCell}>Thinking</th>
+                <th className={headCell}>Context</th>
+                <th className={headCell}>Max output</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>gpt-4o*</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">128K</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>gpt-4-turbo</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">128K</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>o1</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">200K</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>o1-mini</strong></td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">128K</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>o3-mini</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">200K</td>
-              </tr>
+              {[
+                ['gpt-4o*', 'Yes', 'Yes', 'Yes', 'No', '128K', '16,384'],
+                ['gpt-4-turbo', 'Yes', 'Yes', 'Yes', 'No', '128K', '4,096'],
+                ['gpt-3.5-turbo', 'Yes', 'Yes', 'No', 'No', '16K', '4,096'],
+                ['o1', 'Yes', 'No', 'Yes', 'Yes', '200K', '100,000'],
+                ['o1-mini', 'No', 'No', 'No', 'Yes', '128K', '65,536'],
+                ['o3-mini', 'Yes', 'No', 'No', 'Yes', '200K', '100,000'],
+              ].map((row) => (
+                <tr key={row[0]}>
+                  <td className="border-t border-rule px-3 py-2 font-semibold text-brand-deep">{row[0]}</td>
+                  {row.slice(1).map((value, index) => (
+                    <td key={index} className={cell}>
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
 
-        <h3>Gemini Models</h3>
-        <div className="overflow-x-auto my-6">
-          <table className="min-w-full border border-gray-200 text-sm">
-            <thead className="bg-gray-100">
+        <h3 className="text-lg font-semibold text-brand-deep">Gemini</h3>
+        <div className="overflow-x-auto rounded-xl border border-rule bg-surface-paper">
+          <table className="min-w-full text-[15px] text-brand-navy">
+            <thead>
               <tr>
-                <th className="px-4 py-2 text-left">Model</th>
-                <th className="px-4 py-2 text-center">Tools</th>
-                <th className="px-4 py-2 text-center">Vision</th>
-                <th className="px-4 py-2 text-center">Thinking</th>
-                <th className="px-4 py-2 text-center">Context</th>
+                <th className="px-3 py-2 text-left font-semibold text-brand-deep">Model</th>
+                <th className={headCell}>Tools</th>
+                <th className={headCell}>Vision</th>
+                <th className={headCell}>Thinking</th>
+                <th className={headCell}>Context</th>
+                <th className={headCell}>Max output</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>gemini-2.0-flash-exp</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">1M</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>gemini-2.0-flash-thinking</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">1M</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>gemini-1.5-pro</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">2M</td>
-              </tr>
-              <tr className="border-t border-gray-200">
-                <td className="px-4 py-2"><strong>gemini-1.5-flash</strong></td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">✅</td>
-                <td className="px-4 py-2 text-center">❌</td>
-                <td className="px-4 py-2 text-center">1M</td>
-              </tr>
+              {[
+                ['gemini-2.0-flash-exp', 'Yes', 'Yes', 'No', '1M', '8,192'],
+                ['gemini-2.0-flash-thinking', 'Yes', 'Yes', 'Yes', '1M', '8,192'],
+                ['gemini-1.5-pro', 'Yes', 'Yes', 'No', '2M', '8,192'],
+                ['gemini-1.5-flash', 'Yes', 'Yes', 'No', '1M', '8,192'],
+              ].map((row) => (
+                <tr key={row[0]}>
+                  <td className="border-t border-rule px-3 py-2 font-semibold text-brand-deep">{row[0]}</td>
+                  {row.slice(1).map((value, index) => (
+                    <td key={index} className={cell}>
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
+      </DocSection>
 
-        <Divider />
-
-        <h2 id="runtime-checks">Runtime Capability Checks</h2>
-        <p>Query model capabilities at runtime using the model registry:</p>
-
-        <CodeBlock language="typescript">
-          {`import {
+      <DocSection id="runtime-checks" num="06" title="Runtime capability checks">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Query the model registry at runtime:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import {
   getModelInfo,
   modelSupportsCapability,
   getModelsForProvider,
   getModelsWithCapability,
 } from '@lov3kaizen/agentsea-core';
 
-// Get full model info
+// Full model info, including capabilities
 const info = getModelInfo('claude-3-5-sonnet-20241022');
-console.log(info);
-// {
-//   provider: 'anthropic',
-//   model: 'claude-3-5-sonnet-20241022',
-//   displayName: 'Claude 3.5 Sonnet',
-//   capabilities: {
-//     tools: true,
-//     streaming: true,
-//     vision: true,
-//     structuredOutput: true,
-//     systemMessage: true,
-//     extendedThinking: true,
-//     contextWindow: 200000,
-//     maxOutputTokens: 8192,
-//     parallelToolCalls: true,
-//   }
-// }
+console.log(info?.capabilities.contextWindow, info?.capabilities.maxOutputTokens);
 
-// Check specific capability
+// Check one capability
 const supportsTools = modelSupportsCapability('o1-mini', 'tools'); // false
 const supportsVision = modelSupportsCapability('gpt-4o', 'vision'); // true
 
-// Find models by provider
+// Find models by provider, or by capability
 const anthropicModels = getModelsForProvider('anthropic');
-
-// Find models with specific capabilities
 const visionModels = getModelsWithCapability('vision', true);
 const thinkingModels = getModelsWithCapability('extendedThinking', true);`}
-        </CodeBlock>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          A provider wrapper exposes the same checks: <code>provider.supportsCapability(name)</code>{' '}
+          and <code>provider.getModelInfo()</code>.
+        </p>
+      </DocSection>
 
-        <Divider />
+      <DocSection id="type-level-checks" num="07" title="Type-level capability checks">
+        <p className="text-base leading-relaxed text-brand-navy">
+          For generic code, use the type utilities. They check a config at compile time without
+          running it.
+        </p>
+        <ApiList>
+          <ApiRow name="ConfigSupports<T, 'tools'>">Resolves to true or false for a config type.</ApiRow>
+          <ApiRow name="RequireCapability<T, 'tools'>">
+            Constrains a parameter to configs that support the capability.
+          </ApiRow>
+        </ApiList>
+        <CodeBlock
+          lang="TS"
+          code={`import type { ConfigSupports, RequireCapability, ProviderModelConfig } from '@lov3kaizen/agentsea-core';
 
-        <h2 id="type-safe-providers">Type-Safe Provider Creation</h2>
+type SupportsTools = ConfigSupports<typeof myConfig, 'tools'>; // true | false
 
-        <CodeBlock language="typescript">
-          {`import {
-  createProvider,
-  createAnthropicProvider,
-  createOpenAIProvider,
-  anthropic,
-  openai,
-} from '@lov3kaizen/agentsea-core';
+function withTools<T extends ProviderModelConfig>(config: RequireCapability<T, 'tools'>) {
+  // config is known to support tools
+}`}
+        />
+      </DocSection>
 
-// Generic factory (works with any config)
-const provider1 = createProvider(anthropic('claude-3-5-sonnet-20241022', { ... }));
-const provider2 = createProvider(openai('gpt-4o', { ... }));
-
-// Provider-specific factories (for explicit typing)
-const claudeProvider = createAnthropicProvider(
-  anthropic('claude-3-5-sonnet-20241022', { tools: [myTool] }),
-  { apiKey: process.env.ANTHROPIC_API_KEY }
-);
-
-// Access typed config and capabilities
-console.log(claudeProvider.config.model); // 'claude-3-5-sonnet-20241022'
-console.log(claudeProvider.supportsCapability('vision')); // true
-console.log(claudeProvider.getModelInfo()?.capabilities.contextWindow); // 200000`}
-        </CodeBlock>
-
-        <Divider />
-
-        <h2 id="migration">Migration Guide</h2>
-
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 my-4">
-          <h4 className="text-red-900 font-semibold mb-2">Before (No Type Safety)</h4>
-          <CodeBlock language="typescript">
-            {`// Runtime error: o1-mini doesn't support tools!
+      <DocSection id="migration" num="08" title="Migration guide">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Before, the mismatch surfaces when the agent runs:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`// Fails at runtime: o1-mini does not support tools or system prompts
 const agent = new Agent(
   {
+    name: 'assistant',
+    description: 'Reasoning assistant',
     model: 'o1-mini',
     provider: 'openai',
-    systemPrompt: 'Hello', // Also fails - no system prompt support
+    systemPrompt: 'Hello',
     tools: [myTool],
   },
   new OpenAIProvider(),
-  toolRegistry
+  toolRegistry,
 );`}
-          </CodeBlock>
-        </div>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          After, the same mismatch is a compile error:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { openai, createProvider } from '@lov3kaizen/agentsea-core';
 
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 my-4">
-          <h4 className="text-green-900 font-semibold mb-2">After (With Type Safety)</h4>
-          <CodeBlock language="typescript">
-            {`import { openai, createProvider } from '@lov3kaizen/agentsea-core';
-
-// TypeScript catches all errors at compile time!
 const config = openai('o1-mini', {
-  // systemPrompt: 'Hello', // ❌ Compile error
-  // tools: [myTool], // ❌ Compile error
-  reasoningEffort: 'high', // ✅ Valid option
+  // systemPrompt: 'Hello', // Compile error
+  // tools: [myTool],       // Compile error
+  reasoningEffort: 'high',  // Valid
 });
 
 const provider = createProvider(config);`}
-          </CodeBlock>
-        </div>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          The builders check the config. The <code>Agent</code> constructor takes a provider
+          instance, not the wrapper. Pass <code>provider.provider</code>, the underlying provider
+          that <code>createProvider</code> creates, along with the tool registry.
+        </p>
+      </DocSection>
 
-        <Divider />
-
-        <h2 id="benefits">Key Benefits</h2>
-
-        <div className="grid md:grid-cols-3 gap-4 my-6">
-          <div className="border border-gray-200 rounded-lg p-4">
-            <div className="text-2xl mb-2">⚡</div>
-            <h4 className="font-semibold mb-2">Zero Runtime Overhead</h4>
-            <p className="text-sm m-0">
-              All validation happens during TypeScript compilation. No performance impact at runtime.
-            </p>
-          </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <div className="text-2xl mb-2">💡</div>
-            <h4 className="font-semibold mb-2">IDE Autocomplete</h4>
-            <p className="text-sm m-0">
-              Only valid options appear in your IDE&apos;s autocomplete suggestions per model.
-            </p>
-          </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <div className="text-2xl mb-2">🔍</div>
-            <h4 className="font-semibold mb-2">Self-Documenting</h4>
-            <p className="text-sm m-0">
-              Model capabilities are explicit in type definitions. No guessing what&apos;s supported.
-            </p>
-          </div>
-        </div>
-
-        <h2 id="next-steps">Next Steps</h2>
-        <ul>
-          <li>
-            <Link href="/docs/providers">Providers Reference</Link> - Full provider documentation
-          </li>
-          <li>
-            <Link href="/docs/tools">Tools Guide</Link> - Creating and using tools
-          </li>
-          <li>
-            <Link href="/docs/agents">Agents</Link> - Agent configuration options
-          </li>
-          <li>
-            <a href="https://tanstack.com/ai/latest/docs/guides/per-model-type-safety" target="_blank" rel="noopener noreferrer">
-              TanStack AI Docs
-            </a> - Inspiration for this feature
-          </li>
-        </ul>
-
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6 mt-8">
-          <h3 className="text-lg font-semibold text-purple-900 mb-2">
-            💡 Pro Tip
-          </h3>
-          <p className="text-purple-800 m-0">
-            Use per-model type safety from the start of your project. It&apos;s much easier than
-            debugging runtime errors later. The TypeScript compiler becomes your best friend
-            when switching between models or providers!
-          </p>
-        </div>
-      </div>
-    </PageContainer>
+      <DocSection id="next-steps" num="09" title="Next steps">
+        <BulletPanel
+          items={[
+            <Link key="providers" href="/docs/providers" className="text-brand-ocean hover:underline">
+              Providers reference
+            </Link>,
+            <Link key="tools" href="/docs/tools" className="text-brand-ocean hover:underline">
+              Tools guide
+            </Link>,
+            <Link key="agents" href="/docs/agents" className="text-brand-ocean hover:underline">
+              Agents
+            </Link>,
+            <a
+              key="tanstack"
+              href="https://tanstack.com/ai/latest/docs/guides/per-model-type-safety"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-ocean hover:underline"
+            >
+              TanStack AI: per-model type safety (inspiration)
+            </a>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }
