@@ -1,399 +1,189 @@
-import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import type { Metadata } from 'next';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+
+export const metadata: Metadata = {
+  title: 'Voice | AgentSea',
+  description:
+    'Speech-to-text and text-to-speech providers, and a VoiceAgent that places an agent between them.',
+};
+
+const toc = [
+  { id: 'stt-providers', label: 'Speech-to-text providers' },
+  { id: 'tts-providers', label: 'Text-to-speech providers' },
+  { id: 'synthesize', label: 'Synthesize speech' },
+  { id: 'streaming-speech', label: 'Streaming speech' },
+  { id: 'voice-agent', label: 'VoiceAgent' },
+  { id: 'voice-agent-methods', label: 'VoiceAgent methods' },
+  { id: 'audio-input', label: 'Audio input' },
+];
 
 export default function VoicePage() {
   return (
-    <PageContainer maxWidth="5xl">
-      {/* Header */}
-      <PageHeader
-        title="Voice Features (TTS/STT)"
-        titleGradient="purple"
-        description="Complete guide to building voice-enabled AI agents with Text-to-Speech
-          (TTS) and Speech-to-Text (STT)."
-      />
-
-      {/* Overview */}
-      <Section title="Overview" id="overview">
-        <p className="text-base-content/70">
-          AgentSea ADK includes comprehensive voice support for building
-          voice-enabled AI agents:
+    <DocsShell
+      eyebrow="Guide"
+      title="Voice"
+      lead="Speech-to-text and text-to-speech providers, and a VoiceAgent that places an agent between them."
+      active="guides"
+      toc={toc}
+    >
+      <DocSection id="stt-providers" num="01" title="Speech-to-text providers">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Each provider has a <code>transcribe</code> method. The OpenAI classes accept an API key as a string, or a
+          config object with <code>apiKey</code> and <code>baseURL</code>.
         </p>
-        <ul className="list-disc list-inside space-y-2 text-base-content/70">
-          <li>
-            <strong>Speech-to-Text (STT)</strong> - Transcribe audio to text
-          </li>
-          <li>
-            <strong>Text-to-Speech (TTS)</strong> - Synthesize speech from text
-          </li>
-          <li>
-            <strong>Voice Agent</strong> - Wrapper that combines both for voice
-            conversations
-          </li>
-          <li>
-            <strong>Multiple Providers</strong> - Cloud and local options
-          </li>
-          <li>
-            <strong>Streaming</strong> - Real-time audio streaming
-          </li>
-          <li>
-            <strong>Multiple Languages</strong> - Support for 99+ languages
-          </li>
-        </ul>
+        <BulletPanel
+          items={[
+            <>
+              <code>OpenAIWhisperProvider</code>: the OpenAI Whisper API.
+            </>,
+            <>
+              <code>LemonFoxSTTProvider</code>: LemonFox transcription, which uses the OpenAI-compatible API.
+            </>,
+            <>
+              <code>LocalWhisperProvider</code>: runs a whisper binary on your machine. Takes <code>whisperPath</code>{' '}
+              and <code>modelPath</code>. <code>whisperPath</code> defaults to <code>whisper</code>.
+            </>,
+          ]}
+        />
+        <CodeBlock
+          lang="TS"
+          code={`import { OpenAIWhisperProvider } from '@lov3kaizen/agentsea-core';
 
-        <AlertBox type="info">
-          <div>
-            <h3 className="font-bold text-lg mb-2">
-              7 Voice Providers Included
-            </h3>
-            <p className="mb-2">
-              <strong>STT Providers:</strong> OpenAI Whisper (cloud), LemonFox
-              (cost-effective), Local Whisper (privacy)
-            </p>
-            <p>
-              <strong>TTS Providers:</strong> OpenAI TTS, LemonFox
-              (cost-effective), ElevenLabs (premium), Piper TTS (local)
-            </p>
-          </div>
-        </AlertBox>
-      </Section>
+const stt = new OpenAIWhisperProvider(process.env.OPENAI_API_KEY);
 
-      {/* Speech-to-Text */}
-      <Section title="Speech-to-Text (STT)" id="speech-to-text">
-        <h3 className="text-2xl font-semibold mb-4">OpenAI Whisper (Cloud)</h3>
-        <p className="text-base-content/70 mb-4">
-          High-quality transcription with OpenAI's Whisper model - supports 99+
-          languages with word-level timestamps.
-        </p>
-
-        <CodeBlock language="typescript">
-          {`import { OpenAIWhisperProvider } from '@lov3kaizen/agentsea-core';
-
-const sttProvider = new OpenAIWhisperProvider(process.env.OPENAI_API_KEY);
-
-// Transcribe audio file
-const result = await sttProvider.transcribe('./audio.mp3', {
+const result = await stt.transcribe('./audio.mp3', {
   model: 'whisper-1',
   language: 'en',
-  responseFormat: 'verbose_json',
 });
+console.log(result.text);`}
+        />
+        <Callout kind="note">
+          <code>transcribe()</code> takes a file path and options such as <code>model</code> and{' '}
+          <code>language</code>.
+        </Callout>
+      </DocSection>
 
-console.log('Text:', result.text);
-console.log('Language:', result.language);
-console.log('Duration:', result.duration);`}
-        </CodeBlock>
+      <DocSection id="tts-providers" num="02" title="Text-to-speech providers">
+        <BulletPanel
+          items={[
+            <>
+              <code>OpenAITTSProvider</code>: OpenAI speech. Accepts an API key string or an{' '}
+              <code>OpenAITTSConfig</code> object.
+            </>,
+            <>
+              <code>LemonFoxTTSProvider</code>: LemonFox speech, using the OpenAI-compatible API.
+            </>,
+            <>
+              <code>ElevenLabsTTSProvider</code>: ElevenLabs. Takes an <code>apiKey</code>.{' '}
+              <code>getVoices()</code> lists the voices.
+            </>,
+            <>
+              <code>PiperTTSProvider</code>: runs a piper binary with a local <code>.onnx</code> voice model. Takes{' '}
+              <code>piperPath</code>, <code>modelPath</code> and <code>configPath</code>.
+            </>,
+          ]}
+        />
+      </DocSection>
 
-        <h3 className="text-2xl font-semibold mb-4 mt-8">
-          LemonFox STT (Cost-Effective)
-        </h3>
-        <p className="text-base-content/70 mb-4">
-          OpenAI-compatible Whisper v3 transcription at a fraction of the cost
-          - $0.50 per 3 hours of audio. Perfect for production workloads.
+      <DocSection id="synthesize" num="03" title="Synthesize speech">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code>synthesize(text, config?)</code> returns a result that holds the audio. Write the audio to a file or
+          send it to a client.
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { writeFileSync } from 'node:fs';
+import { OpenAITTSProvider } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { LemonFoxSTTProvider } from '@lov3kaizen/agentsea-core';
+const tts = new OpenAITTSProvider(process.env.OPENAI_API_KEY);
 
-const sttProvider = new LemonFoxSTTProvider(process.env.LEMONFOX_API_KEY);
-
-// Transcribe audio file - same API as OpenAI Whisper
-const result = await sttProvider.transcribe('./audio.mp3', {
-  model: 'whisper-1',
-  language: 'en',
-  responseFormat: 'verbose_json',
-});
-
-console.log('Text:', result.text);
-console.log('Duration:', result.duration);`}
-        </CodeBlock>
-
-        <AlertBox type="success">
-          <div>
-            <h4 className="font-semibold mb-2">Alternative: Custom baseURL</h4>
-            <p className="mb-2">
-              You can also use the OpenAI Whisper provider with a custom
-              baseURL:
-            </p>
-            <code className="text-sm">
-              {`new OpenAIWhisperProvider({ apiKey: LEMONFOX_API_KEY, baseURL: 'https://api.lemonfox.ai/v1' })`}
-            </code>
-          </div>
-        </AlertBox>
-
-        <h3 className="text-2xl font-semibold mb-4 mt-8">
-          Local Whisper (Privacy)
-        </h3>
-        <p className="text-base-content/70 mb-4">
-          Run Whisper locally for complete privacy - your audio never leaves
-          your machine.
-        </p>
-
-        <CodeBlock language="typescript">
-          {`import { LocalWhisperProvider } from '@lov3kaizen/agentsea-core';
-
-const sttProvider = new LocalWhisperProvider({
-  whisperPath: '/usr/local/bin/whisper',
-  modelPath: '/path/to/ggml-base.bin',
-});
-
-// Check if installed
-if (!(await sttProvider.isInstalled())) {
-  console.log(sttProvider.getInstallInstructions());
-  return;
-}
-
-const result = await sttProvider.transcribe('./audio.wav', {
-  model: 'base',
-  language: 'en',
-});`}
-        </CodeBlock>
-      </Section>
-
-      {/* Text-to-Speech */}
-      <Section title="Text-to-Speech (TTS)" id="text-to-speech">
-        <h3 className="text-2xl font-semibold mb-4">OpenAI TTS</h3>
-        <p className="text-base-content/70 mb-4">
-          High-quality voices with streaming support - 6 voices available.
-        </p>
-
-        <CodeBlock language="typescript">
-          {`import { OpenAITTSProvider } from '@lov3kaizen/agentsea-core';
-import { writeFileSync } from 'fs';
-
-const ttsProvider = new OpenAITTSProvider(process.env.OPENAI_API_KEY);
-
-// Synthesize speech
-const result = await ttsProvider.synthesize('Hello, world!', {
-  model: 'tts-1-hd',
-  voice: 'nova',
-  speed: 1.0,
-  format: 'mp3',
-});
-
-// Save audio
+const result = await tts.synthesize('Hello, world!', { voice: 'nova', format: 'mp3' });
 writeFileSync('./output.mp3', result.audio);`}
-        </CodeBlock>
+        />
+        <Callout kind="note">Audio comes back as <code>result.audio</code>. Use <code>format</code> to choose the file type.</Callout>
+      </DocSection>
 
-        <h3 className="text-2xl font-semibold mb-4 mt-8">
-          LemonFox TTS (Cost-Effective)
-        </h3>
-        <p className="text-base-content/70 mb-4">
-          OpenAI-compatible TTS with 50+ voices at up to 90% savings - $2.50
-          per 1M characters. Includes all OpenAI voices plus extras like
-          "sarah".
+      <DocSection id="streaming-speech" num="04" title="Streaming speech">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code>OpenAITTSProvider.synthesizeStream(text, config?)</code> is an async generator that yields audio
+          chunks. Send each chunk as it arrives.
         </p>
-
-        <CodeBlock language="typescript">
-          {`import { LemonFoxTTSProvider } from '@lov3kaizen/agentsea-core';
-import { writeFileSync } from 'fs';
-
-const ttsProvider = new LemonFoxTTSProvider(process.env.LEMONFOX_API_KEY);
-
-// Synthesize speech - same API as OpenAI TTS
-const result = await ttsProvider.synthesize('Hello, world!', {
-  model: 'tts-1',
-  voice: 'sarah', // or any OpenAI voice like 'nova'
-  format: 'mp3',
-});
-
-// Save audio
-writeFileSync('./output.mp3', result.audio);
-
-// Streaming also supported
-for await (const chunk of ttsProvider.synthesizeStream('Long text...')) {
-  // Process audio chunks in real-time
+        <CodeBlock
+          lang="TS"
+          code={`for await (const chunk of tts.synthesizeStream('A longer passage to read aloud.')) {
+  // Each chunk is a Buffer of audio.
+  console.log('chunk size:', chunk.length);
 }`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <AlertBox type="success">
-          <div>
-            <h4 className="font-semibold mb-2">Alternative: Custom baseURL</h4>
-            <p className="mb-2">
-              You can also use the OpenAI TTS provider with a custom baseURL:
-            </p>
-            <code className="text-sm">
-              {`new OpenAITTSProvider({ apiKey: LEMONFOX_API_KEY, baseURL: 'https://api.lemonfox.ai/v1' })`}
-            </code>
-          </div>
-        </AlertBox>
-
-        <h3 className="text-2xl font-semibold mb-4 mt-8">
-          ElevenLabs (Premium)
-        </h3>
-        <p className="text-base-content/70 mb-4">
-          Studio-quality synthesis with voice cloning and 100+ premium voices.
+      <DocSection id="voice-agent" num="05" title="VoiceAgent">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code>VoiceAgent</code> wraps an <code>Agent</code> with an STT provider and a TTS provider. The constructor
+          takes the agent and a config with <code>sttProvider</code>, <code>ttsProvider</code>,{' '}
+          <code>ttsConfig</code>, <code>sttConfig</code> and <code>autoSpeak</code>. The agent and the context are
+          built as in the other guides, and <code>audioBuffer</code> is a Buffer of recorded audio.
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { OpenAITTSProvider, OpenAIWhisperProvider, VoiceAgent } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { ElevenLabsTTSProvider } from '@lov3kaizen/agentsea-core';
-
-const ttsProvider = new ElevenLabsTTSProvider(process.env.ELEVENLABS_API_KEY);
-
-// List available voices
-const voices = await ttsProvider.getVoices();
-console.log('Available voices:', voices.length);
-
-// Use a specific voice
-const result = await ttsProvider.synthesize('Hello, world!', {
-  voice: 'EXAVITQu4vr4xnSDxMaL', // Sarah voice ID
-  model: 'eleven_multilingual_v2',
-  stability: 0.5,
-  similarityBoost: 0.75,
-});`}
-        </CodeBlock>
-
-        <h3 className="text-2xl font-semibold mb-4 mt-8">Piper TTS (Local)</h3>
-        <p className="text-base-content/70 mb-4">
-          Fast neural synthesis running locally - complete privacy with no API
-          costs.
-        </p>
-
-        <CodeBlock language="typescript">
-          {`import { PiperTTSProvider } from '@lov3kaizen/agentsea-core';
-
-const ttsProvider = new PiperTTSProvider({
-  piperPath: '/usr/local/bin/piper',
-  modelPath: '/path/to/en_US-lessac-medium.onnx',
-});
-
-// Check installation
-if (!(await ttsProvider.isInstalled())) {
-  console.log(ttsProvider.getInstallInstructions());
-  return;
-}
-
-const result = await ttsProvider.synthesize('Hello, world!', {
-  voice: 'lessac',
-  speakerId: 0,
-});`}
-        </CodeBlock>
-      </Section>
-
-      {/* Voice Agent */}
-      <Section title="Voice Agent" id="voice-agent">
-        <p className="text-base-content/70 mb-4">
-          The <code>VoiceAgent</code> class wraps a regular Agent with STT and
-          TTS providers for complete voice interactions. It handles the full
-          pipeline: audio input → transcription → agent processing → speech
-          synthesis → audio output.
-        </p>
-
-        <CodeBlock language="typescript">
-          {`import {
-  Agent,
-  AnthropicProvider,
-  VoiceAgent,
-  OpenAIWhisperProvider,
-  OpenAITTSProvider,
-  ToolRegistry,
-  BufferMemory,
-} from '@lov3kaizen/agentsea-core';
-import type { VoiceAgentConfig, TTSConfig } from '@lov3kaizen/agentsea-types';
-
-// Create base agent
-const agent = new Agent(
-  {
-    name: 'voice-assistant',
-    model: 'claude-sonnet-4-20250514',
-    provider: 'anthropic',
-    systemPrompt: 'You are a helpful voice assistant. Keep responses concise.',
-  },
-  new AnthropicProvider(),
-  new ToolRegistry(),
-  new BufferMemory(50)
-);
-
-// Wrap with voice capabilities
 const voiceAgent = new VoiceAgent(agent, {
   sttProvider: new OpenAIWhisperProvider(process.env.OPENAI_API_KEY),
   ttsProvider: new OpenAITTSProvider(process.env.OPENAI_API_KEY),
-  ttsConfig: { voice: 'nova', model: 'tts-1' },
-  autoSpeak: true, // Automatically synthesize responses
-});`}
-        </CodeBlock>
-      </Section>
+  ttsConfig: { voice: 'nova' },
+  autoSpeak: true,
+});
 
-      {/* Best Practices */}
-      <Section title="Best Practices" id="best-practices">
-        <div className="space-y-4">
-          <AlertBox type="success">
-            <div>
-              <h4 className="font-semibold mb-2">Cost-Effective Production</h4>
-              <p>
-                Use LemonFox for production: STT at $0.50/3hrs (lowest on
-                market) and TTS at $2.50/1M chars (up to 90% savings). Same API
-                as OpenAI - just swap the provider!
-              </p>
-            </div>
-          </AlertBox>
+const result = await voiceAgent.processVoice(audioBuffer, context);
+console.log(result.text, result.response.content);`}
+        />
+        <Callout kind="note">
+          <code>processVoice</code> returns <code>text</code>, <code>response</code> and <code>audio</code>.
+        </Callout>
+      </DocSection>
 
-          <AlertBox type="info">
-            <div>
-              <h4 className="font-semibold mb-2">Voice-Optimized Prompts</h4>
-              <p>
-                Keep responses concise for voice. Add "Keep responses under 2
-                sentences" to your system prompt.
-              </p>
-            </div>
-          </AlertBox>
+      <DocSection id="voice-agent-methods" num="06" title="VoiceAgent methods">
+        <BulletPanel
+          items={[
+            <>
+              <code>processVoice(audio, context)</code>: transcribes the audio, runs the agent, and speaks the reply
+              when <code>autoSpeak</code> is on.
+            </>,
+            <>
+              <code>speak(text, context)</code>: runs the agent on text and returns the spoken reply.
+            </>,
+            <>
+              <code>transcribe(audio)</code>: returns text without running the agent.
+            </>,
+            <>
+              <code>synthesize(text)</code> and <code>synthesizeStream(text)</code>: speech from text.
+            </>,
+            <>
+              <code>setTTSConfig()</code> and <code>setSTTConfig()</code> change settings after construction.{' '}
+              <code>setAutoSpeak()</code> changes the auto-speak setting.
+            </>,
+            <>
+              <code>getHistory()</code>, <code>clearHistory()</code> and <code>exportConversation(outputDir)</code>:
+              read, clear or export the conversation.
+            </>,
+            <>
+              <code>supportsStreaming()</code>: reports which parts can stream.
+            </>,
+          ]}
+        />
+      </DocSection>
 
-          <AlertBox type="warning">
-            <div>
-              <h4 className="font-semibold mb-2">Audio Format</h4>
-              <p>
-                Use MP3 for storage (smaller), WAV for processing (better
-                quality). Most providers accept both.
-              </p>
-            </div>
-          </AlertBox>
-
-          <AlertBox type="info">
-            <div>
-              <h4 className="font-semibold mb-2">Privacy First</h4>
-              <p>
-                Use local providers (Local Whisper + Piper TTS + Ollama) for
-                sensitive data. No data leaves your machine.
-              </p>
-            </div>
-          </AlertBox>
-        </div>
-      </Section>
-
-      {/* Next Steps */}
-      <Section title="Next Steps" id="next-steps">
-        <ul className="list-disc list-inside space-y-2">
-          <li>
-            <Link href="/docs/local-models" className="link link-primary">
-              Learn about Local Models
-            </Link>{' '}
-            - Run everything locally
-          </li>
-          <li>
-            <Link href="/docs/cli" className="link link-primary">
-              Try the CLI Tool
-            </Link>{' '}
-            - Interactive voice setup
-          </li>
-          <li>
-            <Link href="/docs/providers" className="link link-primary">
-              Explore All Providers
-            </Link>{' '}
-            - 12+ LLM providers
-          </li>
-          <li>
-            <Link href="/examples" className="link link-primary">
-              View Examples
-            </Link>{' '}
-            - Complete voice examples
-          </li>
-        </ul>
-      </Section>
-    </PageContainer>
+      <DocSection id="audio-input" num="07" title="Audio input">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Unsupported audio formats fail. Convert the file first, for example with ffmpeg.
+        </p>
+        <CodeBlock lang="BASH" code="ffmpeg -i input.m4a -ar 16000 output.wav" />
+      </DocSection>
+    </DocsShell>
   );
 }
