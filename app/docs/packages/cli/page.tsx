@@ -12,7 +12,6 @@ const pkg: PackageDoc = {
   name: '@lov3kaizen/agentsea-cli',
   summary:
     'Command-line interface for the AgentSea ADK to set up providers, create agents, and chat or run them from a terminal.',
-  version: '1.2.1',
   onNpm: true,
   install: 'npm install -g @lov3kaizen/agentsea-cli',
   example: {

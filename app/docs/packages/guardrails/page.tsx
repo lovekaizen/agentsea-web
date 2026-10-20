@@ -16,7 +16,6 @@ const pkg: PackageDoc = {
   name: '@lov3kaizen/agentsea-guardrails',
   summary:
     'A guard engine that checks text for toxicity, PII, prompt injection, schema and budget limits, and applies a block, transform or warn action.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-guardrails',
   example: {

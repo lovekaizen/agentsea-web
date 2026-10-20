@@ -14,7 +14,6 @@ const pkg: PackageDoc = {
   name: '@lov3kaizen/agentsea-redteam',
   summary:
     'A toolkit for running attacks, vulnerability scans, benchmarks, compliance checks, audit logging and scheduled tests against an AI agent or LLM application.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-redteam @lov3kaizen/agentsea-core',
   example: {

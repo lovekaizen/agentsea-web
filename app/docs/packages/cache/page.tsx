@@ -13,7 +13,6 @@ const pkg: PackageDoc = {
   slug: 'cache',
   name: '@lov3kaizen/agentsea-cache',
   summary: 'Semantic caching layer for LLM responses, using exact-match and semantic-similarity lookups.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-cache',
   example: {

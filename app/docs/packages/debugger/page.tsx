@@ -12,7 +12,6 @@ const pkg: PackageDoc = {
   slug: 'debugger',
   name: '@lov3kaizen/agentsea-debugger',
   summary: 'Records agent runs, sets breakpoints, replays recordings with changes, and runs what-if scenarios.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-debugger',
   example: {

@@ -16,7 +16,6 @@ const pkg: PackageDoc = {
   name: '@lov3kaizen/agentsea-gateway',
   summary:
     'An LLM gateway with an OpenAI-compatible API over OpenAI, Anthropic and Google providers, with routing, caching and metrics.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-gateway',
   example: {

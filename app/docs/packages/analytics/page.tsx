@@ -15,7 +15,6 @@ const pkg: PackageDoc = {
   name: '@lov3kaizen/agentsea-analytics',
   summary:
     'Conversation analytics for AI agents, covering intent classification, flow analysis and sentiment tracking.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-analytics',
   example: {

@@ -14,7 +14,6 @@ const pkg: PackageDoc = {
   name: '@lov3kaizen/agentsea-embeddings',
   summary:
     'Creates embeddings from OpenAI, Cohere, Voyage, HuggingFace or a custom function, chunks documents, and stores vectors.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-embeddings',
   example: {

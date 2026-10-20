@@ -10,7 +10,6 @@ const pkg: PackageDoc = {
   slug: 'core',
   name: '@lov3kaizen/agentsea-core',
   summary: 'Framework-agnostic core library for building agentic AI applications in Node.js.',
-  version: '1.2.1',
   onNpm: true,
   install: 'npm install @lov3kaizen/agentsea-core',
   example: {

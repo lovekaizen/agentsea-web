@@ -14,7 +14,6 @@ const pkg: PackageDoc = {
   slug: 'costs',
   name: '@lov3kaizen/agentsea-costs',
   summary: 'Records LLM usage costs with attribution to users or features, and enforces spending budgets.',
-  version: '1.2.1',
   onNpm: true,
   install: 'npm install @lov3kaizen/agentsea-costs',
   example: {

@@ -10,7 +10,6 @@ const pkg: PackageDoc = {
   slug: 'types',
   name: '@lov3kaizen/agentsea-types',
   summary: 'Shared TypeScript type definitions for the AgentSea ADK.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-types',
   example: {

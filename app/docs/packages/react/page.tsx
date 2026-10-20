@@ -12,7 +12,6 @@ const pkg: PackageDoc = {
   slug: 'react',
   name: '@lov3kaizen/agentsea-react',
   summary: 'React components that render agent response text as formatted markdown.',
-  version: '1.2.1',
   onNpm: true,
   install: 'npm install @lov3kaizen/agentsea-react @lov3kaizen/agentsea-core react react-dom',
   installNote: 'Install the package with its core peer and React. The package also works with pnpm and yarn.',

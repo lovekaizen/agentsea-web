@@ -12,7 +12,6 @@ const pkg: PackageDoc = {
   slug: 'nestjs',
   name: '@lov3kaizen/agentsea-nestjs',
   summary: 'A NestJS module that exposes AgentSea agents over REST and WebSocket endpoints.',
-  version: '1.2.1',
   onNpm: true,
   install: 'npm install @lov3kaizen/agentsea-nestjs @lov3kaizen/agentsea-core',
   example: {

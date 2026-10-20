@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "sync:versions": "node scripts/sync-package-versions.mjs",
     "export": "next build",
     "test:static": "./test-static-build.sh",
     "deploy:sdk": "./deploy-to-sdk.sh",

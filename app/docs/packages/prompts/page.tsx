@@ -13,7 +13,6 @@ const pkg: PackageDoc = {
   slug: 'prompts',
   name: '@lov3kaizen/agentsea-prompts',
   summary: 'A self-hosted prompt registry.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-prompts',
   example: {

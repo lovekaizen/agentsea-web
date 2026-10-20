@@ -10,7 +10,6 @@ const pkg: PackageDoc = {
   slug: 'admin-ui',
   name: '@lov3kaizen/agentsea-admin-ui',
   summary: 'Self-hosted web interface for creating and managing AI agents, workflows, tools and providers.',
-  version: '1.2.1',
   onNpm: false,
   install: `# From the root of the agentsea repository
 cd packages/admin-ui

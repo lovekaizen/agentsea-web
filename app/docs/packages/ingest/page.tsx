@@ -13,7 +13,6 @@ const pkg: PackageDoc = {
   name: '@lov3kaizen/agentsea-ingest',
   summary:
     'Parses PDF, DOCX, HTML, Markdown, text, CSV, Excel and JSON files, chunks them, and runs them through a pipeline for RAG use.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-ingest',
   example: {

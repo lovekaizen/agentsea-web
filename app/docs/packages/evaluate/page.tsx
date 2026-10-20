@@ -14,7 +14,6 @@ const pkg: PackageDoc = {
   slug: 'evaluate',
   name: '@lov3kaizen/agentsea-evaluate',
   summary: 'Runs an evaluation pipeline over a dataset with built-in metrics, LLM judges and preference export.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-evaluate',
   example: {

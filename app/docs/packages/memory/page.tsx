@@ -12,7 +12,6 @@ const pkg: PackageDoc = {
   name: '@lov3kaizen/agentsea-memory',
   summary:
     'A memory store and retrieval layer for agents, with in-memory, Redis, PostgreSQL and SQLite backends.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-memory',
   example: {

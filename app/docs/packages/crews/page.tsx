@@ -15,7 +15,6 @@ const pkg: PackageDoc = {
   slug: 'crews',
   name: '@lov3kaizen/agentsea-crews',
   summary: 'Multi-agent orchestration for building teams of AI agents that work through a shared list of tasks.',
-  version: '1.2.1',
   onNpm: true,
   install: 'npm install @lov3kaizen/agentsea-crews',
   example: {

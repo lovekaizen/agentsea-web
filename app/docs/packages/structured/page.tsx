@@ -13,7 +13,6 @@ const pkg: PackageDoc = {
   slug: 'structured',
   name: '@lov3kaizen/agentsea-structured',
   summary: 'Extracts LLM output validated against a Zod schema, with retries and optional streaming.',
-  version: '1.2.1',
   onNpm: true,
   install: 'pnpm add @lov3kaizen/agentsea-structured zod',
   installNote: 'Install the package and zod. Add the SDK for your provider, such as openai.',

@@ -13,7 +13,6 @@ const pkg: PackageDoc = {
   slug: 'surf',
   name: '@lov3kaizen/agentsea-surf',
   summary: 'A computer-use agent that controls a desktop, a browser, or a Docker desktop.',
-  version: '1.2.1',
   onNpm: true,
   install: 'npm install @lov3kaizen/agentsea-surf',
   installNote: 'Install from npm into your project. Add puppeteer-core or playwright if you use a browser backend.',

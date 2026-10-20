@@ -4,6 +4,7 @@ import CodeBlock from './CodeBlock';
 import DocSection from './DocSection';
 import DocsShell, { type TocItem } from './DocsShell';
 import { ApiList, ApiRow } from './ApiList';
+import { packageVersion } from './packageVersion';
 
 export interface PackageDoc {
   /** URL segment: the page lives at /docs/packages/<slug>. */
@@ -11,7 +12,6 @@ export interface PackageDoc {
   /** npm name, e.g. "@lov3kaizen/agentsea-core". */
   name: string;
   summary: string;
-  version: string;
   onNpm: boolean;
   /** Shell command for the Install section. */
   install: string;
@@ -44,7 +44,7 @@ export default function PackagePage({ pkg, children, extraToc = [] }: PackagePag
       eyebrow="Package"
       title={pkg.name}
       lead={pkg.summary}
-      badges={[`v${pkg.version}`, pkg.onNpm ? 'On npm' : 'Private, not on npm']}
+      badges={[`v${packageVersion(pkg.name)}`, pkg.onNpm ? 'On npm' : 'Private, not on npm']}
       active="packages"
       toc={toc}
     >
