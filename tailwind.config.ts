@@ -24,12 +24,17 @@ export default {
           sky: "#F0F9FF",
           code: "#0B1F33",
           "code-strip": "#12314D",
+          band: "#E6F4FB",
         },
         ink: {
           muted: "#4B6B84",
           eyebrow: "#0369A1",
         },
         rule: "#D6E6F0",
+      },
+      fontFamily: {
+        // JetBrains Mono is loaded in app/layout.tsx as --font-jetbrains-mono
+        mono: ["var(--font-jetbrains-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
       fontSize: {
         // Design type scale: display 56 and label 13 are not in Tailwind's defaults
