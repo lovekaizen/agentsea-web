@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { HeartMark, LOVEKAIZEN_URL } from '../brand/HeartMark';
 import { GITHUB_URL } from './SiteTopBar';
 
 const docsLinks = [
@@ -40,6 +41,19 @@ export default function SiteFooter() {
             Issues
           </a>
         </div>
+      </div>
+
+      <div className="mx-auto mt-10 flex max-w-[1328px] items-center border-t border-brand-navy/10 pt-6 text-sm text-ink-muted">
+        <a
+          href={LOVEKAIZEN_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-brand-navy hover:text-brand-deep"
+        >
+          Powered by
+          <HeartMark className="h-3.5 w-3.5 text-[#be185d]" />
+          lovekaizen
+        </a>
       </div>
     </footer>
   );
