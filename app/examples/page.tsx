@@ -1,78 +1,90 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../components/PageContainer';
-import ExamplesGrid from '../components/ExamplesGrid';
-import { PageHeader, Divider } from '../components/Section';
+import DocsShell from '../components/docs/DocsShell';
+import DocSection from '../components/docs/DocSection';
+import CodeBlock from '../components/docs/CodeBlock';
+import BulletPanel from '../components/docs/BulletPanel';
+
+export const metadata: Metadata = {
+  title: 'Examples | AgentSea',
+  description:
+    'Practical AgentSea examples: chatbots, workflows, MCP, NestJS, local models, memory, crews, gateway, guardrails, evaluation, embeddings and browser automation.',
+};
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 export default function ExamplesPage() {
+  const toc = [
+    ...examples.map((example) => ({ id: slugify(example.title), label: example.title })),
+    { id: 'resources', label: 'Resources' },
+  ];
+
   return (
-    <PageContainer maxWidth="7xl">
-      {/* Header */}
-      <PageHeader
-        title="Examples"
-        titleGradient="warm"
-        description="Explore practical examples to learn how to build powerful agentic AI applications with AgentSea."
-      />
-
-      {/* Interactive Examples Grid */}
-      <ExamplesGrid examples={examples} />
-
-      <Divider />
-
-      {/* Getting Started Section */}
-      <div className="mt-16 bg-gradient-mesh rounded-xl p-8 py-16 relative overflow-hidden">
-        <div className="orb orb-1 opacity-20"></div>
-        <div className="orb orb-2 opacity-20"></div>
-        <div className="relative z-10 text-center">
-          <h2 className="text-4xl font-bold mb-4 text-white">
-            Ready to <span className="text-gradient-animated">Get Started</span>
-            ?
-          </h2>
-          <p className="text-xl mb-8 text-white/80 max-w-2xl mx-auto">
-            Check out our comprehensive documentation to learn more about
-            building with AgentSea.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/docs/quick-start" className="btn btn-gradient btn-lg">
-              <span>Quick Start Guide</span>
-            </Link>
-            <Link
-              href="/docs"
-              className="btn btn-lg bg-white/10 hover:bg-white/20 border-white/20 text-white"
-            >
-              Full Documentation
-            </Link>
+    <DocsShell
+      eyebrow="Examples"
+      title="Examples"
+      lead="Explore practical examples to learn how to build powerful agentic AI applications with AgentSea."
+      toc={toc}
+    >
+      {examples.map((example, index) => (
+        <DocSection
+          key={example.title}
+          id={slugify(example.title)}
+          num={String(index + 1).padStart(2, '0')}
+          title={example.title}
+        >
+          <p className="text-base leading-relaxed text-brand-navy">{example.description}</p>
+          <div className="flex flex-wrap gap-2">
+            {[example.category, example.difficulty, ...example.tags].map((label, labelIndex) => (
+              <span
+                key={`${labelIndex}-${label}`}
+                className="rounded-full border border-rule bg-surface-paper px-2.5 py-[3px] text-label text-ink-eyebrow"
+              >
+                {label}
+              </span>
+            ))}
           </div>
-        </div>
-      </div>
+          <CodeBlock lang="TS" code={example.code} />
+          {example.useCases && example.useCases.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-semibold text-brand-deep">Use cases</h3>
+              <BulletPanel items={example.useCases} />
+            </div>
+          )}
+        </DocSection>
+      ))}
 
-      {/* Additional Resources */}
-      <div className="mt-16">
-        <h2 className="text-3xl font-bold mb-8 text-gradient-purple">
-          Additional Resources
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {resources.map((resource, index) => (
+      <DocSection id="resources" title="Resources">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Read the{' '}
+          <Link href="/docs/quick-start" className="font-semibold text-brand-deep hover:underline">
+            Quick start guide
+          </Link>{' '}
+          or the{' '}
+          <Link href="/docs" className="font-semibold text-brand-deep hover:underline">
+            full documentation
+          </Link>
+          .
+        </p>
+        <div className="grid gap-4 md:grid-cols-3">
+          {resources.map((resource) => (
             <a
-              key={index}
+              key={resource.title}
               href={resource.href}
-              className="card bg-base-200 border border-base-300 card-gradient-hover group"
+              className="flex flex-col gap-2 rounded-xl border border-rule bg-surface-paper p-[22px] transition-colors hover:bg-surface-sky"
             >
-              <div className="card-body relative z-10">
-                <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">
-                  {resource.icon}
-                </div>
-                <h3 className="text-lg font-semibold mb-2 group-hover:text-gradient transition-all">
-                  {resource.title}
-                </h3>
-                <p className="text-base-content/70 text-sm">
-                  {resource.description}
-                </p>
-              </div>
+              <span className="text-lg font-semibold text-brand-deep">{resource.title}</span>
+              <span className="text-[15px] leading-relaxed text-brand-navy">{resource.description}</span>
             </a>
           ))}
         </div>
-      </div>
-    </PageContainer>
+      </DocSection>
+    </DocsShell>
   );
 }
 

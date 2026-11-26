@@ -1,62 +1,86 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
+
+export const metadata: Metadata = {
+  title: 'Tools | AgentSea',
+  description:
+    'Tools let AgentSea agents call external systems and run calculations. Built-in tools, custom tools with Zod schemas, the tool registry, MCP tools and isomorphic tool definitions.',
+};
+
+const toc = [
+  { id: 'what-are-tools', label: 'What are tools?' },
+  { id: 'built-in-tools', label: 'Built-in tools' },
+  { id: 'using-built-in', label: 'Using built-in tools' },
+  { id: 'custom-tools', label: 'Creating custom tools' },
+  { id: 'schema-validation', label: 'Schema validation' },
+  { id: 'async-tools', label: 'Async tools' },
+  { id: 'error-handling', label: 'Error handling' },
+  { id: 'tool-registry', label: 'Tool registry' },
+  { id: 'mcp-tools', label: 'MCP tools' },
+  { id: 'isomorphic-tools', label: 'Isomorphic tools' },
+  { id: 'best-practices', label: 'Best practices' },
+  { id: 'next-steps', label: 'Next steps' },
+];
 
 export default function ToolsPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Tools"
-        titleGradient="warm"
-        description="Tools extend agent capabilities by allowing them to interact with external systems, perform calculations, manipulate data, and more."
-      />
-
-      <div className="prose max-w-none">
-        <h2>What are Tools?</h2>
-        <p>
-          Tools are functions that agents can call to perform specific tasks.
-          They are defined with:
+    <DocsShell
+      eyebrow="Concept"
+      title="Tools"
+      lead="Tools extend agent capabilities by letting agents interact with external systems, perform calculations and manipulate data."
+      active="concepts"
+      toc={toc}
+    >
+      <DocSection id="what-are-tools" num="01" title="What are tools?">
+        <p className="text-base leading-relaxed text-brand-navy">
+          A tool is a function an agent can call. The model decides when to call it. Each tool has:
         </p>
-        <ul>
-          <li>A unique name and description</li>
-          <li>Input schema validation using Zod</li>
-          <li>An execution function that returns results</li>
-        </ul>
+        <BulletPanel
+          items={[
+            'A unique name and a description the model reads',
+            'A Zod schema for its parameters, checked before the tool runs',
+            'An execute function that receives the validated parameters and a context, and returns a result',
+          ]}
+        />
+      </DocSection>
 
-        <h2>Built-in Tools</h2>
-        <p>AgentSea includes 10+ powerful built-in tools ready to use:</p>
+      <DocSection id="built-in-tools" num="02" title="Built-in tools">
+        <p className="text-base leading-relaxed text-brand-navy">
+          AgentSea includes built-in tools, ready to register:
+        </p>
+        <ApiList>
+          <ApiRow name="calculatorTool">Basic arithmetic calculations.</ApiRow>
+          <ApiRow name="httpRequestTool">HTTP requests to external APIs, with retry configured.</ApiRow>
+          <ApiRow name="fileReadTool, fileWriteTool, fileListTool">
+            Read, write and list files and directories.
+          </ApiRow>
+          <ApiRow name="textSummaryTool">Word and character counts, and extraction of emails, URLs and numbers.</ApiRow>
+          <ApiRow name="stringTransformTool">Uppercase, lowercase, titlecase, reverse, trim and slug.</ApiRow>
+          <ApiRow name="figmaGetFileTool, figmaGetNodesTool, figmaGetImagesTool, figmaGetCommentsTool, figmaPostCommentTool">
+            Read Figma files, nodes, images and comments, and post comments.
+          </ApiRow>
+          <ApiRow name="n8nExecuteWorkflowTool, n8nGetExecutionTool, n8nListWorkflowsTool, n8nTriggerWebhookTool, n8nGetWorkflowTool">
+            Run and inspect n8n workflows, and trigger webhooks.
+          </ApiRow>
+          <ApiRow name="shellExecuteTool, codeEditTool, globTool, grepTool">
+            Coding tools: run shell commands, edit code, find files by pattern and search file contents.
+          </ApiRow>
+          <ApiRow name="gitStatusTool, gitDiffTool, gitAddTool, gitCommitTool, gitLogTool, gitBranchTool">
+            Git status, diff, add, commit, log and branch.
+          </ApiRow>
+        </ApiList>
+      </DocSection>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-8">
-          {builtInTools.map((tool, index) => (
-            <div
-              key={index}
-              className="pb-2 px-6 bg-white rounded-lg border border-gray-200"
-            >
-              <div className="flex items-start gap-3">
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {tool.icon} {tool.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {tool.description}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <h2>Using Built-in Tools</h2>
-        <p>Import and register tools with your agent:</p>
-
-        <CodeBlock language="typescript">
-          {`import {
+      <DocSection id="using-built-in" num="03" title="Using built-in tools">
+        <CodeBlock
+          lang="TS"
+          code={`import {
   Agent,
   AnthropicProvider,
   ToolRegistry,
@@ -65,22 +89,18 @@ export default function ToolsPage() {
   fileReadTool,
   textSummaryTool,
 } from '@lov3kaizen/agentsea-core';
-import type { Tool, ToolCall, ToolContext } from '@lov3kaizen/agentsea-types';
 
-// Create tool registry
 const toolRegistry = new ToolRegistry();
-
-// Register tools
 toolRegistry.register(calculatorTool);
 toolRegistry.register(httpRequestTool);
 toolRegistry.register(fileReadTool);
 toolRegistry.register(textSummaryTool);
 
-// Create agent with tools
 const agent = new Agent(
   {
     name: 'tool-agent',
-    model: 'claude-sonnet-4-20250514',
+    description: 'Uses tools to answer questions',
+    model: 'claude-sonnet-4-6',
     provider: 'anthropic',
     tools: [calculatorTool, httpRequestTool, fileReadTool, textSummaryTool],
   },
@@ -88,35 +108,35 @@ const agent = new Agent(
   toolRegistry,
 );
 
-// Agent will automatically use tools when needed
+// The agent calls tools when the model asks for them
 const response = await agent.execute(
-  'Calculate 42 * 58 and fetch weather data from https://api.weather.com',
+  'Calculate 42 * 58 and fetch the JSON at https://api.example.com/stats',
   context,
 );`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Creating Custom Tools</h2>
-        <p>Create your own tools to extend agent capabilities:</p>
-
-        <CodeBlock language="typescript">
-          {`import { Tool } from '@lov3kaizen/agentsea-core';
+      <DocSection id="custom-tools" num="04" title="Creating custom tools">
+        <p className="text-base leading-relaxed text-brand-navy">
+          A custom tool is an object that matches the <code>Tool</code> type. The schema field is{' '}
+          <code>parameters</code>, and it is a Zod schema.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Tool } from '@lov3kaizen/agentsea-core';
 import { z } from 'zod';
 
-// Define tool
 export const databaseQueryTool: Tool = {
   name: 'database_query',
   description: 'Execute SQL queries on the database',
-  inputSchema: z.object({
+  parameters: z.object({
     query: z.string().describe('SQL query to execute'),
     params: z.array(z.any()).optional().describe('Query parameters'),
   }),
   execute: async (input) => {
     const { query, params = [] } = input;
-
     try {
-      // Your database logic here
-      const results = await db.query(query, params);
-
+      const results = await db.query(query, params); // your database client
       return {
         success: true,
         data: results,
@@ -125,25 +145,26 @@ export const databaseQueryTool: Tool = {
     } catch (error) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   },
 };
 
-// Register with agent
 toolRegistry.register(databaseQueryTool);`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Tool Schema Validation</h2>
-        <p>
-          Tools use Zod schemas for input validation. Here are common patterns:
+      <DocSection id="schema-validation" num="05" title="Schema validation">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Tool parameters are Zod schemas. The registry parses them before calling <code>execute</code>.
+          Common patterns:
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { z } from 'zod';
 
-        <CodeBlock language="typescript">
-          {`import { z } from 'zod';
-
-// String with constraints
+// Strings with constraints
 const nameSchema = z.object({
   name: z.string().min(1).max(100).describe('User name'),
 });
@@ -181,61 +202,55 @@ const addressSchema = z.object({
     }),
   }),
 });`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Async Tools</h2>
-        <p>Tools can be async and perform long-running operations:</p>
+      <DocSection id="async-tools" num="06" title="Async tools">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Tools can be async and call external services. Return a plain object with the result:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Tool } from '@lov3kaizen/agentsea-core';
+import { z } from 'zod';
 
-        <CodeBlock language="bash">
-          {`export const imageGenerationTool: Tool = {
-  name: 'generate_image',
-  description: 'Generate an image using DALL-E',
-  inputSchema: z.object({
-    prompt: z.string().describe('Image description'),
-    size: z.enum(['256x256', '512x512', '1024x1024']).default('512x512'),
+export const weatherTool: Tool = {
+  name: 'get_weather',
+  description: 'Get the current weather for a city',
+  parameters: z.object({
+    city: z.string().describe('City name'),
   }),
-  execute: async (input) => {
-    const { prompt, size } = input;
-
-    // Call image generation API
-    const response = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Authorization': \`Bearer \${process.env.OPENAI_API_KEY}\`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        prompt,
-        size,
-        n: 1,
-      }),
-    });
-
+  execute: async ({ city }) => {
+    const response = await fetch(
+      \`https://weather.example.com/current?city=\${encodeURIComponent(city)}\`,
+    );
     const data = await response.json();
-
-    return {
-      success: true,
-      imageUrl: data.data[0].url,
-      message: 'Image generated successfully',
-    };
+    return { success: true, data };
   },
 };`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Error Handling</h2>
-        <p>Always handle errors gracefully in tools:</p>
+      <DocSection id="error-handling" num="07" title="Error handling">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Handle expected failures inside the tool and return them as data. The model can read the
+          message and recover.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Tool } from '@lov3kaizen/agentsea-core';
+import { z } from 'zod';
 
-        <CodeBlock language="bash">
-          {`export const apiCallTool: Tool = {
+export const apiCallTool: Tool = {
   name: 'api_call',
-  description: 'Make an API call',
-  inputSchema: z.object({
+  description: 'Make a GET request to an API endpoint',
+  parameters: z.object({
     endpoint: z.string().url(),
   }),
   execute: async (input) => {
     try {
       const response = await fetch(input.endpoint, {
-        timeout: 5000, // 5 second timeout
+        signal: AbortSignal.timeout(5000), // 5 second timeout
       });
 
       if (!response.ok) {
@@ -245,42 +260,78 @@ const addressSchema = z.object({
         };
       }
 
-      const data = await response.json();
-
-      return {
-        success: true,
-        data,
-      };
+      return { success: true, data: await response.json() };
     } catch (error) {
-      if (error.name === 'AbortError') {
-        return {
-          success: false,
-          error: 'Request timed out',
-        };
+      if (error instanceof Error && error.name === 'TimeoutError') {
+        return { success: false, error: 'Request timed out' };
       }
-
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   },
 };`}
-        </CodeBlock>
+        />
+        <Callout kind="note">
+          The registry does not catch errors for you. If <code>execute</code> throws, the registry
+          rethrows it as <code>Tool execution failed: ...</code>. Return an error object for failures
+          you expect, and reserve exceptions for failures the agent cannot act on.
+        </Callout>
+      </DocSection>
 
-        <h2>MCP Tools</h2>
-        <p>
-          Use MCP (Model Context Protocol) to automatically import tools from
-          external servers:
+      <DocSection id="tool-registry" num="08" title="Tool registry">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The registry holds the tools available to an agent:
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { ToolRegistry, calculatorTool, httpRequestTool, fileReadTool } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { MCPRegistry } from '@lov3kaizen/agentsea-core';
+const toolRegistry = new ToolRegistry();
 
-// Create MCP registry
+// Register one tool, or several at once
+toolRegistry.register(calculatorTool);
+toolRegistry.registerMany([httpRequestTool, fileReadTool]);
+
+// Look up a tool by name
+const calculator = toolRegistry.get('calculator');
+
+// Check whether a tool exists
+const exists = toolRegistry.has('calculator');
+
+// List all registered tools
+const allTools = toolRegistry.getAll();
+
+// Remove a tool (returns true if it was registered)
+toolRegistry.unregister('calculator');
+
+// Clear everything
+toolRegistry.clear();`}
+        />
+        <ApiList>
+          <ApiRow name="register(tool)">Adds one tool.</ApiRow>
+          <ApiRow name="registerMany(tools)">Adds several tools.</ApiRow>
+          <ApiRow name="get(name)">Returns the tool or undefined.</ApiRow>
+          <ApiRow name="has(name)">Returns true when the tool is registered.</ApiRow>
+          <ApiRow name="getAll()">Returns every registered tool.</ApiRow>
+          <ApiRow name="unregister(name)">Removes a tool. Returns true if it was present.</ApiRow>
+          <ApiRow name="clear()">Removes all tools.</ApiRow>
+        </ApiList>
+      </DocSection>
+
+      <DocSection id="mcp-tools" num="09" title="MCP tools">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The Model Context Protocol (MCP) lets you import tools from external servers. The{' '}
+          <code>MCPRegistry</code> starts each server and converts its tools to AgentSea tools:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, AnthropicProvider, MCPRegistry, ToolRegistry } from '@lov3kaizen/agentsea-core';
+
 const mcpRegistry = new MCPRegistry();
+const toolRegistry = new ToolRegistry();
 
-// Connect to MCP servers
 await mcpRegistry.addServer({
   name: 'filesystem',
   command: 'npx',
@@ -293,88 +344,44 @@ await mcpRegistry.addServer({
   command: 'npx',
   args: ['-y', '@modelcontextprotocol/server-github'],
   transport: 'stdio',
-  env: { GITHUB_TOKEN: process.env.GITHUB_TOKEN },
+  env: { GITHUB_TOKEN: process.env.GITHUB_TOKEN! },
 });
 
-// Get all MCP tools (automatically converted)
+// Tools from all connected servers, converted to AgentSea tools
 const mcpTools = mcpRegistry.getTools();
-
-// Register with tool registry
 toolRegistry.registerMany(mcpTools);
 
-// Agent now has access to filesystem and GitHub tools
 const agent = new Agent(
   {
     name: 'mcp-agent',
-    model: 'claude-sonnet-4-20250514',
+    description: 'Uses filesystem and GitHub tools',
+    model: 'claude-sonnet-4-6',
     provider: 'anthropic',
     tools: mcpTools,
   },
-  provider,
+  new AnthropicProvider(),
   toolRegistry,
 );`}
-        </CodeBlock>
-
-        <h2>Tool Registry</h2>
-        <p>Manage tools efficiently with the tool registry:</p>
-
-        <CodeBlock language="typescript">
-          {`import { ToolRegistry } from '@lov3kaizen/agentsea-core';
-
-const toolRegistry = new ToolRegistry();
-
-// Register single tool
-toolRegistry.register(calculatorTool);
-
-// Register multiple tools
-toolRegistry.registerMany([
-  httpRequestTool,
-  fileReadTool,
-  textSummaryTool,
-]);
-
-// Get tool by name
-const calculator = toolRegistry.get('calculator');
-
-// Check if tool exists
-const exists = toolRegistry.has('calculator');
-
-// List all tools
-const allTools = toolRegistry.list();
-
-// Unregister tool
-toolRegistry.unregister('calculator');`}
-        </CodeBlock>
-
-        <h2>Isomorphic Tool Management</h2>
-        <AlertBox type="info">
-          Isomorphic tools let you define tools once and implement them for
-          different environments (server or client). This enables type-safe tool
-          definitions with Zod schemas for both input and output validation.
-        </AlertBox>
-
-        <p>
-          The isomorphic tool system provides a clean separation between tool
-          definitions and their implementations, allowing you to:
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          For transports, server options and reconnect behavior, see the{' '}
+          <Link href="/docs/mcp-overview" className="font-semibold text-brand-ocean hover:underline">MCP overview</Link>.
         </p>
-        <ul>
-          <li>Define tools with full input/output type safety</li>
-          <li>Create server-side implementations for backend operations</li>
-          <li>Create client-side implementations for browser operations</li>
-          <li>Share tool definitions between environments</li>
-        </ul>
+      </DocSection>
 
-        <h3>Tool Definition</h3>
-        <p>
-          Create a tool definition that can be implemented for different
-          environments:
+      <DocSection id="isomorphic-tools" num="10" title="Isomorphic tools">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Isomorphic tools separate a tool&apos;s definition from its implementation. Define the input
+          and output schemas once, then provide a server implementation, a client implementation or
+          both. The input and output types come from the Zod schemas.
         </p>
 
-        <CodeBlock language="typescript">
-          {`import { toolDefinition } from '@lov3kaizen/agentsea-core';
+        <h3 className="text-lg font-semibold text-brand-deep">Tool definition</h3>
+        <CodeBlock
+          lang="TS"
+          code={`import { toolDefinition } from '@lov3kaizen/agentsea-core';
 import { z } from 'zod';
 
-// Define the tool with input/output schemas
 const getUserDef = toolDefinition({
   name: 'get_user',
   description: 'Get user information from the database',
@@ -388,7 +395,7 @@ const getUserDef = toolDefinition({
   }),
 });
 
-// Server implementation - direct database access
+// Server implementation: direct database access
 const getUserServer = getUserDef.server(async ({ userId }, context) => {
   const user = await db.users.findUnique({ where: { id: userId } });
   return {
@@ -398,27 +405,26 @@ const getUserServer = getUserDef.server(async ({ userId }, context) => {
   };
 });
 
-// Client implementation - fetch from API
+// Client implementation: call an API
 const getUserClient = getUserDef.client(async ({ userId }) => {
   const response = await fetch(\`/api/users/\${userId}\`);
   return response.json();
 });
 
-// Use with agent
 const agent = new Agent({
-  tools: [getUserServer.toTool()],
   // ...
+  tools: [getUserServer.toTool()],
 });`}
-        </CodeBlock>
+        />
 
-        <h3>Quick Helpers</h3>
-        <p>
-          For simpler cases, use the quick helper functions to create tools in
-          one step:
+        <h3 className="text-lg font-semibold text-brand-deep">Quick helpers</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code>serverTool</code>, <code>clientTool</code> and <code>hybridTool</code> create a tool in one
+          call:
         </p>
-
-        <CodeBlock language="typescript">
-          {`import { serverTool, clientTool, hybridTool } from '@lov3kaizen/agentsea-core';
+        <CodeBlock
+          lang="TS"
+          code={`import { serverTool, clientTool, hybridTool } from '@lov3kaizen/agentsea-core';
 import { z } from 'zod';
 
 // Server-only tool
@@ -441,14 +447,11 @@ const calculateTool = serverTool({
   },
 });
 
-// Client-only tool (runs in browser)
+// Client-only tool, runs in the browser
 const showNotification = clientTool({
   name: 'show_notification',
   description: 'Show a browser notification',
-  inputSchema: z.object({
-    title: z.string(),
-    body: z.string(),
-  }),
+  inputSchema: z.object({ title: z.string(), body: z.string() }),
   outputSchema: z.object({ shown: z.boolean() }),
   execute: ({ title, body }) => {
     new Notification(title, { body });
@@ -456,214 +459,119 @@ const showNotification = clientTool({
   },
 });
 
-// Hybrid tool with both implementations
+// Hybrid tool with a server and a client implementation
 const userTool = hybridTool({
   name: 'get_user',
   description: 'Get user information',
   inputSchema: z.object({ userId: z.string() }),
   outputSchema: z.object({ name: z.string(), email: z.string() }),
-  server: async ({ userId }) => {
-    return await db.users.findUnique({ where: { id: userId } });
-  },
-  client: async ({ userId }) => {
-    const res = await fetch(\`/api/users/\${userId}\`);
-    return res.json();
-  },
+  server: async ({ userId }) => db.users.findUnique({ where: { id: userId } }),
+  client: async ({ userId }) => (await fetch(\`/api/users/\${userId}\`)).json(),
 });`}
-        </CodeBlock>
+        />
 
-        <h3>Built-in Isomorphic Tools</h3>
-        <p>
-          AgentSea includes isomorphic versions of built-in tools with both
-          server and client implementations:
+        <h3 className="text-lg font-semibold text-brand-deep">Built-in isomorphic tools</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
+          The calculator has an isomorphic definition, with <code>calculatorDef</code>,{' '}
+          <code>calculatorServer</code> and <code>calculatorClient</code> exported:
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { calculatorServer } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import {
-  calculatorDef,
-  calculatorServer,
-  calculatorClient,
-} from '@lov3kaizen/agentsea-core';
-
-// Use the definition to create custom implementations
-const customCalc = calculatorDef.server(async ({ operation, a, b }) => {
-  // Custom server logic with logging
-  console.log(\`Calculating: \${a} \${operation} \${b}\`);
-  // ... implementation
-});
-
-// Or use pre-built implementations
 const tools = [calculatorServer.toTool()];
 
-// Execute directly
 const result = await calculatorServer.execute(
   { operation: 'add', a: 5, b: 3 },
-  context
+  context,
 );
 // { result: 8 }`}
-        </CodeBlock>
+        />
 
-        <h3>Type Safety</h3>
-        <p>
-          Extract input and output types from tool definitions for full type
-          safety:
-        </p>
+        <h3 className="text-lg font-semibold text-brand-deep">Type helpers</h3>
+        <CodeBlock
+          lang="TS"
+          code={`import type { ToolInput, ToolOutput } from '@lov3kaizen/agentsea-core';
+import { calculatorDef, calculatorServer } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import type { ToolInput, ToolOutput } from '@lov3kaizen/agentsea-core';
-
-// Extract types from tool
 type CalcInput = ToolInput<typeof calculatorDef>;
-// { operation: 'add' | 'subtract' | 'multiply' | 'divide'; a: number; b: number }
-
 type CalcOutput = ToolOutput<typeof calculatorDef>;
-// { result: number }
 
-// Use in your code
 function runCalculation(input: CalcInput): Promise<CalcOutput> {
   return calculatorServer.execute(input, context);
 }`}
-        </CodeBlock>
+        />
 
-        <h3>Converting to Legacy Tools</h3>
-        <p>
-          Convert isomorphic tools to the legacy Tool interface for
-          compatibility:
+        <h3 className="text-lg font-semibold text-brand-deep">Converting to legacy tools</h3>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Use <code>toLegacyTool</code> and <code>toLegacyTools</code> to pass isomorphic tools to code
+          that expects the <code>Tool</code> type:
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { toLegacyTool, toLegacyTools } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { toLegacyTool, toLegacyTools } from '@lov3kaizen/agentsea-core';
-
-// Convert single tool
 const legacyCalc = toLegacyTool(calculatorServer);
+const legacyTools = toLegacyTools([calculatorServer, getUserServer]);
 
-// Convert multiple tools
-const legacyTools = toLegacyTools([
-  calculatorServer,
-  getUserServer,
-  customTool,
-]);
-
-// Use with existing code
 toolRegistry.registerMany(legacyTools);`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <Divider />
+      <DocSection id="best-practices" num="11" title="Best practices">
+        <BulletPanel
+          items={[
+            <>
+              <strong>Descriptive names</strong>: use clear names such as <code>database_query</code>, not{' '}
+              <code>db</code>.
+            </>,
+            <>
+              <strong>Detailed descriptions</strong>: the model chooses tools from their descriptions.
+            </>,
+            <>
+              <strong>Validation</strong>: validate every input with a Zod schema.
+            </>,
+            <>
+              <strong>Errors</strong>: return error objects for expected failures. Exceptions are
+              rethrown by the registry.
+            </>,
+            <>
+              <strong>Timeouts</strong>: set a timeout on every external call.
+            </>,
+            <>
+              <strong>Idempotency</strong>: make tools idempotent where you can.
+            </>,
+            <>
+              <strong>Side effects</strong>: state any side effects in the description.
+            </>,
+            <>
+              <strong>Rate limits</strong>: limit calls to expensive operations.
+            </>,
+            <>
+              <strong>Only relevant tools</strong>: give each agent only the tools its job needs.
+            </>,
+          ]}
+        />
+      </DocSection>
 
-        <h2>Best Practices</h2>
-        <ul>
-          <li>
-            <strong>Descriptive Names</strong>: Use clear, descriptive tool
-            names (e.g., <code>database_query</code> not <code>db</code>)
-          </li>
-          <li>
-            <strong>Detailed Descriptions</strong>: Provide comprehensive
-            descriptions so agents know when to use each tool
-          </li>
-          <li>
-            <strong>Validation</strong>: Always validate inputs with Zod schemas
-          </li>
-          <li>
-            <strong>Error Handling</strong>: Return structured error objects,
-            never throw exceptions
-          </li>
-          <li>
-            <strong>Timeouts</strong>: Set reasonable timeouts for external API
-            calls
-          </li>
-          <li>
-            <strong>Idempotency</strong>: Make tools idempotent when possible
-          </li>
-          <li>
-            <strong>Side Effects</strong>: Document any side effects in the
-            description
-          </li>
-          <li>
-            <strong>Rate Limiting</strong>: Implement rate limiting for
-            expensive operations
-          </li>
-          <li>
-            <strong>Use Output Schemas</strong>: Define output schemas for
-            better type safety and validation
-          </li>
-          <li>
-            <strong>Environment Separation</strong>: Use isomorphic tools to
-            keep server and client logic separate
-          </li>
-        </ul>
-
-        <h2>Next Steps</h2>
-        <ul>
-          <li>
-            <Link href="/docs/react-hooks">Use Tools with React Hooks</Link>
-          </li>
-          <li>
-            <Link href="/docs/mcp-overview">Learn about MCP Integration</Link>
-          </li>
-          <li>
-            <Link href="/docs/workflows">Use Tools in Workflows</Link>
-          </li>
-          <li>
-            <Link href="/examples">View Tool Examples</Link>
-          </li>
-        </ul>
-      </div>
-    </PageContainer>
+      <DocSection id="next-steps" num="12" title="Next steps">
+        <BulletPanel
+          items={[
+            <Link key="react" href="/docs/react-hooks" className="text-brand-ocean hover:underline">
+              Use tools with React hooks
+            </Link>,
+            <Link key="mcp" href="/docs/mcp-overview" className="text-brand-ocean hover:underline">
+              MCP integration
+            </Link>,
+            <Link key="workflows" href="/docs/workflows" className="text-brand-ocean hover:underline">
+              Use tools in workflows
+            </Link>,
+            <Link key="agents" href="/docs/agents" className="text-brand-ocean hover:underline">
+              Agents
+            </Link>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }
-
-const builtInTools = [
-  {
-    icon: '🧮',
-    name: 'Calculator',
-    description:
-      'Perform mathematical calculations with support for basic arithmetic',
-  },
-  {
-    icon: '🌐',
-    name: 'HTTP Request',
-    description: 'Make HTTP requests to external APIs with retry logic',
-  },
-  {
-    icon: '📁',
-    name: 'File Read',
-    description: 'Read file contents from the filesystem',
-  },
-  {
-    icon: '✏️',
-    name: 'File Write',
-    description: 'Write data to files on the filesystem',
-  },
-  {
-    icon: '📋',
-    name: 'File List',
-    description: 'List files and directories in a path',
-  },
-  {
-    icon: '📊',
-    name: 'Text Summary',
-    description: 'Extract word count, emails, URLs, and numbers from text',
-  },
-  {
-    icon: '🔤',
-    name: 'String Transform',
-    description:
-      'Transform strings (uppercase, lowercase, titlecase, reverse, trim, slug)',
-  },
-  {
-    icon: '📅',
-    name: 'Date Time',
-    description: 'Get current date/time and format dates',
-  },
-  {
-    icon: '🎨',
-    name: 'Figma',
-    description:
-      'Interact with Figma files, nodes, images, and comments via API',
-  },
-  {
-    icon: '⚡',
-    name: 'n8n',
-    description: 'Execute and manage n8n workflows and webhooks for automation',
-  },
-];

@@ -1,90 +1,90 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
+
+export const metadata: Metadata = {
+  title: 'Installation | AgentSea',
+  description: 'Install the AgentSea packages, set the API keys your providers need, and check the install.',
+};
+
+const toc = [
+  { id: 'requirements', label: 'Requirements' },
+  { id: 'core-package', label: 'Core package' },
+  { id: 'add-on-packages', label: 'Add-on packages' },
+  { id: 'nestjs', label: 'NestJS integration' },
+  { id: 'environment-variables', label: 'API keys and environment' },
+  { id: 'verify', label: 'Verify the install' },
+  { id: 'next-steps', label: 'Next steps' },
+];
+
+const link = 'font-semibold text-brand-deep hover:underline';
 
 export default function InstallationPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Installation"
-        titleGradient="blue"
-        description="Get started with AgentSea in your project"
-      />
+    <DocsShell
+      eyebrow="Getting started"
+      title="Installation"
+      lead="Install the AgentSea packages in a Node.js project, then set the API keys your providers need."
+      active="getting-started"
+      toc={toc}
+    >
+      <DocSection id="requirements" num="01" title="Requirements">
+        <BulletPanel
+          items={[
+            'Node.js 20 or later. Node 18 is no longer supported as of v1.0.1.',
+            'TypeScript 5.0 or later (recommended).',
+            'A package manager: pnpm, npm or yarn.',
+          ]}
+        />
+      </DocSection>
 
-      <div className="prose max-w-none">
-        <Section title="Prerequisites" id="prerequisites">
-          <p>Before installing AgentSea, ensure you have the following:</p>
-          <ul>
-            <li>
-              <strong>Node.js</strong>: Version 18.0.0 or higher
-            </li>
-            <li>
-              <strong>Package Manager</strong>: npm, pnpm, or yarn
-            </li>
-            <li>
-              <strong>TypeScript</strong>: Version 5.0.0 or higher (recommended)
-            </li>
-          </ul>
-        </Section>
-
-        <Section title="Core Package" id="core-package">
-          <p>
-            Install the core AgentSea package using your preferred package
-            manager:
-          </p>
-
-          <CodeBlock language="bash">
-            {`# Using pnpm (recommended)
+      <DocSection id="core-package" num="02" title="Core package">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The core package holds the Agent, provider, tool and memory classes. Install it with your package manager.
+        </p>
+        <CodeBlock
+          lang="BASH"
+          code={`# pnpm (recommended)
 pnpm add @lov3kaizen/agentsea-core
 
-# Using npm
+# npm
 npm install @lov3kaizen/agentsea-core
 
-# Using yarn
+# yarn
 yarn add @lov3kaizen/agentsea-core`}
-          </CodeBlock>
+        />
+        <Callout kind="note">
+          Types are re-exported from <code className="font-mono text-sm">@lov3kaizen/agentsea-core</code>. The
+          dedicated types package is also available: <code className="font-mono text-sm">pnpm add @lov3kaizen/agentsea-types</code>.
+        </Callout>
+        <p className="text-base leading-relaxed text-brand-navy">
+          For the terminal, install the CLI globally with{' '}
+          <code className="font-mono text-sm">pnpm add -g @lov3kaizen/agentsea-cli</code>. It installs the{' '}
+          <code className="font-mono text-sm">sea</code> command. Start an{' '}
+          <Link href="/docs/cli" className="font-semibold text-brand-deep hover:underline">
+            interactive coding session
+          </Link>{' '}
+          with <code className="font-mono text-sm">sea code</code>.
+        </p>
+      </DocSection>
 
-          <AlertBox type="info">
-            <h3 className="text-lg font-semibold mb-2">Types Package</h3>
-            <p className="m-0">
-              Types are re-exported from <code>@lov3kaizen/agentsea-core</code>, but you can also
-              install the dedicated types package for direct imports:{' '}
-              <code>pnpm add @lov3kaizen/agentsea-types</code>
-            </p>
-          </AlertBox>
-        </Section>
-
-        <Section title="NestJS Integration" id="nestjs-integration">
-          <p>If you're using NestJS, install the NestJS integration package:</p>
-
-          <CodeBlock language="bash">
-            {`# Install core and NestJS packages
-pnpm add @lov3kaizen/agentsea-core @lov3kaizen/agentsea-nestjs
-
-# Install peer dependencies
-pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs`}
-          </CodeBlock>
-        </Section>
-
-        <Section title="Add-on Packages" id="add-on-packages">
-          <p>
-            AgentSea is a modular monorepo. Install only the packages you need —
-            each is published under the <code>@lov3kaizen/agentsea-*</code> scope
-            and is framework-agnostic:
-          </p>
-
-          <CodeBlock language="bash">
-            {`# Orchestration & routing
+      <DocSection id="add-on-packages" num="03" title="Add-on packages">
+        <p className="text-base leading-relaxed text-brand-navy">
+          AgentSea is a modular monorepo. Install only the packages you need. Each is published under the{' '}
+          <code className="font-mono text-sm">@lov3kaizen/agentsea-*</code> scope and is framework-agnostic.
+        </p>
+        <CodeBlock
+          lang="BASH"
+          code={`# Orchestration and routing
 pnpm add @lov3kaizen/agentsea-crews      # Multi-agent crews
-pnpm add @lov3kaizen/agentsea-gateway    # LLM gateway & routing
+pnpm add @lov3kaizen/agentsea-gateway    # LLM gateway and routing
 
-# Data & retrieval
+# Data and retrieval
 pnpm add @lov3kaizen/agentsea-memory     # Advanced memory stores
 pnpm add @lov3kaizen/agentsea-embeddings # Vector embeddings
 pnpm add @lov3kaizen/agentsea-cache      # Semantic response cache
@@ -92,175 +92,120 @@ pnpm add @lov3kaizen/agentsea-structured # Zod structured output
 pnpm add @lov3kaizen/agentsea-ingest     # Document ingestion
 pnpm add @lov3kaizen/agentsea-prompts    # Prompt management
 
-# Safety & evaluation
-pnpm add @lov3kaizen/agentsea-guardrails # Safety & validation
+# Safety and evaluation
+pnpm add @lov3kaizen/agentsea-guardrails # Safety and validation
 pnpm add @lov3kaizen/agentsea-evaluate   # LLM evaluation
 pnpm add @lov3kaizen/agentsea-redteam    # Red teaming
 
-# Observability & operations
+# Observability and operations
 pnpm add @lov3kaizen/agentsea-analytics  # Conversation analytics
 pnpm add @lov3kaizen/agentsea-costs      # Cost tracking
 pnpm add @lov3kaizen/agentsea-debugger   # Agent debugger
 
-# Automation & UI
+# Automation and UI
 pnpm add @lov3kaizen/agentsea-surf       # Computer-use agent
 pnpm add @lov3kaizen/agentsea-react      # React components`}
-          </CodeBlock>
+        />
+      </DocSection>
 
-          <AlertBox type="info">
-            <p className="m-0">
-              Prefer the CLI? Install it globally with{' '}
-              <code>npm install -g @lov3kaizen/agentsea-cli</code> and run{' '}
-              <code>sea code</code> to start an{' '}
-              <Link href="/docs/agentic-coding">agentic coding session</Link>.
-            </p>
-          </AlertBox>
-        </Section>
+      <DocSection id="nestjs" num="04" title="NestJS integration">
+        <p className="text-base leading-relaxed text-brand-navy">
+          For a NestJS app, install the NestJS integration with the core package. The integration needs{' '}
+          <code className="font-mono text-sm">@nestjs/common</code> and{' '}
+          <code className="font-mono text-sm">@nestjs/core</code> version 10 or 11.
+        </p>
+        <CodeBlock
+          lang="BASH"
+          code={`# Core and NestJS packages
+pnpm add @lov3kaizen/agentsea-core @lov3kaizen/agentsea-nestjs
 
-        <Section title="API Keys" id="api-keys">
-          <p>You'll need API keys from your chosen LLM provider:</p>
+# Peer dependencies
+pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs`}
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          The{' '}
+          <Link href="/docs/nestjs" className="font-semibold text-brand-deep hover:underline">
+            NestJS guide
+          </Link>{' '}
+          covers the AgenticModule setup.
+        </p>
+      </DocSection>
 
-          <h3>Anthropic Claude</h3>
-          <ol>
-            <li>
-              Sign up at{' '}
-              <a
-                href="https://console.anthropic.com"
-                className="text-sky-600 hover:underline"
-              >
-                console.anthropic.com
-              </a>
-            </li>
-            <li>Navigate to API Keys section</li>
-            <li>Create a new API key</li>
-            <li>Set the environment variable:</li>
-          </ol>
-
-          <CodeBlock language="bash">
-            {`export ANTHROPIC_API_KEY=your_api_key_here`}
-          </CodeBlock>
-
-          <h3>OpenAI</h3>
-          <ol>
-            <li>
-              Sign up at{' '}
-              <a
-                href="https://platform.openai.com"
-                className="text-sky-600 hover:underline"
-              >
-                platform.openai.com
-              </a>
-            </li>
-            <li>Navigate to API Keys section</li>
-            <li>Create a new API key</li>
-            <li>Set the environment variable:</li>
-          </ol>
-
-          <CodeBlock language="bash">
-            {`export OPENAI_API_KEY=your_api_key_here`}
-          </CodeBlock>
-        </Section>
-
-        <Section title="Environment Variables" id="environment-variables">
-          <p>
-            Create a <code>.env</code> file in your project root:
-          </p>
-
-          <CodeBlock language="env">
-            {`# LLM Provider API Keys
-ANTHROPIC_API_KEY=your_anthropic_key
+      <DocSection id="environment-variables" num="05" title="API keys and environment">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Each provider reads its key from the environment when no key is passed to its constructor. Create a{' '}
+          <code className="font-mono text-sm">.env</code> file in your project root, or export the variables in your
+          shell.
+        </p>
+        <ApiList>
+          <ApiRow name="ANTHROPIC_API_KEY">Key for AnthropicProvider.</ApiRow>
+          <ApiRow name="OPENAI_API_KEY">Key for OpenAIProvider.</ApiRow>
+          <ApiRow name="GEMINI_API_KEY">Key for GeminiProvider. GOOGLE_API_KEY is also read.</ApiRow>
+          <ApiRow name="OLLAMA_BASE_URL">Server for OllamaProvider. Defaults to http://localhost:11434.</ApiRow>
+        </ApiList>
+        <CodeBlock
+          lang="ENV"
+          code={`ANTHROPIC_API_KEY=your_anthropic_key
 OPENAI_API_KEY=your_openai_key
+GEMINI_API_KEY=your_gemini_key
 
-# Optional: Redis for persistent memory
-REDIS_URL=redis://localhost:6379
+# Optional, for local models
+OLLAMA_BASE_URL=http://localhost:11434`}
+        />
+        <Callout kind="warning">
+          Never commit API keys to version control. Add <code className="font-mono text-sm">.env</code> to your{' '}
+          <code className="font-mono text-sm">.gitignore</code> file.
+        </Callout>
+      </DocSection>
 
-# Optional: Observability
-LOG_LEVEL=info
-ENABLE_TRACING=true`}
-          </CodeBlock>
-        </Section>
-
-        <Section title="Verify Installation" id="verify-installation">
-          <p>Create a simple test file to verify your installation:</p>
-
-          <CodeBlock language="typescript">
-            {`import { Agent, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
-import type { AgentConfig, AgentContext } from '@lov3kaizen/agentsea-types';
+      <DocSection id="verify" num="06" title="Verify the install">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Save a short script that creates an agent and runs one prompt. Run it with{' '}
+          <code className="font-mono text-sm">npx tsx</code>. The{' '}
+          <Link href="/docs" className="font-semibold text-brand-deep hover:underline">
+            Getting started
+          </Link>{' '}
+          page has complete examples for cloud and local models.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
 
 const agent = new Agent(
-  {
-    name: 'test-agent',
-    model: 'claude-sonnet-4-20250514',
-    provider: 'anthropic',
-    systemPrompt: 'You are a helpful assistant.',
-  },
+  { name: 'test-agent', description: 'Install check', model: 'claude-opus-4-8', provider: 'anthropic' },
   new AnthropicProvider(process.env.ANTHROPIC_API_KEY),
   new ToolRegistry(),
 );
 
-const response = await agent.execute('Hello!', {
-  conversationId: 'test-123',
-  sessionData: {},
-  history: [],
-});
-
+const response = await agent.execute('Hello!', { conversationId: 'test-123', sessionData: {}, history: [] });
 console.log(response.content);`}
-          </CodeBlock>
+        />
+      </DocSection>
 
-          <p>Run the file:</p>
-
-          <CodeBlock language="bash">
-            {`# If using TypeScript
-tsx test.ts
-
-# If using Node.js with ES modules
-node test.js`}
-          </CodeBlock>
-        </Section>
-
-        <Section title="TypeScript Configuration" id="typescript-configuration">
-          <p>
-            For TypeScript projects, update your <code>tsconfig.json</code>:
-          </p>
-
-          <CodeBlock language="json">
-            {`{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true
-  }
-}`}
-          </CodeBlock>
-        </Section>
-
-        <Section title="Next Steps" id="next-steps">
-          <ul>
-            <li>
-              <Link href="/docs/quick-start">Follow the Quick Start Guide</Link>
-            </li>
-            <li>
-              <Link href="/docs/agents">Learn about Agents</Link>
-            </li>
-            <li>
-              <Link href="/examples">Explore Examples</Link>
-            </li>
-          </ul>
-
-          <AlertBox type="warning">
-            <h3 className="text-lg font-semibold mb-2">Important</h3>
-            <p className="m-0">
-              Never commit API keys to version control. Always use environment
-              variables and add <code>.env</code> to your{' '}
-              <code>.gitignore</code> file.
-            </p>
-          </AlertBox>
-        </Section>
-      </div>
-    </PageContainer>
+      <DocSection id="next-steps" num="07" title="Next steps">
+        <BulletPanel
+          items={[
+            <>
+              <Link href="/docs/quick-start" className={link}>
+                Quick start
+              </Link>
+              : a walkthrough from a first agent to tools, MCP servers and workflows.
+            </>,
+            <>
+              <Link href="/docs/agents" className={link}>
+                Agents
+              </Link>
+              : how to create and configure agents.
+            </>,
+            <>
+              <Link href="/examples" className={link}>
+                Examples
+              </Link>
+              : runnable examples for each feature.
+            </>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }

@@ -1,300 +1,172 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  FeatureCard,
-  Divider,
-} from '../components/Section';
+import DocsShell from '../components/docs/DocsShell';
+import DocSection from '../components/docs/DocSection';
+import CodeBlock from '../components/docs/CodeBlock';
+import BulletPanel from '../components/docs/BulletPanel';
+import Callout from '../components/docs/Callout';
 
-export default function DocsPage() {
+export const metadata: Metadata = {
+  title: 'Getting started | AgentSea',
+  description:
+    'Install the AgentSea packages, then run an agent against a cloud model or a local model served by Ollama.',
+};
+
+const toc = [
+  { id: 'install', label: 'Install' },
+  { id: 'cloud-quick-start', label: 'Cloud quick start (Anthropic)' },
+  { id: 'local-quick-start', label: 'Local quick start (Ollama)' },
+  { id: 'local-agent', label: 'Local agent' },
+  { id: 'first-agent-tool', label: 'First agent with a tool' },
+  { id: 'next-steps', label: 'Next steps' },
+];
+
+export default function GettingStartedPage() {
   return (
-    <PageContainer maxWidth="6xl">
-      {/* Header */}
-      <PageHeader
-        title="Documentation"
-        titleGradient="animated"
-        description="Welcome to the AgentSea documentation. Learn how to build powerful agentic AI applications."
-      />
-
-      <AlertBox type="info" gradient>
-        <span>
-          AgentSea is a production-ready ADK for building agentic AI
-          applications with built-in voice, commerce capabilities, local models,
-          REST API, and complete privacy.
-        </span>
-      </AlertBox>
-
-      {/* Documentation Sections */}
-      <Section title="Documentation Sections" titleGradient="purple" badge="01">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sections.map((section, index) => (
-            <Link
-              key={index}
-              href={section.href}
-              className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all border border-base-300 card-gradient-hover group hover:scale-[1.02]"
-            >
-              <div className="card-body relative z-10">
-                <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">
-                  {section.icon}
-                </div>
-                <h3 className="card-title text-lg group-hover:text-gradient transition-all">
-                  {section.title}
-                </h3>
-                <p className="text-sm text-base-content/70">
-                  {section.description}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </Section>
-
-      <Divider />
-
-      {/* Quick Example */}
-      <Section title="Quick Example" titleGradient="blue" badge="02">
-        <p className="text-base-content/70">
-          Create your first agent in just a few lines of code:
+    <DocsShell
+      eyebrow="Getting started"
+      title="Getting started"
+      lead="Install the AgentSea packages, then run an agent against a cloud model or a local model served by Ollama."
+      active="getting-started"
+      toc={toc}
+    >
+      <DocSection id="install" num="01" title="Install">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The core package holds the Agent, provider, tool and memory classes. The CLI package installs a command
+          named sea.
         </p>
-        <CodeBlock language="typescript">
-          {`import { Agent, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
+        <p className="text-base leading-relaxed text-brand-navy">
+          AgentSea needs Node.js 20 or later. TypeScript 5.0 or later is recommended.
+        </p>
+        <CodeBlock lang="BASH" code={`pnpm add @lov3kaizen/agentsea-core\npnpm add -g @lov3kaizen/agentsea-cli`} />
+        <Callout kind="note">The installed command is sea. Use sea in every command.</Callout>
+      </DocSection>
+
+      <DocSection id="cloud-quick-start" num="02" title="Cloud quick start (Anthropic)">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Set <code className="font-mono text-sm">ANTHROPIC_API_KEY</code> in your environment. AnthropicProvider uses
+          it when no key is passed to the constructor.
+        </p>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Save the file as <code className="font-mono text-sm">hello.ts</code> and run it with{' '}
+          <code className="font-mono text-sm">npx tsx hello.ts</code>.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
 
 const agent = new Agent(
-  {
-    name: 'my-agent',
-    model: 'claude-sonnet-4-20250514',
-    systemPrompt: 'You are a helpful assistant.',
-  },
-  new AnthropicProvider(),
-  new ToolRegistry()
+  { name: 'assistant', description: 'General assistant', model: 'claude-opus-4-8', provider: 'anthropic' },
+  new AnthropicProvider(process.env.ANTHROPIC_API_KEY),
+  new ToolRegistry(),
 );
 
-const response = await agent.execute('Hello!', context);`}
-        </CodeBlock>
-      </Section>
+const response = await agent.execute('Hello!', { conversationId: 'user-123', sessionData: {}, history: [] });
+console.log(response.content);`}
+        />
+      </DocSection>
 
-      {/* Elixir SDK callout */}
-      <div className="bg-base-200 rounded-xl p-6 mt-6 border border-primary/30 relative overflow-hidden">
-        <div className="relative z-10 grid md:grid-cols-2 gap-6 items-center">
-          <div>
-            <span className="badge badge-gradient mb-3">Also on the BEAM</span>
-            <h3 className="font-bold text-xl mb-2 text-gradient">
-              AgentSea for Elixir
-            </h3>
-            <p className="text-sm text-base-content/70 mb-4">
-              A native Elixir/OTP edition where agents are supervised processes,
-              crews are supervisors, and you stream tokens live over Phoenix
-              LiveView. All 14 libraries are published on Hex.
-            </p>
-            <Link href="/docs/elixir" className="btn btn-gradient btn-sm">
-              <span>Explore the Elixir SDK →</span>
-            </Link>
-          </div>
-          <CodeBlock language="elixir">
-            {`config = %AgentSea.Agent.Config{
-  name: :assistant,
-  model: "claude-opus-4-8",
-  provider: {AgentSea.Providers.Anthropic, []}
-}
+      <DocSection id="local-quick-start" num="03" title="Local quick start (Ollama)">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Install Ollama, start its server, and pull a model. The sea CLI can also pull models with{' '}
+          <code className="font-mono text-sm">sea model pull llama2</code>.
+        </p>
+        <p className="text-base leading-relaxed text-brand-navy">
+          OllamaProvider reads <code className="font-mono text-sm">OLLAMA_BASE_URL</code>. When that variable is not
+          set, it uses <code className="font-mono text-sm">http://localhost:11434</code>.
+        </p>
+        <CodeBlock lang="BASH" code={`# Terminal 1\nollama serve\n\n# Terminal 2\nollama pull llama2`} />
+      </DocSection>
 
-{:ok, agent} = AgentSea.Agent.start_link(config)
-{:ok, res} = AgentSea.Agent.run(agent, "Hello!")`}
-          </CodeBlock>
-        </div>
-      </div>
+      <DocSection id="local-agent" num="04" title="Local agent">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Pass the provider to the Agent constructor. The model name must match a model that Ollama has pulled.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, OllamaProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
 
-      <Divider />
+const agent = new Agent(
+  { name: 'local-assistant', description: 'Local assistant', model: 'llama2', provider: 'ollama' },
+  new OllamaProvider({ baseUrl: 'http://localhost:11434' }),
+  new ToolRegistry(),
+);
 
-      {/* Key Features */}
-      <Section title="Key Features" titleGradient="warm" badge="03">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {features.map((feature, idx) => (
-            <div
-              key={idx}
-              className="card bg-base-200 border border-base-300 card-gradient-hover group"
-            >
-              <div className="card-body p-4 relative z-10">
-                <div className="flex items-start gap-3">
-                  <span className="badge badge-gradient mt-1">+</span>
-                  <p className="text-sm">{feature}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Section>
+const response = await agent.execute('What are three benefits of running models locally?', { conversationId: 'conv-1', sessionData: {}, history: [] });
+console.log(response.content);`}
+        />
+        <Callout kind="warning">
+          Do not call agent.registerProvider. Pass the provider to the Agent constructor, as shown here.
+        </Callout>
+      </DocSection>
 
-      {/* CTA */}
-      <div className="bg-gradient-mesh rounded-xl p-8 mt-8 relative overflow-hidden">
-        <div className="orb orb-2 opacity-20"></div>
-        <div className="relative z-10">
-          <h3 className="font-bold text-2xl mb-4 text-white">
-            Ready to get started?
-          </h3>
-          <p className="text-white/80 mb-6">
-            Check out our Quick Start Guide to begin building powerful AI
-            agents.
-          </p>
-          <Link href="/docs/quick-start" className="btn btn-gradient">
-            <span>Get Started →</span>
-          </Link>
-        </div>
-      </div>
-    </PageContainer>
+      <DocSection id="first-agent-tool" num="05" title="First agent with a tool">
+        <p className="text-base leading-relaxed text-brand-navy">
+          A tool has a name, a description, a Zod schema for its parameters, and an execute function.
+        </p>
+        <p className="text-base leading-relaxed text-brand-navy">
+          Register the tool in a ToolRegistry so the agent can run it. List the tool in config.tools so the model is
+          told that it exists.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, AnthropicProvider, ToolRegistry, calculatorTool } from '@lov3kaizen/agentsea-core';
+
+const tools = new ToolRegistry();
+tools.register(calculatorTool);
+
+const agent = new Agent(
+  { name: 'math', description: 'Arithmetic helper', model: 'claude-opus-4-8', provider: 'anthropic', tools: [calculatorTool] },
+  new AnthropicProvider(process.env.ANTHROPIC_API_KEY),
+  tools,
+);
+
+const response = await agent.execute('What is 42 * 58?', { conversationId: 'math-1', sessionData: {}, history: [] });
+console.log(response.content);`}
+        />
+      </DocSection>
+
+      <DocSection id="next-steps" num="06" title="Next steps">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Run <code className="font-mono text-sm">sea code</code> for an interactive coding session. It uses 13
+          built-in coding tools and accepts <code className="font-mono text-sm">--provider</code>,{' '}
+          <code className="font-mono text-sm">--model</code> and <code className="font-mono text-sm">--verbose</code>.
+        </p>
+        <BulletPanel
+          items={[
+            <>
+              <Link href="/docs/concepts" className="font-semibold text-brand-deep hover:underline">
+                Concepts
+              </Link>
+              : agents, providers, tools, memory, crews, guardrails and observability.
+            </>,
+            <>
+              <Link href="/changelog" className="font-semibold text-brand-deep hover:underline">
+                Changelog
+              </Link>
+              : the v0.6.0 release notes.
+            </>,
+            <>
+              <Link href="/docs/providers" className="font-semibold text-brand-deep hover:underline">
+                Providers
+              </Link>
+              : setup for each supported provider.
+            </>,
+            <>
+              <Link href="/docs/local-models" className="font-semibold text-brand-deep hover:underline">
+                Local models
+              </Link>
+              : running agents on Ollama and other local servers.
+            </>,
+            <>
+              <Link href="/docs/cli" className="font-semibold text-brand-deep hover:underline">
+                CLI reference
+              </Link>
+              : all sea commands and options.
+            </>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }
-
-const sections = [
-  {
-    icon: '🚀',
-    title: 'Quick Start',
-    description: 'Get up and running with AgentSea in minutes',
-    href: '/docs/quick-start',
-  },
-  {
-    icon: '💻',
-    title: 'Agentic Coding',
-    description: 'Interactive AI coding sessions with 13 built-in tools',
-    href: '/docs/agentic-coding',
-  },
-  {
-    icon: '🤖',
-    title: 'Agents',
-    description: 'Learn how to create and configure intelligent agents',
-    href: '/docs/agents',
-  },
-  {
-    icon: '👥',
-    title: 'Multi-Agent Crews',
-    description: 'Role-based coordination with delegation strategies',
-    href: '/docs/crews',
-  },
-  {
-    icon: '🎯',
-    title: 'Per-Model Type Safety',
-    description: 'Compile-time validation for model-specific options',
-    href: '/docs/per-model-type-safety',
-  },
-  {
-    icon: '🦙',
-    title: 'Local & Open Source',
-    description: 'Run agents locally for privacy and zero API costs',
-    href: '/docs/local-providers',
-  },
-  {
-    icon: '🔧',
-    title: 'Tools',
-    description: 'Extend agent capabilities with built-in and custom tools',
-    href: '/docs/tools',
-  },
-  {
-    icon: '🌐',
-    title: 'LLM Gateway',
-    description: 'OpenAI-compatible API with intelligent routing',
-    href: '/docs/gateway',
-  },
-  {
-    icon: '🛡️',
-    title: 'Guardrails',
-    description: 'Content safety, validation, and prompt injection protection',
-    href: '/docs/guardrails',
-  },
-  {
-    icon: '📊',
-    title: 'LLM Evaluation',
-    description: 'Metrics, LLM-as-Judge, and human feedback',
-    href: '/docs/evaluate',
-  },
-  {
-    icon: '🔴',
-    title: 'Red Teaming',
-    description: 'Adversarial testing, vulnerability scanning, and compliance',
-    href: '/docs/redteam',
-  },
-  {
-    icon: '🔍',
-    title: 'Embeddings',
-    description: 'Multi-provider embeddings with caching and vector stores',
-    href: '/docs/embeddings',
-  },
-  {
-    icon: '💾',
-    title: 'Semantic Cache',
-    description: 'Exact-match, semantic, and hybrid LLM response caching',
-    href: '/docs/cache',
-  },
-  {
-    icon: '📥',
-    title: 'Document Ingestion',
-    description: 'PDF, DOCX, HTML & Markdown parsing with smart chunking',
-    href: '/docs/ingest',
-  },
-  {
-    icon: '📝',
-    title: 'Prompt Management',
-    description: 'Version control, A/B testing, and environment promotion',
-    href: '/docs/prompts',
-  },
-  {
-    icon: '💰',
-    title: 'Cost Tracking',
-    description: '60+ model pricing registry with budget enforcement',
-    href: '/docs/costs',
-  },
-  {
-    icon: '📈',
-    title: 'Conversation Analytics',
-    description: 'Intent classification, sentiment, and flow analysis',
-    href: '/docs/analytics',
-  },
-  {
-    icon: '🐛',
-    title: 'Agent Debugger',
-    description: 'Step-through execution, checkpoint replay, and what-if tests',
-    href: '/docs/debugger',
-  },
-  {
-    icon: '🖥️',
-    title: 'Browser Automation',
-    description: 'Computer-use agent with Claude vision',
-    href: '/docs/surf',
-  },
-  {
-    icon: '🔌',
-    title: 'MCP Integration',
-    description: 'Connect to MCP servers for external tools',
-    href: '/docs/mcp-overview',
-  },
-];
-
-const features = [
-  'Agentic coding (sea code) with 13 built-in coding tools',
-  'Multi-agent crews with 5 delegation strategies',
-  'LLM Gateway with intelligent routing and caching',
-  'Multi-provider support: 60+ models incl. GPT-5, o3, o4-mini',
-  'Guardrails for safety, validation, and security',
-  'Red teaming with adversarial testing and compliance checks',
-  'LLM evaluation with metrics and LLM-as-Judge',
-  'Multi-provider embeddings with vector stores',
-  'Semantic caching (exact, similarity, hybrid) with replay',
-  'Document ingestion (PDF, DOCX, HTML, Markdown) with chunking',
-  'Prompt management with version control and A/B testing',
-  'Cost tracking with 60+ model pricing and budget enforcement',
-  'Conversation analytics with intent and sentiment tracking',
-  'Agent debugger with checkpoint replay and what-if testing',
-  'Computer-use & browser automation with Claude vision',
-  'Per-model type safety with compile-time validation',
-  'Local & open source models (Ollama, LM Studio, vLLM, etc.)',
-  'First-class MCP (Model Context Protocol) integration',
-  'Built-in voice support (TTS/STT) with multiple providers',
-  'Commerce capabilities with ACP protocol (14 tools)',
-  'REST API, SSE, and WebSocket support',
-  'Advanced memory (Episodic, Semantic, Working)',
-  'Enterprise multi-tenancy with API key auth',
-  'Comprehensive observability (logging, metrics, tracing)',
-  'NestJS integration with decorators and modules',
-  'Full TypeScript support with strict types',
-];

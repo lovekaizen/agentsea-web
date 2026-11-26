@@ -1,37 +1,48 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '@/app/components/PageContainer';
-import { PageHeader, Section, CodeBlock, AlertBox } from '@/app/components/Section';
+import DocsShell from '../../../components/docs/DocsShell';
+import DocSection from '../../../components/docs/DocSection';
+import CodeBlock from '../../../components/docs/CodeBlock';
+import Callout from '../../../components/docs/Callout';
+import BulletPanel from '../../../components/docs/BulletPanel';
 
-export const metadata = {
-  title: 'Embeddings & RAG — AgentSea for Elixir',
+export const metadata: Metadata = {
+  title: 'Embeddings & RAG | AgentSea for Elixir',
   description: 'Embedders, vector stores (pgvector/Qdrant/Pinecone), retrieval, and ingestion.',
 };
 
+const toc = [
+  { id: 'index-search', label: 'Index & search' },
+  { id: 'embedders', label: 'Embedders' },
+  { id: 'stores', label: 'Vector stores' },
+  { id: 'retrieval-tool', label: 'Give an agent retrieval' },
+  { id: 'ingest', label: 'Bulk ingestion' },
+  { id: 'next', label: 'Next' },
+];
+
 export default function ElixirRagPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Embeddings & RAG"
-        titleGradient="purple"
-        description="Pluggable embedders and vector stores, a retrieval tool, and a Broadway ingestion pipeline."
-      />
+    <DocsShell
+      eyebrow="Guide"
+      title="Embeddings & RAG"
+      lead="Pluggable embedders and vector stores, a retrieval tool, and a Broadway ingestion pipeline."
+      active="packages"
+      toc={toc}
+    >
+      <Callout kind="note">
+        <code className="font-mono text-sm">agentsea_embeddings</code> pairs an{' '}
+        <code className="font-mono text-sm">Embedder</code> with a <code className="font-mono text-sm">VectorStore</code>{' '}
+        behind one handle. Both are behaviours, so adapters swap freely. API on{' '}
+        <a href="https://hexdocs.pm/agentsea_embeddings" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-deep underline">
+          HexDocs
+        </a>
+        .
+      </Callout>
 
-      <div className="prose max-w-none">
-        <AlertBox type="info">
-          <p className="m-0">
-            <code>agentsea_embeddings</code> pairs an <code>Embedder</code> with a{' '}
-            <code>VectorStore</code> behind one handle. Both are behaviours, so adapters
-            swap freely. API on{' '}
-            <a href="https://hexdocs.pm/agentsea_embeddings" target="_blank" rel="noopener noreferrer">
-              HexDocs
-            </a>
-            .
-          </p>
-        </AlertBox>
-
-        <Section title="Index & search" id="index-search">
-          <CodeBlock language="elixir">
-            {`{:ok, store} = AgentSea.VectorStore.Memory.start_link()
+      <DocSection id="index-search" title="Index & search">
+        <CodeBlock
+          lang="EX"
+          code={`{:ok, store} = AgentSea.VectorStore.Memory.start_link()
 
 handle =
   AgentSea.Embeddings.new(
@@ -49,28 +60,37 @@ AgentSea.Embeddings.index(handle, [
 [hit | _] = AgentSea.Embeddings.search(handle, "can I get my money back?", 1)
 hit.id    # "refund"
 hit.score # cosine similarity`}
-          </CodeBlock>
-        </Section>
+        />
+      </DocSection>
 
-        <Section title="Embedders" id="embedders">
-          <ul>
-            <li><code>AgentSea.Embedder.Hashing</code> — dependency-free, deterministic; great for tests/dev.</li>
-            <li><code>AgentSea.Embedder.OpenAI</code> / <code>AgentSea.Embedder.Cohere</code> — remote, over Req.</li>
-            <li>
-              <code>AgentSea.Embedder.Bumblebee</code> — in-process Hugging Face models via
-              Bumblebee + Nx (ships in{' '}
-              <a href="https://hexdocs.pm/agentsea_bumblebee" target="_blank" rel="noopener noreferrer">
+      <DocSection id="embedders" title="Embedders">
+        <BulletPanel
+          items={[
+            <>
+              <code className="font-mono text-sm">AgentSea.Embedder.Hashing</code>: dependency-free and deterministic;
+              great for tests and dev.
+            </>,
+            <>
+              <code className="font-mono text-sm">AgentSea.Embedder.OpenAI</code> and{' '}
+              <code className="font-mono text-sm">AgentSea.Embedder.Cohere</code>: remote, over Req.
+            </>,
+            <>
+              <code className="font-mono text-sm">AgentSea.Embedder.Bumblebee</code>: in-process Hugging Face models via
+              Bumblebee and Nx (ships in{' '}
+              <a href="https://hexdocs.pm/agentsea_bumblebee" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-deep underline">
                 agentsea_bumblebee
               </a>
-              ), no embedding API needed.
-            </li>
-          </ul>
-        </Section>
+              ), with no embedding API needed.
+            </>,
+          ]}
+        />
+      </DocSection>
 
-        <Section title="Vector stores" id="stores">
-          <p>The same <code>handle</code> works over any of four stores:</p>
-          <CodeBlock language="elixir">
-            {`# In-memory (default; dev/tests)
+      <DocSection id="stores" title="Vector stores">
+        <p className="text-base leading-relaxed text-brand-navy">The same <code className="font-mono text-sm">handle</code> works over any of four stores:</p>
+        <CodeBlock
+          lang="EX"
+          code={`# In-memory (default; dev/tests)
 {:ok, store} = AgentSea.VectorStore.Memory.start_link()
 
 # pgvector (Postgres + the vector extension)
@@ -83,18 +103,18 @@ store = AgentSea.VectorStore.Qdrant.store(url: "http://localhost:6333", collecti
 
 # Pinecone
 store = AgentSea.VectorStore.Pinecone.store(host: "https://my-index-xxxx.svc.pinecone.io")`}
-          </CodeBlock>
-        </Section>
+        />
+      </DocSection>
 
-        <Section title="Give an agent retrieval" id="retrieval-tool">
-          <p>
-            <code>AgentSea.Embeddings.RetrievalTool</code> is a ready-made{' '}
-            <code>search_knowledge</code> tool. Add it to an agent and pass the embeddings
-            handle in the run context — the agent retrieves on demand:
-          </p>
-
-          <CodeBlock language="elixir">
-            {`config = %AgentSea.Agent.Config{
+      <DocSection id="retrieval-tool" title="Give an agent retrieval">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code className="font-mono text-sm">AgentSea.Embeddings.RetrievalTool</code> is a ready-made{' '}
+          <code className="font-mono text-sm">search_knowledge</code> tool. Add it to an agent and pass the embeddings
+          handle in the run context, and the agent retrieves on demand:
+        </p>
+        <CodeBlock
+          lang="EX"
+          code={`config = %AgentSea.Agent.Config{
   name: :support,
   model: "claude-opus-4-8",
   provider: {AgentSea.Providers.Anthropic, []},
@@ -103,32 +123,37 @@ store = AgentSea.VectorStore.Pinecone.store(host: "https://my-index-xxxx.svc.pin
 
 {:ok, agent} = AgentSea.Agent.start_link(config)
 {:ok, answer} = AgentSea.Agent.run(agent, "What's the refund policy?", %{embeddings: handle})`}
-          </CodeBlock>
-        </Section>
+        />
+      </DocSection>
 
-        <Section title="Bulk ingestion" id="ingest">
-          <p>
-            For documents at scale, <code>agentsea_ingest</code> provides a{' '}
-            <a href="https://hexdocs.pm/agentsea_ingest" target="_blank" rel="noopener noreferrer">
-              Broadway
-            </a>{' '}
-            pipeline — chunk → embed → store — with batching and backpressure, writing into
-            any of the stores above. Pair it with structured extraction and{' '}
-            <a href="https://hexdocs.pm/agentsea_evaluate" target="_blank" rel="noopener noreferrer">
-              agentsea_evaluate
-            </a>{' '}
-            to measure retrieval quality.
-          </p>
-        </Section>
+      <DocSection id="ingest" title="Bulk ingestion">
+        <p className="text-base leading-relaxed text-brand-navy">
+          For documents at scale, <code className="font-mono text-sm">agentsea_ingest</code> provides a{' '}
+          <a href="https://hexdocs.pm/agentsea_ingest" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-deep underline">
+            Broadway
+          </a>{' '}
+          pipeline (chunk, embed, store) with batching and backpressure, writing into any of the stores above. Pair it
+          with structured extraction and{' '}
+          <a href="https://hexdocs.pm/agentsea_evaluate" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-deep underline">
+            agentsea_evaluate
+          </a>{' '}
+          to measure retrieval quality.
+        </p>
+      </DocSection>
 
-        <Section title="Next" id="next">
-          <p>
-            Route generation across providers with the{' '}
-            <Link href="/docs/elixir/gateway">gateway</Link>, or revisit tools and memory
-            on the <Link href="/docs/elixir/agents">Agents page</Link>.
-          </p>
-        </Section>
-      </div>
-    </PageContainer>
+      <DocSection id="next" title="Next">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Route generation across providers with the{' '}
+          <Link href="/docs/elixir/gateway" className="font-semibold text-brand-deep underline">
+            gateway
+          </Link>
+          , or revisit tools and memory on the{' '}
+          <Link href="/docs/elixir/agents" className="font-semibold text-brand-deep underline">
+            Agents page
+          </Link>
+          .
+        </p>
+      </DocSection>
+    </DocsShell>
   );
 }

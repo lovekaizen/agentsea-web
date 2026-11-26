@@ -152,7 +152,9 @@ export default function MainLayout({
           </div>
         </main>
 
-        <footer className={`footer footer-center bg-base-100 border-t border-base-300 p-10 ${isHomePage ? '' : 'ml-16 mr-6 lg:mx-0'}`}>
+        {/* The home page renders its own footer (app/page.tsx) */}
+        {!isHomePage && (
+        <footer className="footer footer-center bg-base-100 border-t border-base-300 p-10 ml-16 mr-6 lg:mx-0">
           <div>
             <nav className="grid grid-flow-col gap-6 mb-4">
               <Link
@@ -211,6 +213,7 @@ export default function MainLayout({
             </aside>
           </div>
         </footer>
+        )}
       </div>
 
       {/* Narrow sidebar when closed */}

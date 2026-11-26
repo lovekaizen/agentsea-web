@@ -1,58 +1,73 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
+
+export const metadata: Metadata = {
+  title: 'Agents | AgentSea',
+  description:
+    'Agents in AgentSea: LLM-backed entities that process input, call tools, keep conversation history and stream responses.',
+};
+
+const toc = [
+  { id: 'what-is-an-agent', label: 'What is an agent' },
+  { id: 'creating', label: 'Creating an agent' },
+  { id: 'configuration', label: 'Configuration' },
+  { id: 'executing', label: 'Executing an agent' },
+  { id: 'streaming', label: 'Streaming responses' },
+  { id: 'tools', label: 'Agents with tools' },
+  { id: 'memory', label: 'Memory' },
+  { id: 'multiple-providers', label: 'Multiple providers' },
+  { id: 'local-providers', label: 'Local providers' },
+  { id: 'best-practices', label: 'Best practices' },
+  { id: 'next-steps', label: 'Next steps' },
+];
 
 export default function AgentsPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Agents"
-        titleGradient="purple"
-        description="Agents are the core building blocks of AgentSea. They represent autonomous AI entities that can reason, use tools, and maintain conversation context."
-      />
-
-      <div className="prose max-w-none">
-        <h2>What is an Agent?</h2>
-        <p>
+    <DocsShell
+      eyebrow="Concept"
+      title="Agents"
+      lead="Agents are the core building blocks of AgentSea. They represent autonomous AI entities that can reason, use tools, and maintain conversation context."
+      active="concepts"
+      toc={toc}
+    >
+      <DocSection id="what-is-an-agent" num="01" title="What is an agent?">
+        <p className="text-base leading-relaxed text-brand-navy">
           An agent in AgentSea is an intelligent entity powered by a Large
           Language Model (LLM) that can:
         </p>
-        <ul>
-          <li>Process natural language inputs and generate responses</li>
-          <li>
-            Use tools to perform actions (API calls, file operations,
-            calculations, etc.)
-          </li>
-          <li>Maintain conversation history and context</li>
-          <li>Make decisions about which tools to use and when</li>
-          <li>Stream responses for real-time interactions</li>
-        </ul>
+        <BulletPanel
+          items={[
+            'Process natural language inputs and generate responses',
+            'Use tools to perform actions (API calls, file operations, calculations, etc.)',
+            'Maintain conversation history and context',
+            'Make decisions about which tools to use and when',
+            'Stream responses for real-time interactions',
+          ]}
+        />
+      </DocSection>
 
-        <h2>Creating an Agent</h2>
-        <p>Here's a basic example of creating an agent:</p>
-
-        <CodeBlock language="typescript">
-          {`import {
+      <DocSection id="creating" num="02" title="Creating an agent">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Here is a basic example of creating an agent:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import {
   Agent,
   AnthropicProvider,
   ToolRegistry,
   BufferMemory,
 } from '@lov3kaizen/agentsea-core';
-import type { AgentConfig, AgentContext, AgentResponse } from '@lov3kaizen/agentsea-types';
 
-// Set up provider
+// Provider, tool registry and memory
 const provider = new AnthropicProvider(process.env.ANTHROPIC_API_KEY);
-
-// Set up tool registry
 const toolRegistry = new ToolRegistry();
-
-// Set up memory
 const memory = new BufferMemory(50); // Keep last 50 messages
 
 // Create agent
@@ -60,7 +75,7 @@ const agent = new Agent(
   {
     name: 'customer-support-agent',
     description: 'A helpful customer support assistant',
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-6',
     provider: 'anthropic',
     systemPrompt: 'You are a friendly customer support agent...',
     tools: [],
@@ -71,117 +86,41 @@ const agent = new Agent(
   toolRegistry,
   memory,
 );`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Agent Configuration</h2>
-        <p>The agent configuration object accepts the following properties:</p>
-
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Property
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                  name
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  string
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  Unique identifier for the agent
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                  model
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  string
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  LLM model name (e.g., claude-sonnet-4-20250514)
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                  provider
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  string
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  'anthropic', 'openai', 'ollama', 'llama-cpp', 'gpt4all', or
-                  'huggingface'
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                  systemPrompt
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  string
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  Instructions for the agent's behavior
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                  tools
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  Tool[]
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  Array of tools the agent can use
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                  temperature
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  number
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  Randomness (0.0-1.0). Lower = more focused
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                  maxTokens
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  number
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  Maximum response length
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h2>Executing an Agent</h2>
-        <p>
-          To execute an agent, call the <code>execute()</code> method with a
-          prompt and context:
+      <DocSection id="configuration" num="03" title="Configuration">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The agent configuration object accepts the following properties:
         </p>
+        <ApiList>
+          <ApiRow name="name: string">Unique identifier for the agent.</ApiRow>
+          <ApiRow name="description: string">What the agent is for.</ApiRow>
+          <ApiRow name="model: string">LLM model ID, for example claude-sonnet-4-6.</ApiRow>
+          <ApiRow name="provider: string">
+            Provider name, for example <code>anthropic</code>, <code>openai</code>,{' '}
+            <code>gemini</code> or <code>ollama</code>.
+          </ApiRow>
+          <ApiRow name="systemPrompt?: string">Instructions for the agent&apos;s behavior.</ApiRow>
+          <ApiRow name="tools?: Tool[]">Tools the agent can call.</ApiRow>
+          <ApiRow name="temperature?: number">
+            Randomness. Lower is more focused. The Anthropic provider leaves temperature out
+            for models that reject it.
+          </ApiRow>
+          <ApiRow name="maxTokens?: number">Maximum response length.</ApiRow>
+          <ApiRow name="maxIterations?: number">
+            Maximum LLM calls in one execution, including tool-call rounds. Defaults to 10.
+          </ApiRow>
+        </ApiList>
+      </DocSection>
 
-        <CodeBlock language="typescript">
-          {`const response = await agent.execute(
+      <DocSection id="executing" num="04" title="Executing an agent">
+        <p className="text-base leading-relaxed text-brand-navy">
+          To execute an agent, call <code>execute()</code> with an input string and a context:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`const response = await agent.execute(
   'What is the weather like today?',
   {
     conversationId: 'user-123',
@@ -191,36 +130,51 @@ const agent = new Agent(
 );
 
 console.log(response.content); // Agent's response
-console.log(response.toolCalls); // Tools that were used
-console.log(response.metadata); // Additional metadata`}
-        </CodeBlock>
+console.log(response.toolCalls); // Tool calls made during the run
+console.log(response.metadata); // tokensUsed, latencyMs, iterations`}
+        />
+        <Callout kind="note">
+          When the agent has a memory store, history is loaded from it by{' '}
+          <code>conversationId</code>. <code>context.history</code> is only used when no memory
+          store is configured.
+        </Callout>
+      </DocSection>
 
-        <h2>Streaming Responses</h2>
-        <p>
-          For real-time interactions, use streaming to receive responses as
-          they're generated:
+      <DocSection id="streaming" num="05" title="Streaming responses">
+        <p className="text-base leading-relaxed text-brand-navy">
+          For real-time interactions, use <code>executeStream()</code> to receive events as they
+          are generated:
         </p>
-
-        <CodeBlock language="typescript">
-          {`const stream = await agent.stream(
+        <CodeBlock
+          lang="TS"
+          code={`for await (const event of agent.executeStream(
   'Write a story about a robot',
   context,
-);
-
-for await (const chunk of stream) {
-  if (chunk.type === 'content') {
-    process.stdout.write(chunk.content);
-  } else if (chunk.type === 'tool_call') {
-    console.log('Using tool:', chunk.toolName);
+)) {
+  if (event.type === 'content') {
+    process.stdout.write(event.content);
+  } else if (event.type === 'tool_calls') {
+    for (const call of event.toolCalls) {
+      console.log('Using tool:', call.tool);
+    }
+  } else if (event.type === 'error') {
+    console.error(event.error);
   }
 }`}
-        </CodeBlock>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          Other event types are <code>iteration</code>, <code>tool_result</code> and{' '}
+          <code>done</code>, which carries the run metadata.
+        </p>
+      </DocSection>
 
-        <h2>Agent with Tools</h2>
-        <p>Agents become powerful when equipped with tools:</p>
-
-        <CodeBlock language="typescript">
-          {`import {
+      <DocSection id="tools" num="06" title="Agents with tools">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Agents become powerful when equipped with tools:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import {
   Agent,
   AnthropicProvider,
   ToolRegistry,
@@ -228,7 +182,7 @@ for await (const chunk of stream) {
   httpRequestTool,
 } from '@lov3kaizen/agentsea-core';
 
-// Set up tools
+// Register tools
 const toolRegistry = new ToolRegistry();
 toolRegistry.register(calculatorTool);
 toolRegistry.register(httpRequestTool);
@@ -237,7 +191,8 @@ toolRegistry.register(httpRequestTool);
 const agent = new Agent(
   {
     name: 'data-analyst',
-    model: 'claude-sonnet-4-20250514',
+    description: 'Fetches and analyzes data',
+    model: 'claude-sonnet-4-6',
     provider: 'anthropic',
     systemPrompt: 'You are a data analyst that can fetch and analyze data.',
     tools: [calculatorTool, httpRequestTool],
@@ -246,56 +201,74 @@ const agent = new Agent(
   toolRegistry,
 );
 
-// Agent can now use tools automatically
+// The agent calls tools as the model requests them
 const response = await agent.execute(
   'Fetch data from https://api.example.com/stats and calculate the average',
   context,
 );`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Memory Management</h2>
-        <p>Agents can use different memory stores to maintain context:</p>
-
-        <CodeBlock language="typescript">
-          {`import {
+      <DocSection id="memory" num="07" title="Memory">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Agents can use different memory stores to keep context across calls. The memory
+          argument is optional. Each store implements the same save, load and clear interface.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import {
   Agent,
+  AnthropicProvider,
   BufferMemory, // In-memory, simple
   RedisMemory, // Persistent, scalable
-  SummaryMemory, // Auto-summarization
+  SummaryMemory, // Summarizes older messages
 } from '@lov3kaizen/agentsea-core';
 
-// Option 1: Buffer memory (default)
-const bufferMemory = new BufferMemory(100); // Keep last 100 messages
+// Option 1: Buffer memory, keeps the last 100 messages
+const bufferMemory = new BufferMemory(100);
 
-// Option 2: Redis memory (persistent)
+// Option 2: Redis memory, persistent
 const redisMemory = new RedisMemory({
-  url: 'redis://localhost:6379',
-  ttl: 86400, // 24 hours
+  host: 'localhost',
+  port: 6379,
+  ttl: 86400, // 24 hours, in seconds
 });
 
-// Option 3: Summary memory (auto-summarizes old messages)
+// Option 3: Summary memory, keeps the most recent messages and summarizes the rest
 const summaryMemory = new SummaryMemory(
   new AnthropicProvider(),
-  {
-    maxMessages: 20,
-    summaryModel: 'claude-haiku-4-20250514',
-  },
+  20, // maxRecentMessages
+  'claude-haiku-4-5', // summaryModel
 );
 
 const agent = new Agent(config, provider, toolRegistry, redisMemory);`}
-        </CodeBlock>
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          For the full set of options, see the memory package reference.
+        </p>
+      </DocSection>
 
-        <h2>Multiple Providers</h2>
-        <p>Switch between Anthropic Claude and OpenAI easily:</p>
+      <DocSection id="multiple-providers" num="08" title="Multiple providers">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Switch between Anthropic Claude and OpenAI by changing the provider instance:
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import {
+  Agent,
+  AnthropicProvider,
+  OpenAIProvider,
+  ToolRegistry,
+} from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { Agent, AnthropicProvider, OpenAIProvider } from '@lov3kaizen/agentsea-core';
+const toolRegistry = new ToolRegistry();
 
 // Anthropic Claude
 const claudeAgent = new Agent(
   {
     name: 'claude-agent',
-    model: 'claude-sonnet-4-20250514',
+    description: 'Claude-backed agent',
+    model: 'claude-sonnet-4-6',
     provider: 'anthropic',
   },
   new AnthropicProvider(),
@@ -306,118 +279,106 @@ const claudeAgent = new Agent(
 const gptAgent = new Agent(
   {
     name: 'gpt-agent',
+    description: 'OpenAI-backed agent',
     model: 'gpt-4-turbo-preview',
     provider: 'openai',
   },
   new OpenAIProvider(),
   toolRegistry,
 );`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Local & Open Source Providers</h2>
-        <p>
-          Run agents with local LLMs for privacy, cost savings, and offline
-          operation:
+      <DocSection id="local-providers" num="09" title="Local providers">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Run agents with local LLMs for privacy, cost savings and offline operation:
         </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { Agent, OllamaProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`import { Agent, OllamaProvider, LlamaCppProvider } from '@lov3kaizen/agentsea-core';
+const toolRegistry = new ToolRegistry();
 
-// Ollama (easiest for local models)
-const ollamaAgent = new Agent(
+// Ollama
+const localAgent = new Agent(
   {
     name: 'local-agent',
+    description: 'Runs on a local Ollama server',
     model: 'llama3.2',
     provider: 'ollama',
     systemPrompt: 'You are a helpful assistant running locally.',
   },
   new OllamaProvider({
     baseUrl: 'http://localhost:11434',
-    model: 'llama3.2'
+    timeout: 60000,
   }),
   toolRegistry,
 );
 
-// llama.cpp (fastest performance)
-const llamaCppAgent = new Agent(
-  {
-    name: 'fast-local-agent',
-    model: 'llama-3.2-3b-q4_k_m',
-    provider: 'llama-cpp',
-  },
-  new LlamaCppProvider({
-    baseUrl: 'http://localhost:8080'
-  }),
-  toolRegistry,
-);
+const response = await localAgent.execute('Hello!', context);`}
+        />
+        <BulletPanel
+          items={[
+            'Data privacy: prompts and responses stay on your machine',
+            'No per-token API costs',
+            'Low latency: no network round trip to a hosted API',
+            'Works offline once the model is downloaded',
+          ]}
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          <Link href="/docs/local-providers" className="font-semibold text-brand-ocean hover:underline">
+            Complete guide to local and open source providers
+          </Link>
+        </p>
+      </DocSection>
 
-// Response times are faster with no API latency!
-const response = await ollamaAgent.execute('Hello!');`}
-        </CodeBlock>
+      <DocSection id="best-practices" num="10" title="Best practices">
+        <BulletPanel
+          items={[
+            <>
+              <strong>System prompts</strong>: write clear, specific system prompts that define the
+              agent&apos;s role and behavior.
+            </>,
+            <>
+              <strong>Temperature</strong>: use a lower temperature (0.0 to 0.3) for factual tasks
+              and a higher one (0.7 to 1.0) for creative tasks.
+            </>,
+            <>
+              <strong>Memory</strong>: choose the store for the job. Buffer for simple cases, Redis
+              for production, Summary for long conversations.
+            </>,
+            <>
+              <strong>Tools</strong>: only provide tools that are relevant to the agent&apos;s purpose.
+            </>,
+            <>
+              <strong>Error handling</strong>: wrap agent execution in try/catch. Errors are
+              rethrown as <code>Agent execution failed: ...</code>.
+            </>,
+            <>
+              <strong>Streaming</strong>: use streaming in interactive applications.
+            </>,
+          ]}
+        />
+      </DocSection>
 
-        <div className="bg-sky-50 border-l-4 border-sky-500 p-6 my-6">
-          <p className="font-semibold mb-2">Benefits of Local Providers:</p>
-          <ul className="space-y-1">
-            <li>🔒 Data privacy - nothing leaves your machine</li>
-            <li>💰 No API costs - unlimited usage</li>
-            <li>⚡ Low latency - no network round trips</li>
-            <li>🔌 Offline capable - works without internet</li>
-          </ul>
-          <p className="mt-4">
-            <Link
-              href="/docs/local-providers"
-              className="text-sky-600 hover:underline font-semibold"
-            >
-              → Complete Guide to Local & Open Source Providers
-            </Link>
-          </p>
-        </div>
-
-        <h2>Best Practices</h2>
-        <ul>
-          <li>
-            <strong>System Prompts</strong>: Write clear, specific system
-            prompts that define the agent's role and behavior
-          </li>
-          <li>
-            <strong>Temperature</strong>: Use lower temperature (0.0-0.3) for
-            factual tasks, higher (0.7-1.0) for creative tasks
-          </li>
-          <li>
-            <strong>Memory</strong>: Choose memory store based on your needs
-            (Buffer for simple, Redis for production, Summary for long
-            conversations)
-          </li>
-          <li>
-            <strong>Tools</strong>: Only provide tools that are relevant to the
-            agent's purpose
-          </li>
-          <li>
-            <strong>Error Handling</strong>: Always wrap agent execution in
-            try-catch blocks
-          </li>
-          <li>
-            <strong>Streaming</strong>: Use streaming for better user experience
-            in interactive applications
-          </li>
-        </ul>
-
-        <h2>Next Steps</h2>
-        <ul>
-          <li>
-            <Link href="/docs/tools">Learn about Tools</Link>
-          </li>
-          <li>
-            <Link href="/docs/workflows">Orchestrate Multiple Agents</Link>
-          </li>
-          <li>
-            <Link href="/docs/memory">Explore Memory Options</Link>
-          </li>
-          <li>
-            <Link href="/examples">View Examples</Link>
-          </li>
-        </ul>
-      </div>
-    </PageContainer>
+      <DocSection id="next-steps" num="11" title="Next steps">
+        <BulletPanel
+          items={[
+            <Link key="tools" href="/docs/tools" className="text-brand-ocean hover:underline">
+              Learn about tools
+            </Link>,
+            <Link key="workflows" href="/docs/workflows" className="text-brand-ocean hover:underline">
+              Orchestrate multiple agents
+            </Link>,
+            <Link key="memory" href="/docs/memory" className="text-brand-ocean hover:underline">
+              Explore memory options
+            </Link>,
+            <Link key="examples" href="/examples" className="text-brand-ocean hover:underline">
+              View examples
+            </Link>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import './docs.css';
-import MainLayout from './components/MainLayout';
 
 const inter = Inter({ subsets: ['latin'] });
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains-mono' });
 
 const description =
   'Build powerful agentic AI applications with AgentSea — for TypeScript/Node and natively for Elixir/OTP (14 libraries on Hex). Multi-provider support, workflow orchestration, MCP protocol, and enterprise-grade observability.';
@@ -48,9 +48,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="agentsea">
-      <body className={inter.className}>
-        <MainLayout>{children}</MainLayout>
-      </body>
+      <body className={`${inter.className} ${jetbrainsMono.variable}`}>{children}</body>
     </html>
   );
 }

@@ -1,55 +1,71 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import PageContainer from '../../components/PageContainer';
-import {
-  PageHeader,
-  Section,
-  CodeBlock,
-  AlertBox,
-  Divider,
-} from '../../components/Section';
+import DocsShell from '../../components/docs/DocsShell';
+import DocSection from '../../components/docs/DocSection';
+import CodeBlock from '../../components/docs/CodeBlock';
+import BulletPanel from '../../components/docs/BulletPanel';
+import Callout from '../../components/docs/Callout';
+import { ApiList, ApiRow } from '../../components/docs/ApiList';
+
+export const metadata: Metadata = {
+  title: 'Workflows | AgentSea',
+  description:
+    'Coordinate several AgentSea agents with sequential, parallel and supervisor workflows, error-handling strategies and retries.',
+};
+
+const toc = [
+  { id: 'what-are-workflows', label: 'What are workflows?' },
+  { id: 'sequential', label: 'Sequential workflows' },
+  { id: 'parallel', label: 'Parallel workflows' },
+  { id: 'supervisor', label: 'Supervisor workflows' },
+  { id: 'error-handling', label: 'Error handling' },
+  { id: 'retry', label: 'Retry strategy' },
+  { id: 'context-and-results', label: 'Context and results' },
+  { id: 'workflow-factory', label: 'Workflow factory' },
+  { id: 'use-cases', label: 'Use cases' },
+  { id: 'best-practices', label: 'Best practices' },
+  { id: 'next-steps', label: 'Next steps' },
+];
 
 export default function WorkflowsPage() {
   return (
-    <PageContainer maxWidth="5xl">
-      <PageHeader
-        title="Workflows"
-        titleGradient="purple"
-        description="Workflows enable multi-agent orchestration, allowing you to coordinate multiple agents to solve complex tasks through sequential, parallel, or supervised execution patterns."
-      />
-
-      <div className="prose max-w-none">
-        <h2>What are Workflows?</h2>
-        <p>
-          Workflows coordinate multiple agents to work together on complex
-          tasks. AgentSea supports three workflow patterns:
+    <DocsShell
+      eyebrow="Concept"
+      title="Workflows"
+      lead="Workflows coordinate multiple agents to solve a task together, through sequential, parallel or supervisor patterns."
+      active="concepts"
+      toc={toc}
+    >
+      <DocSection id="what-are-workflows" num="01" title="What are workflows?">
+        <p className="text-base leading-relaxed text-brand-navy">
+          A workflow runs a list of agents over one input. AgentSea has three patterns:
         </p>
+        <ApiList>
+          <ApiRow name="sequential">Agents run one after another. Each agent&apos;s output becomes the next agent&apos;s input.</ApiRow>
+          <ApiRow name="parallel">All agents run at the same time on the same input. Their results are combined.</ApiRow>
+          <ApiRow name="supervisor">
+            Agents run in a routed loop. Each response decides which agent runs next.
+          </ApiRow>
+        </ApiList>
+      </DocSection>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 not-prose mb-8">
-          {workflowTypes.map((type, index) => (
-            <div
-              key={index}
-              className="p-4 bg-white rounded-lg border border-gray-200"
-            >
-              <div className="text-3xl mb-2">{type.icon}</div>
-              <h3 className="font-semibold text-gray-900 mb-2">{type.name}</h3>
-              <p className="text-sm text-gray-600">{type.description}</p>
-            </div>
-          ))}
-        </div>
-
-        <h2>Sequential Workflows</h2>
-        <p>
-          Agents execute one after another, with each agent's output becoming
-          the next agent's input.
+      <DocSection id="sequential" num="02" title="Sequential workflows">
+        <p className="text-base leading-relaxed text-brand-navy">
+          The result is the last agent&apos;s response. Token counts and iterations are summed across
+          all agents.
         </p>
-
-        <CodeBlock language="typescript">
-          {`import {
+        <CodeBlock
+          lang="TS"
+          code={`import {
   WorkflowFactory,
   AnthropicProvider,
   ToolRegistry,
+  httpRequestTool,
 } from '@lov3kaizen/agentsea-core';
-import type { WorkflowConfig, WorkflowType } from '@lov3kaizen/agentsea-types';
+
+const provider = new AnthropicProvider();
+const toolRegistry = new ToolRegistry();
+toolRegistry.register(httpRequestTool);
 
 const workflow = WorkflowFactory.create(
   {
@@ -58,168 +74,204 @@ const workflow = WorkflowFactory.create(
     agents: [
       {
         name: 'researcher',
-        model: 'claude-sonnet-4-20250514',
+        description: 'Gathers information on the topic',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Research the topic and gather information.',
         tools: [httpRequestTool],
       },
       {
         name: 'writer',
-        model: 'claude-sonnet-4-20250514',
+        description: 'Drafts the article',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Write a comprehensive article based on the research.',
       },
       {
         name: 'editor',
-        model: 'claude-sonnet-4-20250514',
+        description: 'Polishes the article',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Edit and polish the article for publication.',
       },
     ],
   },
-  new AnthropicProvider(),
-  new ToolRegistry(),
+  provider,
+  toolRegistry,
 );
 
-// Execute workflow
-const result = await workflow.execute(
-  'Write an article about AI agents',
-  context,
-);
+const result = await workflow.execute('Write an article about AI agents', context);
+console.log(result.content); // the editor's output`}
+        />
+      </DocSection>
 
-console.log(result.content); // Final edited article`}
-        </CodeBlock>
-
-        <h2>Parallel Workflows</h2>
-        <p>
-          All agents execute simultaneously, and their results are aggregated.
+      <DocSection id="parallel" num="03" title="Parallel workflows">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Every agent receives the same input. The result content lists each agent&apos;s response,
+          labeled by agent name, in configuration order.
         </p>
-
-        <CodeBlock language="typescript">
-          {`const workflow = WorkflowFactory.create(
+        <CodeBlock
+          lang="TS"
+          code={`const workflow = WorkflowFactory.create(
   {
     name: 'multi-analysis',
     type: 'parallel',
     agents: [
       {
         name: 'sentiment-analyzer',
-        model: 'claude-sonnet-4-20250514',
+        description: 'Scores sentiment',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Analyze the sentiment of the text.',
       },
       {
         name: 'keyword-extractor',
-        model: 'claude-sonnet-4-20250514',
+        description: 'Extracts keywords',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Extract key topics and keywords.',
       },
       {
         name: 'summarizer',
-        model: 'claude-sonnet-4-20250514',
+        description: 'Summarizes the text',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Create a concise summary.',
       },
     ],
   },
-  new AnthropicProvider(),
-  new ToolRegistry(),
+  provider,
+  toolRegistry,
 );
 
-// All agents run in parallel
-const result = await workflow.execute(
-  'Analyze this product review: ...',
-  context,
-);
+const result = await workflow.execute('Analyze this product review: ...', context);
 
-// Result contains combined output from all agents
+// [sentiment-analyzer]: ...
+//
+// [keyword-extractor]: ...
+//
+// [summarizer]: ...
 console.log(result.content);`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Supervisor Workflows</h2>
-        <p>
-          A supervisor agent dynamically routes tasks to specialized worker
-          agents based on the input.
+      <DocSection id="supervisor" num="04" title="Supervisor workflows">
+        <p className="text-base leading-relaxed text-brand-navy">
+          A supervisor workflow starts with the first agent in <code>agents</code>. After each
+          response, the next agent is chosen in this order:
         </p>
+        <BulletPanel
+          items={[
+            <>
+              The response&apos;s <code>nextAgent</code> field, when an agent sets it.
+            </>,
+            <>
+              The first matching rule in <code>routing.rules</code>. Each rule is a{' '}
+              <code>condition(context, response)</code> function and a <code>nextAgent</code> name.
+            </>,
+            <>
+              The round-robin order, when <code>routing.strategy</code> is <code>&apos;round-robin&apos;</code>.
+            </>,
+          ]}
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          When none of these picks an agent, the workflow ends and returns the last response. The
+          loop stops after 10 routing steps.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { WorkflowFactory, AnthropicProvider, ToolRegistry } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`const workflow = WorkflowFactory.create(
+const workflow = WorkflowFactory.create(
   {
     name: 'customer-support',
     type: 'supervisor',
-    supervisor: {
-      name: 'routing-agent',
-      model: 'claude-sonnet-4-20250514',
-      provider: 'anthropic',
-      systemPrompt: \`You are a routing supervisor. Analyze the request and:
-- Route technical questions to 'technical-support'
-- Route billing questions to 'billing-support'
-- Route general questions to 'general-support'
-
-Respond with ONLY the agent name to route to.\`,
-    },
     agents: [
       {
+        name: 'triage',
+        description: 'Classifies the request and routes it',
+        model: 'claude-sonnet-4-6',
+        provider: 'anthropic',
+        systemPrompt: \`You route customer requests. Reply with one word:
+technical, billing or general.\`,
+      },
+      {
         name: 'technical-support',
-        model: 'claude-sonnet-4-20250514',
+        description: 'Technical troubleshooting',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Provide technical support and troubleshooting.',
         tools: [databaseQueryTool],
       },
       {
         name: 'billing-support',
-        model: 'claude-sonnet-4-20250514',
+        description: 'Billing and payment questions',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Handle billing and payment inquiries.',
         tools: [paymentApiTool],
       },
       {
         name: 'general-support',
-        model: 'claude-sonnet-4-20250514',
+        description: 'General customer support',
+        model: 'claude-sonnet-4-6',
         provider: 'anthropic',
         systemPrompt: 'Provide general customer support.',
       },
     ],
-    maxRounds: 3, // Prevent infinite loops
+    routing: {
+      strategy: 'conditional',
+      rules: [
+        {
+          condition: (_context, response) => response.content.includes('technical'),
+          nextAgent: 'technical-support',
+        },
+        {
+          condition: (_context, response) => response.content.includes('billing'),
+          nextAgent: 'billing-support',
+        },
+        {
+          condition: () => true,
+          nextAgent: 'general-support',
+        },
+      ],
+    },
   },
   new AnthropicProvider(),
   new ToolRegistry(),
 );
 
-// Supervisor routes to appropriate agent
-const result = await workflow.execute(
-  'My credit card payment failed',
-  context,
-);`}
-        </CodeBlock>
+const result = await workflow.execute('My credit card payment failed', context);`}
+        />
+        <Callout kind="note">
+          The example routes on the text of the triage reply. Keyword matching is fragile, so prefer
+          a structured reply or a <code>nextAgent</code> set by the agent where you can.
+        </Callout>
+      </DocSection>
 
-        <h2>Error Handling</h2>
-        <p>
-          Configure how workflows handle agent errors with the{' '}
-          <code>errorHandling</code> strategy. It is a single string value, not
-          an object:
+      <DocSection id="error-handling" num="05" title="Error handling">
+        <p className="text-base leading-relaxed text-brand-navy">
+          Set <code>errorHandling</code> on the workflow config. It is one string value:
         </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mb-6">
-          {errorStrategies.map((strategy, index) => (
-            <div
-              key={index}
-              className="p-4 bg-white rounded-lg border border-gray-200"
-            >
-              <h3 className="font-mono text-sm font-semibold text-purple-700 mb-1">
-                {strategy.name}
-              </h3>
-              <p className="text-sm text-gray-600">{strategy.description}</p>
-            </div>
-          ))}
-        </div>
-
-        <CodeBlock language="typescript">
-          {`const workflow = WorkflowFactory.create(
+        <ApiList>
+          <ApiRow name="'fail-fast' (default)">Throws the agent&apos;s error to the caller. The workflow stops.</ApiRow>
+          <ApiRow name="'retry'">Re-invokes the failing agent up to <code>retry.maxAttempts</code> times. If every attempt fails, the error propagates.</ApiRow>
+          <ApiRow name="'fallback'">
+            Returns a response in place of the failed agent&apos;s output. The content says the agent failed and
+            finish reason is <code>error</code>.
+          </ApiRow>
+          <ApiRow name="'continue'">
+            Skips the failed agent. In a sequential workflow the next agent receives the same input. In a
+            supervisor workflow the next agent in the list runs.
+          </ApiRow>
+        </ApiList>
+        <CodeBlock
+          lang="TS"
+          code={`const workflow = WorkflowFactory.create(
   {
     name: 'resilient-workflow',
     type: 'sequential',
-    agents: [...],
-    // 'fail-fast' (default) | 'retry' | 'fallback' | 'continue'
+    agents: [/* ... */],
     errorHandling: 'continue',
   },
   provider,
@@ -228,268 +280,164 @@ const result = await workflow.execute(
 
 try {
   const result = await workflow.execute(input, context);
-  console.log(result);
+  console.log(result.content);
 } catch (error) {
   console.error('Workflow failed:', error);
 }`}
-        </CodeBlock>
+        />
+      </DocSection>
 
-        <h2>Retry Strategy</h2>
-        <AlertBox type="info">
-          As of v1.1.0, the <code>&apos;retry&apos;</code> strategy performs
-          real retries. A failing agent is re-invoked up to{' '}
-          <code>retry.maxAttempts</code> times before the error propagates.
-          (Previously this was a no-op that simply re-threw the error.)
-        </AlertBox>
-
-        <p>
-          Pair <code>errorHandling: &apos;retry&apos;</code> with an optional{' '}
-          <code>retry</code> config to tune attempts and backoff:
+      <DocSection id="retry" num="06" title="Retry strategy">
+        <p className="text-base leading-relaxed text-brand-navy">
+          With <code>errorHandling: &apos;retry&apos;</code>, the agent is re-invoked after a failure. Tune
+          the attempts and backoff with the <code>retry</code> config:
         </p>
-
-        <CodeBlock language="typescript">
-          {`const workflow = WorkflowFactory.create(
+        <CodeBlock
+          lang="TS"
+          code={`const workflow = WorkflowFactory.create(
   {
     name: 'resilient-workflow',
     type: 'sequential',
-    agents: [...],
+    agents: [/* ... */],
     errorHandling: 'retry',
     retry: {
-      maxAttempts: 5,        // re-invoke the agent up to 5 times
-      initialDelayMs: 500,   // base delay before backing off
+      maxAttempts: 5,         // total attempts, including the first
+      initialDelayMs: 500,    // base delay between attempts
       backoff: 'exponential', // 'linear' | 'exponential'
-      maxDelayMs: 10000,     // optional cap on the computed delay
+      maxDelayMs: 10000,      // cap on the computed delay
     },
   },
   provider,
   toolRegistry,
-);
-
-// The agent is retried on failure. If every attempt fails,
-// the final error propagates to the workflow's error handler.
-const result = await workflow.execute(input, context);`}
-        </CodeBlock>
-
-        <p>
-          When the <code>retry</code> config is omitted, retries default to{' '}
-          <strong>3 attempts</strong> with <strong>no delay</strong> and{' '}
-          <strong>exponential</strong> backoff. Delays only apply when{' '}
-          <code>initialDelayMs</code> is greater than <code>0</code>:{' '}
-          <code>linear</code> waits <code>initialDelayMs * attempt</code>, while{' '}
-          <code>exponential</code> waits{' '}
-          <code>initialDelayMs * 2 ** (attempt - 1)</code>, each capped by{' '}
-          <code>maxDelayMs</code>.
+);`}
+        />
+        <p className="text-base leading-relaxed text-brand-navy">
+          When <code>retry</code> is omitted, the defaults are 3 attempts with no delay. The delay applies
+          only when <code>initialDelayMs</code> is greater than 0. <code>linear</code> waits{' '}
+          <code>initialDelayMs * attempt</code>. <code>exponential</code> waits{' '}
+          <code>initialDelayMs * 2 ** (attempt - 1)</code>. <code>maxDelayMs</code> caps either value.
         </p>
+      </DocSection>
 
-        <h2>Workflow Context</h2>
-        <p>Pass data between agents using workflow context:</p>
-
-        <CodeBlock language="typescript">
-          {`const context = {
+      <DocSection id="context-and-results" num="07" title="Context and results">
+        <p className="text-base leading-relaxed text-brand-navy">
+          A workflow takes the same <code>AgentContext</code> as an agent. Its <code>conversationId</code>{' '}
+          and memory store are used by every agent in the workflow.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`const context = {
   conversationId: 'workflow-123',
   sessionData: {
     userId: '12345',
-    userPreferences: {
-      language: 'en',
-      timezone: 'UTC',
-    },
+    userPreferences: { language: 'en', timezone: 'UTC' },
   },
-  history: [], // Conversation history
+  history: [],
 };
 
-// In sequential workflows, output from one agent
-// becomes input to the next agent automatically
 const result = await workflow.execute('Create a report', context);
 
-// Access workflow metadata
-console.log(result.metadata.agentsUsed);
-console.log(result.metadata.executionTime);
-console.log(result.metadata.tokensUsed);`}
-        </CodeBlock>
+console.log(result.content);
+console.log(result.metadata.tokensUsed);
+console.log(result.metadata.latencyMs);
+console.log(result.metadata.iterations);`}
+        />
+        <Callout kind="note">
+          Workflows do not expose a streaming API in this version. To stream output, call{' '}
+          <code>executeStream()</code> on an individual <code>Agent</code>.
+        </Callout>
+      </DocSection>
 
-        <h2>Streaming Workflows</h2>
-        <p>Stream results in real-time as agents process:</p>
+      <DocSection id="workflow-factory" num="08" title="Workflow factory">
+        <p className="text-base leading-relaxed text-brand-navy">
+          <code>WorkflowFactory.create(config, provider, toolRegistry, memory?)</code> returns the workflow class
+          that matches <code>config.type</code>. The types are <code>sequential</code>, <code>parallel</code>{' '}
+          and <code>supervisor</code>. A <code>custom</code> workflow must be created with its class directly.
+        </p>
+        <CodeBlock
+          lang="TS"
+          code={`import { SupervisorWorkflow } from '@lov3kaizen/agentsea-core';
 
-        <CodeBlock language="typescript">
-          {`const stream = await workflow.stream(
-  'Analyze this data',
-  context,
-);
+// The same config as the factory, constructed directly
+const workflow = new SupervisorWorkflow(config, provider, toolRegistry, memory);`}
+        />
+      </DocSection>
 
-for await (const chunk of stream) {
-  if (chunk.type === 'agent_start') {
-    console.log(\`Starting agent: \${chunk.agentName}\`);
-  } else if (chunk.type === 'content') {
-    process.stdout.write(chunk.content);
-  } else if (chunk.type === 'agent_complete') {
-    console.log(\`\\nCompleted agent: \${chunk.agentName}\`);
-  }
-}`}
-        </CodeBlock>
+      <DocSection id="use-cases" num="09" title="Use cases">
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-xl border border-rule bg-surface-paper p-6">
+            <h3 className="text-lg font-semibold text-brand-deep">Sequential</h3>
+            <BulletPanel
+              items={[
+                'Content pipelines: research, write, edit',
+                'Data processing: extract, transform, load',
+                'Multi-step analysis: collect, analyze, report',
+              ]}
+            />
+          </div>
+          <div className="rounded-xl border border-rule bg-surface-paper p-6">
+            <h3 className="text-lg font-semibold text-brand-deep">Parallel</h3>
+            <BulletPanel
+              items={[
+                'Multi-perspective analysis: sentiment, keywords, summary',
+                'Competitive research across several companies',
+                'Generating several variations to compare',
+              ]}
+            />
+          </div>
+          <div className="rounded-xl border border-rule bg-surface-paper p-6">
+            <h3 className="text-lg font-semibold text-brand-deep">Supervisor</h3>
+            <BulletPanel
+              items={[
+                'Customer support routing',
+                'Dynamic task delegation',
+                'Multi-round problem solving',
+              ]}
+            />
+          </div>
+        </div>
+      </DocSection>
 
-        <h2>Dynamic Agent Selection</h2>
-        <p>Create workflows where agents are selected dynamically:</p>
+      <DocSection id="best-practices" num="10" title="Best practices">
+        <BulletPanel
+          items={[
+            <>
+              <strong>Specialize agents</strong>: give each agent one clear role and a specific system prompt.
+            </>,
+            <>
+              <strong>Choose an error strategy</strong> for the use case. Use <code>retry</code> for flaky
+              external calls and <code>fallback</code> when a partial answer is acceptable.
+            </>,
+            <>
+              <strong>Route with clear signals</strong>: have agents set <code>nextAgent</code> or return a
+              structured answer that a rule can read.
+            </>,
+            <>
+              <strong>Mind the loop limit</strong>: supervisor workflows stop after 10 routing steps. Design
+              routing so the loop ends before that.
+            </>,
+            <>
+              <strong>Share context through sessionData</strong>: pass what the agents need in the context.
+            </>,
+            <>
+              <strong>Track cost and latency</strong>: record <code>tokensUsed</code> and <code>latencyMs</code> from each run.
+            </>,
+          ]}
+        />
+      </DocSection>
 
-        <CodeBlock language="typescript">
-          {`import { SupervisorWorkflow } from '@lov3kaizen/agentsea-core';
-
-const workflow = new SupervisorWorkflow(
-  {
-    name: 'dynamic-workflow',
-    supervisor: supervisorAgent,
-    agents: [
-      codeReviewAgent,
-      bugFixAgent,
-      documentationAgent,
-    ],
-    routingStrategy: 'conditional', // or 'round-robin'
-    maxRounds: 5,
-  },
-  provider,
-  toolRegistry,
-);
-
-// Supervisor will route based on the input
-const result = await workflow.execute(
-  'Review this pull request and fix any bugs',
-  context,
-);`}
-        </CodeBlock>
-
-        <h2>Workflow Factory</h2>
-        <p>Use the factory for simplified workflow creation:</p>
-
-        <CodeBlock language="typescript">
-          {`import { WorkflowFactory } from '@lov3kaizen/agentsea-core';
-
-// Factory handles provider and tool registry setup
-const workflow = WorkflowFactory.create(
-  {
-    name: 'my-workflow',
-    type: 'sequential', // 'parallel' or 'supervisor'
-    agents: [
-      // Agent configurations
-    ],
-  },
-  new AnthropicProvider(),
-  new ToolRegistry(),
-);
-
-// Factory creates appropriate workflow type automatically
-// - SequentialWorkflow for type: 'sequential'
-// - ParallelWorkflow for type: 'parallel'
-// - SupervisorWorkflow for type: 'supervisor'`}
-        </CodeBlock>
-
-        <h2>Use Cases</h2>
-
-        <h3>Sequential Workflows</h3>
-        <ul>
-          <li>Content creation pipelines (research → write → edit)</li>
-          <li>Data processing (extract → transform → load)</li>
-          <li>Multi-step analysis (collect → analyze → report)</li>
-        </ul>
-
-        <h3>Parallel Workflows</h3>
-        <ul>
-          <li>Multi-perspective analysis (sentiment + keywords + summary)</li>
-          <li>Competitive research (analyze multiple competitors)</li>
-          <li>A/B testing (generate multiple variations)</li>
-        </ul>
-
-        <h3>Supervisor Workflows</h3>
-        <ul>
-          <li>Customer support routing</li>
-          <li>Dynamic task delegation</li>
-          <li>Multi-round problem solving</li>
-        </ul>
-
-        <h2>Best Practices</h2>
-        <ul>
-          <li>
-            <strong>Agent Specialization</strong>: Give each agent a clear,
-            focused role
-          </li>
-          <li>
-            <strong>System Prompts</strong>: Write specific system prompts for
-            each agent's task
-          </li>
-          <li>
-            <strong>Error Handling</strong>: Configure appropriate error
-            strategies for your use case
-          </li>
-          <li>
-            <strong>Round Limits</strong>: Set maxRounds in supervisor workflows
-            to prevent infinite loops
-          </li>
-          <li>
-            <strong>Context Management</strong>: Use sessionData to pass
-            relevant context between agents
-          </li>
-          <li>
-            <strong>Monitoring</strong>: Track workflow execution metrics and
-            token usage
-          </li>
-          <li>
-            <strong>Testing</strong>: Test workflows with various inputs to
-            ensure proper routing
-          </li>
-        </ul>
-
-        <h2>Next Steps</h2>
-        <ul>
-          <li>
-            <Link href="/docs/agents">Learn more about Agents</Link>
-          </li>
-          <li>
-            <Link href="/docs/observability">Monitor Workflow Performance</Link>
-          </li>
-          <li>
-            <Link href="/examples">View Workflow Examples</Link>
-          </li>
-        </ul>
-      </div>
-    </PageContainer>
+      <DocSection id="next-steps" num="11" title="Next steps">
+        <BulletPanel
+          items={[
+            <Link key="agents" href="/docs/agents" className="text-brand-ocean hover:underline">
+              Agents
+            </Link>,
+            <Link key="observability" href="/docs/observability" className="text-brand-ocean hover:underline">
+              Monitor workflow performance
+            </Link>,
+          ]}
+        />
+      </DocSection>
+    </DocsShell>
   );
 }
-
-const workflowTypes = [
-  {
-    icon: '➡️',
-    name: 'Sequential',
-    description: 'Agents execute one after another, passing output as input',
-  },
-  {
-    icon: '⚡',
-    name: 'Parallel',
-    description: 'All agents execute simultaneously and results are combined',
-  },
-  {
-    icon: '👔',
-    name: 'Supervisor',
-    description: 'A supervisor routes tasks dynamically to specialized agents',
-  },
-];
-
-const errorStrategies = [
-  {
-    name: "'fail-fast'",
-    description:
-      'Default. The agent runs once and any error immediately propagates, terminating the workflow.',
-  },
-  {
-    name: "'retry'",
-    description:
-      'Re-invokes the failing agent up to retry.maxAttempts times with optional backoff. The error propagates only after every attempt fails.',
-  },
-  {
-    name: "'fallback'",
-    description:
-      'Returns a fallback response noting the failure instead of throwing, letting the workflow continue.',
-  },
-  {
-    name: "'continue'",
-    description:
-      'Skips the failed agent and continues the workflow with the remaining agents.',
-  },
-];
