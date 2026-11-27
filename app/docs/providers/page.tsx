@@ -6,6 +6,7 @@ import CodeBlock from '../../components/docs/CodeBlock';
 import BulletPanel from '../../components/docs/BulletPanel';
 import Callout from '../../components/docs/Callout';
 import { ApiList, ApiRow } from '../../components/docs/ApiList';
+import { packageVersion } from '../../components/docs/packageVersion';
 
 export const metadata: Metadata = {
   title: 'Providers | AgentSea',
@@ -32,7 +33,7 @@ export default function ProvidersPage() {
       lead="AgentSea talks to cloud APIs and local model servers through one provider interface. Mix and match providers per agent."
       active="concepts"
       toc={toc}
-      badges={['v1.2.1']}
+      badges={[`v${packageVersion('@lov3kaizen/agentsea-core')}`]}
     >
       <DocSection id="overview" num="01" title="Overview">
         <p className="text-base leading-relaxed text-brand-navy">
@@ -81,11 +82,17 @@ const agent = new Agent(
 );`}
         />
         <p className="text-base leading-relaxed text-brand-navy">
-          Models include <code>claude-opus-4-8</code>, <code>claude-opus-4-7</code>,{' '}
+          Models include <code>claude-opus-5-5</code>, <code>claude-sonnet-5-5</code>,{' '}
+          <code>claude-haiku-5-5</code>, <code>claude-opus-4-8</code>, <code>claude-opus-4-7</code>,{' '}
           <code>claude-opus-4-6</code>, <code>claude-sonnet-4-6</code>, <code>claude-haiku-4-5</code>{' '}
-          and <code>claude-fable-5</code>. Older generations remain supported. Environment
-          variable: <code>ANTHROPIC_API_KEY</code>.
+          and <code>claude-fable-5</code>. <code>claude-opus-5-5</code> is the default model. Older
+          generations remain supported. Environment variable: <code>ANTHROPIC_API_KEY</code>.
         </p>
+        <Callout kind="warning">
+          From 2.0.0, the <code>AnthropicProvider</code> in <code>@lov3kaizen/agentsea-gateway</code>{' '}
+          does not send <code>temperature</code> or <code>top_p</code>. Remove them from gateway
+          configs and steer the model through the prompt. <code>top_k</code> is unchanged.
+        </Callout>
 
         <h3 className="text-lg font-semibold text-brand-deep">OpenAI (GPT)</h3>
         <CodeBlock
@@ -109,13 +116,13 @@ const agent = new Agent(
 );`}
         />
         <p className="text-base leading-relaxed text-brand-navy">
-          Models include <code>gpt-5</code>, <code>gpt-4.1</code>, <code>gpt-4o</code>,{' '}
-          <code>gpt-4o-mini</code>, <code>o3</code> and <code>o4-mini</code>. Environment variable:{' '}
-          <code>OPENAI_API_KEY</code>.
+          Models include <code>gpt-5.5</code>, <code>gpt-5.4-mini</code>, <code>gpt-4.1</code>,{' '}
+          <code>gpt-4o</code> and <code>gpt-4o-mini</code>. Environment variable:{' '}
+          <code>OPENAI_API_KEY</code>. Retired OpenAI model IDs, such as <code>o3</code>,{' '}
+          <code>o4-mini</code> and <code>gpt-5</code>, were removed in 2.0.0.
         </p>
         <Callout kind="note">
-          Reasoning models such as <code>o3</code> and <code>o4-mini</code> accept different
-          options. <Link href="/docs/per-model-type-safety" className="font-semibold text-brand-ocean hover:underline">Per-model type safety</Link>{' '}
+          Reasoning models accept different options. <Link href="/docs/per-model-type-safety" className="font-semibold text-brand-ocean hover:underline">Per-model type safety</Link>{' '}
           checks at compile time which options each model supports.
         </Callout>
 

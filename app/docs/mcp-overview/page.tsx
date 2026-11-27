@@ -78,6 +78,14 @@ const agent = new Agent(
           <code>passEnv</code> copies a variable from the parent environment. Set the variable in the shell that
           runs the app. Do not print its value in logs.
         </Callout>
+        <Callout kind="warning">
+          Breaking change in 2.0.0. Before 2.0.0, stdio servers inherited the whole parent
+          environment, so they could read provider API keys without any setting. They now get only
+          the allow-list above, plus <code>passEnv</code> and <code>env</code>. If a server still
+          needs a variable, name it in <code>passEnv</code>. <code>inheritFullEnv: true</code>{' '}
+          restores the old behaviour for now. It logs a deprecation warning and will be removed in a
+          later major release.
+        </Callout>
       </DocSection>
     </DocsShell>
   );

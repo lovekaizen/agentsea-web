@@ -144,7 +144,7 @@ console.log(response.content);`}
               <Link href="/changelog" className="font-semibold text-brand-deep hover:underline">
                 Changelog
               </Link>
-              : the v0.6.0 release notes.
+              : the 2.0.0 release notes, with the breaking changes.
             </>,
             <>
               <Link href="/docs/providers" className="font-semibold text-brand-deep hover:underline">
