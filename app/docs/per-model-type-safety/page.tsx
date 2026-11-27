@@ -40,8 +40,8 @@ export default function PerModelTypeSafetyPage() {
       <DocSection id="why" num="01" title="Why per-model type safety">
         <p className="text-base leading-relaxed text-brand-navy">
           Different models have different capabilities. <code>o1-mini</code> does not support
-          tools. <code>o1</code> does not support system prompts. Claude Haiku 4.5 does not support
-          extended thinking.
+          tools. <code>gpt-5.5</code> supports tools and system prompts but not extended thinking.
+          Claude Haiku 4.5 does not support extended thinking.
         </p>
         <p className="text-base leading-relaxed text-brand-navy">
           Without type safety, you find these mismatches at runtime. With per-model type safety,
@@ -63,7 +63,7 @@ export default function PerModelTypeSafetyPage() {
                 ['Claude 3.5 Sonnet', 'Yes', 'Yes', 'Yes', 'Yes'],
                 ['Claude 3 Haiku', 'Yes', 'Yes', 'Yes', 'No'],
                 ['GPT-4o', 'Yes', 'Yes', 'Yes', 'No'],
-                ['o1', 'Yes', 'No', 'Yes', 'Yes'],
+                ['GPT-5.5', 'Yes', 'Yes', 'Yes', 'No'],
                 ['o1-mini', 'No', 'No', 'No', 'Yes'],
                 ['Gemini 1.5 Pro', 'Yes', 'Yes', 'Yes', 'No'],
               ].map((row) => (
@@ -94,11 +94,10 @@ const claudeConfig = anthropic('claude-sonnet-4-5-20250929', {
   temperature: 0.7,
 });
 
-// Valid: o1 supports tools but NOT system prompts
-const o1Config = openai('o1', {
+// Valid: gpt-5.5 supports tools and system prompts
+const gptConfig = openai('gpt-5.5', {
   tools: [myTool],
-  reasoningEffort: 'high',
-  // systemPrompt: '...' // Error: not allowed for o1
+  systemPrompt: 'You are helpful',
 });
 
 // Error: o1-mini does not support tools
@@ -149,7 +148,8 @@ const haikuConfig = anthropic('claude-haiku-4-5-20251001', {
 });`}
         />
         <p className="text-base leading-relaxed text-brand-navy">
-          Typed models include <code>claude-opus-4-8</code> (the default), <code>claude-opus-4-7</code>,{' '}
+          Typed models include <code>claude-opus-5-5</code> (the default), <code>claude-sonnet-5-5</code>,{' '}
+          <code>claude-haiku-5-5</code>, <code>claude-opus-4-8</code>, <code>claude-opus-4-7</code>,{' '}
           <code>claude-opus-4-6</code>, <code>claude-sonnet-4-6</code>, <code>claude-haiku-4-5</code>,{' '}
           <code>claude-fable-5</code>, <code>claude-sonnet-4-5-20250929</code>,{' '}
           <code>claude-opus-4-5-20251101</code> and the Claude 3.x family.
@@ -172,28 +172,23 @@ const gpt4oConfig = openai('gpt-4o', {
   },
 });
 
-// o1: tools and reasoning, but no system prompt
-const o1Config = openai('o1', {
+// GPT-5.5: tools and system prompts
+const gpt55Config = openai('gpt-5.5', {
   tools: [myTool],
-  reasoningEffort: 'high',
+  systemPrompt: 'You are helpful',
 });
 
-// o1-mini: reasoning only
+// o1-mini: reasoning only, no tools and no system prompt
 const o1MiniConfig = openai('o1-mini', {
   reasoningEffort: 'medium',
-});
-
-// o3-mini: tools, but no system prompt
-const o3MiniConfig = openai('o3-mini', {
-  tools: [myTool],
-  reasoningEffort: 'high',
 });`}
         />
         <p className="text-base leading-relaxed text-brand-navy">
-          Typed models include <code>gpt-5.5</code>, <code>gpt-5.4-mini</code>, <code>gpt-5</code>,{' '}
-          <code>gpt-4.1</code>, <code>gpt-4o</code>, <code>gpt-4o-mini</code>, <code>gpt-4-turbo</code>,{' '}
-          <code>gpt-4</code>, <code>gpt-3.5-turbo</code> and the reasoning models <code>o3</code>,{' '}
-          <code>o3-mini</code>, <code>o1</code> and <code>o1-mini</code>.
+          Typed models include <code>gpt-5.5</code>, <code>gpt-5.4-mini</code>, <code>gpt-5.2</code>,{' '}
+          <code>gpt-4.1</code>, <code>gpt-4o</code> and <code>gpt-4o-mini</code>, and the reasoning
+          models <code>o1-mini</code> and <code>o1-preview</code>. IDs that OpenAI retired, such as{' '}
+          <code>o3</code>, <code>gpt-4-turbo</code> and <code>gpt-3.5-turbo</code>, were removed in
+          2.0.0 and no longer type-check.
         </p>
 
         <h3 className="text-lg font-semibold text-brand-deep">gemini(model, config?)</h3>
@@ -299,8 +294,8 @@ console.log(claude.getModelInfo()?.capabilities.contextWindow);`}
 
       <DocSection id="capability-reference" num="05" title="Capability reference">
         <p className="text-base leading-relaxed text-brand-navy">
-          The tables below are illustrative. The typed registry includes the latest Claude, GPT-5,
-          o3 and Gemini 3 and 2.5 models. For exact capabilities, context window and maximum
+          The tables below are illustrative. The typed registry includes the latest Claude, GPT-5.5
+          and Gemini 3 and 2.5 models. For exact capabilities, context window and maximum
           output of a specific model, call <code>getModelInfo(model)</code>.
         </p>
 
@@ -354,11 +349,8 @@ console.log(claude.getModelInfo()?.capabilities.contextWindow);`}
             <tbody>
               {[
                 ['gpt-4o*', 'Yes', 'Yes', 'Yes', 'No', '128K', '16,384'],
-                ['gpt-4-turbo', 'Yes', 'Yes', 'Yes', 'No', '128K', '4,096'],
-                ['gpt-3.5-turbo', 'Yes', 'Yes', 'No', 'No', '16K', '4,096'],
-                ['o1', 'Yes', 'No', 'Yes', 'Yes', '200K', '100,000'],
+                ['gpt-5.5', 'Yes', 'Yes', 'Yes', 'No', '1.05M', '128,000'],
                 ['o1-mini', 'No', 'No', 'No', 'Yes', '128K', '65,536'],
-                ['o3-mini', 'Yes', 'No', 'No', 'Yes', '200K', '100,000'],
               ].map((row) => (
                 <tr key={row[0]}>
                   <td className="border-t border-rule px-3 py-2 font-semibold text-brand-deep">{row[0]}</td>
